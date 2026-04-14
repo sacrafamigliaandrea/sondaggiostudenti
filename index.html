@@ -221,34 +221,113 @@ function canGo(){
   return true;
 }
 
-// PANELS
+// PANELS — phrase-based, no numbers
 function rP(){rPL();rPR();}
+
+// Phrase maps: [section_key, question_index, answer_value, phrase]
+const PL_PHRASES=[
+// S1 Come imparo
+['S1',0,3,"Impari facendo, non ascoltando."],['S1',0,1,"Impari bene ascoltando le spiegazioni."],
+['S1',1,3,"Se non vedi l'utilit\u00e0, molli."],['S1',2,3,"Senza esempi concreti ti perdi."],
+['S1',4,3,"Se non provi, dimentichi."],['S1',3,3,"Hai bisogno di costruire e creare."],
+// S2 Ritmo
+['S2',0,3,"La tua attenzione cala dopo pochi minuti."],['S2',0,1,"Segui le spiegazioni fino alla fine."],
+['S2',2,3,"I compiti lunghi ti scoraggiano."],['S2',3,3,"Se non capisci subito, ti blocchi."],
+['S2',1,3,"Hai bisogno di feedback immediato."],
+// S3 Concentrazione
+['S3',1,3,"Il disturbo dei compagni ti impedisce di capire."],['S3',3,3,"Se qualcuno interrompe, perdi il filo."],
+['S3',5,3,"Il comportamento degli altri ti condiziona."],['S3',6,3,"Il disturbo in classe \u00e8 un problema serio per te."],
+['S3',0,1,"Resti concentrato durante tutta la spiegazione."],
+// S4 Capisco e studio
+['S4',0,3,"I video ti fanno capire molto pi\u00f9 dei testi."],['S4',3,3,"Carta e quaderno funzionano meglio per te."],
+['S4',2,3,"I simulatori digitali ti fanno capire di pi\u00f9."],
+['S4',6,3,"Studi ripetendo a memoria."],['S4',6,1,"Studi per capire, non a memoria."],
+['S4',8,3,"Dopo pochi giorni dimentichi quasi tutto."],['S4',9,3,"Ricordi solo ci\u00f2 che ti appassiona."],
+['S4',10,3,"Studi solo per la verifica."],['S4',10,1,"Studi perch\u00e9 vuoi capire davvero."],
+['S4',11,3,"Quando non capisci, rileggi sperando che entri."],
+// S5 Socialità
+['S5',0,3,"Lavori meglio in gruppo."],['S5',0,1,"Preferisci lavorare da solo."],
+['S5',4,3,"La collaborazione vera ti fa imparare il doppio."],
+// S6 Aspettative
+['S6',0,3,"Le lezioni monotone ti spengono."],['S6',1,3,"Senza coinvolgimento emotivo non ti arriva nulla."],
+['S6',3,3,"Vuoi che quello che impari sia collegato alla realt\u00e0."],
+['S6',4,3,"Apprezzi chi pretende il massimo da te."],['S6',6,3,"I compiti ripetitivi ti spengono."],
+['S6',7,3,"Vuoi poter scegliere come affrontare i compiti."],
+];
+
+const PR_PHRASES=[
+// ICC-A (studente) — valore 3 = impulsivo
+['IA',0,3,"Non rileggi le consegne."],['IA',1,3,"Parti subito senza pensarci."],
+['IA',2,3,"Ti bastano le prime righe."],['IA',3,3,"Pensi di aver gi\u00e0 capito tutto."],
+['IA',0,1,"Rileggi sempre con attenzione."],
+// ICC-B (consegna) — valore 3 = bisogno supporto
+['IB',0,3,"Hai bisogno di esempi concreti nella consegna."],
+['IB',1,3,"La spiegazione a voce cambia tutto per te."],
+['IB',2,3,"Ti capita spesso di fare una cosa diversa da quella richiesta."],
+['IB',3,3,"Le consegne lunghe scritte non le leggi."],
+];
+
 function rPL(){
-  let h='<h3>Il mio profilo</h3>';
-  SECS.forEach((sec,si)=>{
-    const items=Q[sec].q;let sum=0,cnt=0;
-    items.forEach((_,i)=>{const v=ST.a[sec+'_'+i];if(v){sum+=v;cnt++;}});
-    const avg=cnt?sum/cnt:0;const pct=avg/3*100;
-    h+='<div class="pi"><div class="pl"><span>'+SDIM[si]+'</span><span class="pv" style="color:'+SCOL[si]+'">'+(avg?avg.toFixed(1):'-')+'/3</span></div>';
-    h+='<div class="pr"><div class="prf" style="width:'+pct+'%;background:'+SCOL[si]+'"></div></div></div>';
+  let h='<h3>Chi sono io</h3>';
+  let phrases=[];
+  PL_PHRASES.forEach(([sec,qi,val,phrase])=>{
+    if(ST.a[sec+'_'+qi]===val) phrases.push(phrase);
   });
-  let ia=0,ib=0,ca=0,cb=0;
-  for(let i=0;i<4;i++){if(ST.a['IA_'+i]){ia+=(4-ST.a['IA_'+i]);ca++;}if(ST.a['IB_'+i]){ib+=ST.a['IB_'+i];cb++;}}
-  if(ca||cb){h+='<div style="margin-top:10px;padding:6px 8px;background:var(--aml);border-radius:var(--r);font-size:9px;line-height:1.5"><strong>ICC Consegna</strong><br>';if(ca)h+='Studente: '+(ia/ca).toFixed(1)+'/3<br>';if(cb)h+='Consegna: '+(ib/cb).toFixed(1)+'/3';h+='</div>';}
+  if(phrases.length===0){
+    h+='<p style="font-size:11px;color:var(--mu);font-style:italic;padding:8px 0">Rispondi alle domande e il tuo profilo si costruir\u00e0 qui, parola dopo parola.</p>';
+  } else {
+    phrases.forEach(p=>{
+      h+='<div style="font-size:11px;line-height:1.5;padding:5px 8px;margin-bottom:4px;background:var(--gl);border-radius:6px;color:var(--gd)">'+p+'</div>';
+    });
+  }
+  // ICC summary as phrases
+  let iccP=[];
+  PR_PHRASES.filter(([s])=>s==='IA'||s==='IB').forEach(([sec,qi,val,phrase])=>{
+    if(ST.a[sec+'_'+qi]===val) iccP.push(phrase);
+  });
+  if(iccP.length){
+    h+='<div style="margin-top:8px;padding:6px 8px;background:var(--aml);border-radius:6px;font-size:10px;line-height:1.5;color:#8a6a0a"><strong>Tu e la consegna</strong><br>';
+    iccP.forEach(p=>{h+='\u2022 '+p+'<br>';});
+    h+='</div>';
+  }
   $('pnL').innerHTML=h;
 }
+
 function rPR(){
-  let h='<h3>Cosa funziona per me</h3>';
-  const dims=[[0,'Interesse'],[1,'Realtà'],[3,'Chiarezza'],[4,'Attivazione'],[5,'Capisco consegna']];
-  dims.forEach(([di,name])=>{
-    let sum=0,cnt=0;for(let i=0;i<SUBS.length;i++){const v=ST.a['M_'+i+'_'+di];if(v){sum+=v;cnt++;}}
-    const avg=cnt?sum/cnt:0;const pct=avg/3*100;
-    h+='<div class="pi"><div class="pl"><span>'+name+'</span><span class="pv">'+(avg?avg.toFixed(1):'-')+'/3</span></div>';
-    h+='<div class="pr"><div class="prf" style="width:'+pct+'%;background:var(--tl)"></div></div></div>';
+  let h='<h3>La scuola che funziona per me</h3>';
+  // From S6 aspettative
+  let asp=[];
+  if(ST.a.S6_0===3) asp.push("Ha bisogno di variare il ritmo.");
+  if(ST.a.S6_1===3) asp.push("Deve coinvolgermi emotivamente.");
+  if(ST.a.S6_2===3) asp.push("Deve dare spazio alla creativit\u00e0.");
+  if(ST.a.S6_3===3) asp.push("Deve collegare i contenuti alla realt\u00e0.");
+  if(ST.a.S6_4===3) asp.push("Pu\u00f2 essere severa, purch\u00e9 giusta.");
+  if(ST.a.S6_5===3) asp.push("Deve pretendere il massimo e rispettarmi.");
+  if(ST.a.S6_6===3) asp.push("Non deve darmi compiti ripetitivi.");
+  if(ST.a.S6_7===3) asp.push("Deve lasciarmi scegliere come lavorare.");
+  // From matrix — find subjects where student feels passive (ATV=1)
+  let passive=[], noCapisce=[];
+  SUBS.forEach(([sc,sn],si)=>{
+    if(ST.a['M_'+si+'_4']===1) passive.push(sn);
+    if(ST.a['M_'+si+'_3']===1) noCapisce.push(sn);
   });
-  const ak=[[4,'Autorevolezza'],[5,'Pretende+rispetta'],[6,'No ripetitivi'],[7,'Scelta autonoma']];
-  let has=false;ak.forEach(([i])=>{if(ST.a['S6_'+i])has=true;});
-  if(has){h+='<div style="margin-top:10px;padding:6px 8px;background:var(--skl);border-radius:var(--r);font-size:9px;line-height:1.6"><strong>Insegnante ideale</strong><br>';ak.forEach(([i,l])=>{const v=ST.a['S6_'+i];if(v)h+=l+': <strong>'+v+'/3</strong><br>';});h+='</div>';}
+
+  if(asp.length===0 && passive.length===0 && noCapisce.length===0){
+    h+='<p style="font-size:11px;color:var(--mu);font-style:italic;padding:8px 0">Completa le sezioni e scoprirai che tipo di scuola funziona per te.</p>';
+  } else {
+    if(asp.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--sk);margin:8px 0 4px">L\'insegnante ideale per me:</div>';
+      asp.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:4px 8px;margin-bottom:3px;background:var(--skl);border-radius:6px;color:#1a5a8a">'+p+'</div>';});
+    }
+    if(passive.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--co);margin:8px 0 4px">Mi sento passivo in:</div>';
+      h+='<div style="font-size:11px;padding:4px 8px;background:var(--col);border-radius:6px;color:#7a2a1a">'+passive.join(', ')+'</div>';
+    }
+    if(noCapisce.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--am);margin:8px 0 4px">Non capisco le spiegazioni in:</div>';
+      h+='<div style="font-size:11px;padding:4px 8px;background:var(--aml);border-radius:6px;color:#7a5a0a">'+noCapisce.join(', ')+'</div>';
+    }
+  }
   $('pnR').innerHTML=h;
 }
 
@@ -268,15 +347,23 @@ function rTri(sec){
 function rMat(){
   const tot=SUBS.length*MDIMS.length;let done=0;
   SUBS.forEach((_,i)=>MDIMS.forEach((_,j)=>{if(ST.a['M_'+i+'_'+j])done++;}));
-  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Le tue materie, una per una</h2><p>Per ogni domanda, giudica ciascuna materia.</p></div>';
+  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Le tue materie</h2><p>Per ogni materia, rispondi alle 6 domande.</p></div>';
   h+='<div class="cnt">'+done+'/'+tot+'</div>';
-  MDIMS.forEach(([dc,dt,labels],di)=>{
-    h+='<div class="mx"><div class="mx-q">'+dt+'</div>';
-    SUBS.forEach(([sc,sn],si)=>{
-      h+='<div class="mx-row"><div class="mx-lab">'+sn+'</div><div class="mx-btns">';
-      labels.forEach((l,v)=>{h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';});
-      h+='</div></div>';});
-    h+='</div>';});
+  SUBS.forEach(([sc,sn],si)=>{
+    let subDone=0;MDIMS.forEach((_,j)=>{if(ST.a['M_'+si+'_'+j])subDone++;});
+    h+='<div class="qc'+(subDone===6?' ok':'')+'" style="padding:10px 12px">';
+    h+='<div style="font-size:14px;font-weight:700;color:var(--pu);margin-bottom:6px;display:flex;justify-content:space-between"><span>'+sn+'</span><span style="font-size:10px;color:var(--mu);font-weight:400">'+subDone+'/6</span></div>';
+    MDIMS.forEach(([dc,dt,labels],di)=>{
+      h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--bd)">';
+      h+='<div style="width:180px;font-size:10px;color:var(--mu);flex-shrink:0">'+dt+'</div>';
+      h+='<div style="display:flex;gap:3px;flex:1">';
+      labels.forEach((l,v)=>{
+        h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';
+      });
+      h+='</div></div>';
+    });
+    h+='</div>';
+  });
   return h;
 }
 
