@@ -57,13 +57,13 @@
 .divider{margin:12px 0 8px;padding:8px 10px;border-radius:var(--r);font-size:11px;font-weight:500}
 </style></head><body>
 <div id="login"><div class="lc">
-<img src="logogreeen.jpg" alt="" class="lc-logo">
+<img src="logogreeen.jpg" alt="" class="lc-logo" id="adm-trigger">
 <h1>TI ASCOLTO!</h1><div class="sub">Scuola Sacra Famiglia — Orzinuovi</div>
 <div class="tb">Vogliamo migliorare la nostra scuola. E la prima cosa che facciamo è <strong>ascoltarti</strong>.<br><br>Questo strumento lo ha costruito il tuo Animatore Digitale — la stessa persona che ti accompagna con l'iPad, che ti ha insegnato a difenderti dai rischi della rete, che ti ha guidato nell'uso etico dell'intelligenza artificiale e che lavora ogni giorno perché la tecnologia a scuola abbia senso. I tuoi dati sono protetti e servono a costruire una scuola migliore.<br><br>Ti chiedo il nome perché questo non è un sondaggio: è il <strong>tuo</strong> profilo di crescita. Ha senso solo se è tuo davvero.</div>
 <div class="fd-row"><div class="fd"><label>Nome e cognome</label><input type="text" id="inp-nome" placeholder="Nome Cognome" autocomplete="off"></div>
 <div class="fd"><label>Classe</label><div class="cls-opts" id="cls-opts"></div></div></div>
 <button class="btn-s" id="btn-s" disabled onclick="startApp()">Iniziamo</button>
-<div class="copy">© 2026 Progetto Ferraboschi/Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
+<div class="copy"><a href="admin.html" style="color:var(--bd);text-decoration:none;font-size:8px;float:right">&#9881;</a>© 2026 Progetto Ferraboschi/Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
 </div></div>
 <div id="main"><div class="layout">
 <div class="pn" id="pnL"></div>
@@ -439,5 +439,7 @@ function send(){
 
 document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['u','s','i','j'].includes(e.key.toLowerCase()))e.preventDefault();});
+// Admin access: triple click on logo
+let _ac=0,_at=0;document.getElementById('adm-trigger').onclick=()=>{const n=Date.now();if(n-_at>800)_ac=0;_ac++;_at=n;if(_ac>=3){_ac=0;window.open('admin.html','_blank');}};
 console.log('%cTI ASCOLTO! — Progetto Ferraboschi/Cerioli — Tutti i diritti riservati','color:#1B6D3F;font-size:12px;font-weight:bold');
 </script></body></html>
