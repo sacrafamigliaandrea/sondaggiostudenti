@@ -31,15 +31,27 @@
 .load{text-align:center;padding:60px;font-size:14px;color:var(--mu)}
 canvas{max-height:280px}
 </style></head><body>
+<div id="gate" style="height:100%;display:flex;align-items:center;justify-content:center">
+<div style="background:#fff;padding:40px;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center;max-width:360px;width:100%">
+<h1 style="font-size:24px;color:var(--g);margin-bottom:4px">TI ASCOLTO!</h1>
+<p style="font-size:12px;color:var(--mu);margin-bottom:20px">Area riservata — Dashboard docenti</p>
+<input type="password" id="pwd" placeholder="Password" style="width:100%;padding:12px;border:2px solid var(--bd);border-radius:10px;font-family:var(--f);font-size:16px;text-align:center;margin-bottom:10px" onkeydown="if(event.key==='Enter')tryPwd()">
+<button onclick="tryPwd()" style="width:100%;padding:12px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer">Accedi</button>
+<p id="pwdErr" style="font-size:11px;color:var(--co);margin-top:8px;display:none">Password errata</p>
+</div></div>
+<div id="dash" style="display:none">
 <div class="top">
 <h1>TI ASCOLTO! — Dashboard docenti</h1>
 <div><select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select></div>
 </div>
 <div id="content"><div class="load">Caricamento dati dal foglio...</div></div>
+</div>
 
 <script>
-const SHEET_ID='1bYTks1zIKu-e_sdXQuFVRuq6LkoR4sX_jFZOw9Pimuk';
-const CSV_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Risposte';
+const PWD='tiascolto2026';
+function tryPwd(){const v=document.getElementById('pwd').value;if(v===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
+
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1621012532&single=true&output=csv';
 
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.'];
 const SUB_CODES=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP'];
@@ -49,13 +61,20 @@ const S_COLORS=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 
 let ALL_DATA=[];
 
-// Load
+// Load — row 1 = section labels, row 2 = codes, row 3+ = data
+function loadData(){
 fetch(CSV_URL).then(r=>r.text()).then(csv=>{
-  const res=Papa.parse(csv,{header:true,skipEmptyLines:true});
-  ALL_DATA=res.data;
+  const rows=Papa.parse(csv,{skipEmptyLines:true}).data;
+  if(rows.length<3){document.getElementById('content').innerHTML='<div class="load">Foglio vuoto — compila qualche questionario di prova.</div>';return;}
+  const headers=rows[1];
+  for(let i=2;i<rows.length;i++){
+    const obj={};headers.forEach((h,j)=>{if(h&&h.trim())obj[h.trim()]=rows[i][j]||'';});
+    if(obj.timestamp||obj.nome)ALL_DATA.push(obj);
+  }
   document.getElementById('filtro').onchange=()=>render();
   render();
-}).catch(e=>{document.getElementById('content').innerHTML='<div class="load">Errore: pubblica il foglio su File → Condividi → Pubblica sul web → CSV</div>';});
+}).catch(e=>{document.getElementById('content').innerHTML='<div class="load">Errore caricamento. Verifica che il foglio sia pubblicato come CSV.</div>';});
+}
 
 function getData(){
   const f=document.getElementById('filtro').value;
