@@ -1,125 +1,203 @@
 <!DOCTYPE html><html lang="it"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Progetto Ferraboschi/Cerioli - Scuola Sacra Famiglia Orzinuovi. Tutti i diritti riservati."><title>TI ASCOLTO!</title>
+<meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Progetto Ferraboschi/Cerioli - Scuola Sacra Famiglia. Tutti i diritti riservati.">
+<title>TI ASCOLTO!</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--g:#1B6D3F;--gl:#E8F5EE;--gd:#145230;--g50:#C8E0D2;--tl:#1A7F6D;--tll:#E0F5F1;--am:#C28B0A;--aml:#FFF8EC;--co:#B8432E;--col:#FDECE8;--pu:#6B4FA0;--pul:#F0ECF8;--sk:#2E7CAF;--skl:#E8F2FA;--bg:#FAFAF7;--cd:#FFF;--tx:#2C2C2C;--mu:#7A7A72;--bd:#E8E8E2;--f:'DM Sans',system-ui,sans-serif;--fb:'Source Sans 3',system-ui,sans-serif;--r:10px}
-*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}
-body{font-family:var(--f);background:var(--bg);color:var(--tx);-webkit-user-select:none;user-select:none}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}body{font-family:var(--f);background:var(--bg);color:var(--tx);-webkit-user-select:none;user-select:none}
 #login{height:100%;display:flex;align-items:center;justify-content:flex-start;padding:24px 40px;background:url('tiascolto.jpg') center/cover no-repeat;position:relative}
 #login::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,.1) 40%,transparent 60%)}
 .lc{background:rgba(255,255,255,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;padding:28px 44px;max-width:680px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.12);position:relative;z-index:1;border:1px solid rgba(255,255,255,.6)}
 .lc-logo{display:block;width:56px;height:56px;border-radius:50%;margin:0 auto 8px;object-fit:cover}
 .lc h1{font-size:32px;color:var(--g);text-align:center;margin-bottom:2px}.lc .sub{text-align:center;color:var(--mu);font-size:13px;margin-bottom:10px}
 .tb{background:rgba(27,109,63,.1);border-left:4px solid var(--g);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin:10px 0;font-family:var(--fb);font-size:13px;line-height:1.6;color:var(--gd)}
-.fd{margin:10px 0}.fd label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.fd-row{display:flex;gap:16px}.fd{flex:1;margin:10px 0}.fd label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
 .fd input{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:var(--r);font-family:var(--f);font-size:16px;background:rgba(255,255,255,.9)}.fd input:focus{outline:none;border-color:var(--g)}
-.fd-row{display:flex;gap:16px}.fd-row .fd{flex:1;margin:10px 0}
-.cls-opts{display:flex;gap:8px}.cls-o{flex:1;padding:12px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}
-.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
+.cls-opts{display:flex;gap:8px}.cls-o{flex:1;padding:12px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
 .btn-s{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;margin-top:10px}.btn-s:hover{background:var(--gd)}.btn-s:disabled{background:var(--bd);color:var(--mu);cursor:default}
 .copy{text-align:center;font-size:9px;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)}
 #main{display:none;height:100%}.layout{display:flex;height:100%}
-.pn{width:250px;flex-shrink:0;overflow-y:auto;padding:14px;background:var(--cd)}.pn:first-child{border-right:1px solid var(--bd)}.pn:last-child{border-left:1px solid var(--bd)}
-.pn::-webkit-scrollbar{width:3px}.pn::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.pn{width:250px;flex-shrink:0;overflow-y:auto;padding:14px;background:var(--cd)}.pn:first-child{border-right:1px solid var(--bd)}.pn:last-child{border-left:1px solid var(--bd)}.pn::-webkit-scrollbar{width:3px}.pn::-webkit-scrollbar-thumb{background:var(--bd)}
 .pn h3{font-size:11px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid var(--g);text-transform:uppercase;letter-spacing:.5px;color:var(--g)}
 .ct{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.pb{height:4px;background:var(--bd);flex-shrink:0}.pf{height:100%;background:linear-gradient(90deg,var(--g),var(--tl));transition:width .4s;border-radius:0 2px 2px 0}
-.cs{flex:1;overflow-y:auto;padding:16px 20px 100px}.cs::-webkit-scrollbar{width:4px}.cs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-.ci{max-width:620px;margin:0 auto}
+.pb-bar{height:4px;background:var(--bd);flex-shrink:0}.pf{height:100%;background:linear-gradient(90deg,var(--g),var(--tl));transition:width .4s;border-radius:0 2px 2px 0}
+.cs{flex:1;overflow-y:auto;padding:16px 20px 100px}.cs::-webkit-scrollbar{width:4px}.cs::-webkit-scrollbar-thumb{background:var(--bd)}
+.ci{max-width:640px;margin:0 auto}
 .nv{flex-shrink:0;padding:8px 16px;display:flex;gap:8px;background:var(--cd);border-top:1px solid var(--bd)}
-.bt{font-family:var(--f);font-size:13px;font-weight:600;padding:10px 18px;border:none;border-radius:var(--r);cursor:pointer;transition:all .2s}
-.bt-g{background:var(--g);color:#fff;flex:1}.bt-g:hover{background:var(--gd)}.bt-g:disabled{background:var(--bd);color:var(--mu);cursor:default}.bt-b{background:var(--gl);color:var(--g)}
-.pi{margin-bottom:8px}.pl{font-size:9px;font-weight:600;color:var(--mu);margin-bottom:2px;display:flex;justify-content:space-between}
-.pr{height:7px;background:var(--bd);border-radius:4px;overflow:hidden}.prf{height:100%;border-radius:4px;transition:width .4s}
-.pv{font-size:9px;font-weight:700}
-.sh{margin-bottom:12px}.sht{display:inline-block;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:12px;margin-bottom:3px}
-.sh h2{font-size:17px;font-weight:700;letter-spacing:-.3px}.sh p{font-size:11px;color:var(--mu);margin-top:2px;font-family:var(--fb);line-height:1.5}
+.bt{font-family:var(--f);font-size:13px;font-weight:600;padding:10px 18px;border:none;border-radius:var(--r);cursor:pointer;transition:all .2s}.bt-g{background:var(--g);color:#fff;flex:1}.bt-g:hover{background:var(--gd)}.bt-g:disabled{background:var(--bd);color:var(--mu);cursor:default}.bt-b{background:var(--gl);color:var(--g)}
+/* Panel bars */
+.pi{margin-bottom:8px}.pl{font-size:9px;font-weight:600;color:var(--mu);margin-bottom:2px;display:flex;justify-content:space-between}.pr{height:7px;background:var(--bd);border-radius:4px;overflow:hidden}.prf{height:100%;border-radius:4px;transition:width .4s}.pv{font-size:9px;font-weight:700}
+/* Section header */
+.sh{margin-bottom:12px}.sht{display:inline-block;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:12px;margin-bottom:3px}.sh h2{font-size:17px;font-weight:700}.sh p{font-size:11px;color:var(--mu);margin-top:2px;font-family:var(--fb);line-height:1.5}
 .cnt{font-size:9px;color:var(--mu);text-align:right;margin-bottom:3px}
-.qc{background:var(--cd);border-radius:var(--r);padding:11px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid var(--bd);transition:border-color .2s}.qc.ok{border-color:var(--g50)}
-.qt{font-size:12px;font-weight:500;line-height:1.5;margin-bottom:7px}.qn{color:var(--g);font-weight:700;margin-right:3px}
-.qh{font-size:9px;color:var(--mu);font-style:italic;margin:-2px 0 5px}
-.lk{display:flex;gap:3px}
-.lb{flex:1;padding:7px 2px;border:1.5px solid var(--bd);border-radius:7px;text-align:center;font-family:var(--f);font-size:9px;font-weight:500;cursor:pointer;transition:all .1s;background:var(--cd);line-height:1.3;min-height:34px;display:flex;align-items:center;justify-content:center}
-.lb:hover{border-color:var(--g);background:var(--gl)}.lb.on{border-color:var(--g);background:var(--g);color:#fff}
-.mx{margin-bottom:14px}.mx-q{font-size:11px;font-weight:600;margin-bottom:5px;padding:7px 10px;background:var(--cd);border-radius:var(--r);border:1px solid var(--bd)}
+/* Question card */
+.qc{background:var(--cd);border-radius:var(--r);padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid var(--bd);transition:border-color .2s}.qc.ok{border-color:var(--g50)}
+.qt{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--g)}
+/* TRI BUTTONS — 3 specific text options */
+.tri{display:flex;gap:5px}
+.tri-b{flex:1;padding:10px 8px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--fb);font-size:12px;line-height:1.4;cursor:pointer;transition:all .15s;background:var(--cd);min-height:48px;display:flex;align-items:center;justify-content:center}
+.tri-b:hover{border-color:var(--g);background:var(--gl)}
+.tri-b[data-v="1"].on{border-color:#8cb88c;background:#e8f0e8;color:#3a6b3a;font-weight:600}
+.tri-b[data-v="2"].on{border-color:var(--am);background:var(--aml);color:#8a6a0a;font-weight:600}
+.tri-b[data-v="3"].on{border-color:var(--g);background:var(--g);color:#fff;font-weight:600}
+/* Matrix */
+.mx{margin-bottom:14px}.mx-q{font-size:12px;font-weight:600;margin-bottom:5px;padding:7px 10px;background:var(--cd);border-radius:var(--r);border:1px solid var(--bd)}
 .mx-row{display:flex;align-items:center;padding:3px 0;border-bottom:1px solid var(--bd)}.mx-row:last-child{border-bottom:none}
-.mx-lab{width:105px;font-size:10px;font-weight:500;flex-shrink:0}.mx-btns{display:flex;gap:2px;flex:1}
-.mx-b{flex:1;height:28px;border:1.5px solid var(--bd);border-radius:6px;font-family:var(--f);font-size:8px;font-weight:500;cursor:pointer;transition:all .1s;background:var(--cd);display:flex;align-items:center;justify-content:center}
+.mx-lab{width:105px;font-size:10px;font-weight:500;flex-shrink:0}.mx-btns{display:flex;gap:3px;flex:1}
+.mx-b{flex:1;height:30px;border:1.5px solid var(--bd);border-radius:6px;font-family:var(--f);font-size:9px;font-weight:500;cursor:pointer;transition:all .1s;background:var(--cd);display:flex;align-items:center;justify-content:center}
 .mx-b:hover{border-color:var(--g);background:var(--gl)}.mx-b.on{border-color:var(--g);background:var(--g);color:#fff}
-.emo{display:flex;gap:3px}.eb{flex:1;padding:6px 2px;border:1.5px solid var(--bd);border-radius:7px;text-align:center;font-family:var(--f);font-size:9px;font-weight:500;cursor:pointer;transition:all .1s;background:var(--cd);min-height:36px;display:flex;align-items:center;justify-content:center}
-.eb:hover{border-color:var(--tl);background:var(--tll)}.eb.on{border-color:var(--tl);background:var(--tl);color:#fff}
-.ri{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--cd);border:2px solid var(--bd);border-radius:var(--r);margin-bottom:5px;cursor:pointer;transition:all .1s;font-size:12px}
-.ri:hover{border-color:var(--g)}.ri.rk{border-color:var(--g);background:var(--gl)}
+/* Emotional */
+.emo{display:flex;gap:3px}.eb{flex:1;padding:6px 2px;border:1.5px solid var(--bd);border-radius:7px;text-align:center;font-family:var(--f);font-size:9px;font-weight:500;cursor:pointer;transition:all .1s;background:var(--cd);min-height:36px;display:flex;align-items:center;justify-content:center}.eb:hover{border-color:var(--tl);background:var(--tll)}.eb.on{border-color:var(--tl);background:var(--tl);color:#fff}
+/* Ranking */
+.ri{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--cd);border:2px solid var(--bd);border-radius:var(--r);margin-bottom:5px;cursor:pointer;transition:all .1s;font-size:12px}.ri:hover{border-color:var(--g)}.ri.rk{border-color:var(--g);background:var(--gl)}
 .rn{width:22px;height:22px;border-radius:50%;background:var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--mu);flex-shrink:0}.ri.rk .rn{background:var(--g);color:#fff}
 .fb textarea{width:100%;border:2px solid var(--bd);border-radius:var(--r);padding:12px;font-family:var(--fb);font-size:13px;resize:vertical;min-height:160px;color:var(--tx);background:var(--cd);line-height:1.6}.fb textarea:focus{outline:none;border-color:var(--g)}
 .done{text-align:center;padding:40px}.done h2{font-size:20px;color:var(--g);margin:12px 0 4px}.done p{color:var(--mu);font-size:12px;line-height:1.6}
+.divider{margin:12px 0 8px;padding:8px 10px;border-radius:var(--r);font-size:11px;font-weight:500}
 </style></head><body>
 <div id="login"><div class="lc">
-<img src="logogreeen.jpg" alt="Scuola Sacra Famiglia" class="lc-logo">
-<h1>TI ASCOLTO!</h1><div class="sub">Scuola Sacra Famiglia &mdash; Orzinuovi</div>
-<div class="tb">Vogliamo migliorare la nostra scuola. E la prima cosa che facciamo &egrave; <strong>ascoltarti</strong>.<br><br>
-Questo strumento lo ha costruito il tuo Animatore Digitale &mdash; la stessa persona che ti accompagna con l'iPad, che ti ha insegnato a difenderti dai rischi della rete, che ti ha guidato nell'uso etico dell'intelligenza artificiale e che lavora ogni giorno perch&eacute; la tecnologia a scuola abbia senso. I tuoi dati sono protetti e servono a costruire una scuola migliore.<br><br>
-Ti chiedo il nome perch&eacute; questo non &egrave; un sondaggio: &egrave; il <strong>tuo</strong> profilo di crescita. Ha senso solo se &egrave; tuo davvero.</div>
-<div class="fd-row">
-<div class="fd"><label>Il tuo nome e cognome</label><input type="text" id="inp-nome" placeholder="Nome Cognome" autocomplete="off"></div>
-<div class="fd"><label>Classe</label><div class="cls-opts" id="cls-opts"></div></div>
-</div>
+<img src="logogreeen.jpg" alt="" class="lc-logo">
+<h1>TI ASCOLTO!</h1><div class="sub">Scuola Sacra Famiglia — Orzinuovi</div>
+<div class="tb">Vogliamo migliorare la nostra scuola. E la prima cosa che facciamo è <strong>ascoltarti</strong>.<br><br>Questo strumento lo ha costruito il tuo Animatore Digitale — la stessa persona che ti accompagna con l'iPad, che ti ha insegnato a difenderti dai rischi della rete, che ti ha guidato nell'uso etico dell'intelligenza artificiale e che lavora ogni giorno perché la tecnologia a scuola abbia senso. I tuoi dati sono protetti e servono a costruire una scuola migliore.<br><br>Ti chiedo il nome perché questo non è un sondaggio: è il <strong>tuo</strong> profilo di crescita. Ha senso solo se è tuo davvero.</div>
+<div class="fd-row"><div class="fd"><label>Nome e cognome</label><input type="text" id="inp-nome" placeholder="Nome Cognome" autocomplete="off"></div>
+<div class="fd"><label>Classe</label><div class="cls-opts" id="cls-opts"></div></div></div>
 <button class="btn-s" id="btn-s" disabled onclick="startApp()">Iniziamo</button>
-<div class="copy">&copy; 2026 Progetto Ferraboschi/Cerioli &mdash; Scuola Sacra Famiglia Orzinuovi<br>Tutti i diritti riservati</div>
+<div class="copy">© 2026 Progetto Ferraboschi/Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
 </div></div>
 <div id="main"><div class="layout">
 <div class="pn" id="pnL"></div>
-<div class="ct"><div class="pb"><div class="pf" id="pf"></div></div><div class="cs" id="cs"><div class="ci" id="cc"></div></div><div class="nv" id="nv"></div></div>
+<div class="ct"><div class="pb-bar"><div class="pf" id="pf"></div></div><div class="cs" id="cs"><div class="ci" id="cc"></div></div><div class="nv" id="nv"></div></div>
 <div class="pn" id="pnR"></div>
 </div></div>
 <script>
-const SCRIPT='https://script.google.com/macros/s/AKfycbzjzLl7jgSy2uQrqPc1Nt4-V_Kbprz26xLhnqBhnd1z6ampVLmRBVgNSQoEZIra_3lZ/exec';
-const S5=["Per niente","Poco","Cos\u00ec cos\u00ec","Abbastanza","Molto"];
-const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Geografia"],["MATE","Matematica"],["SCIE","Scienze"],["TECN","Tecnologia"],["ARTE","Arte e Immagine"],["MUSI","Musica"],["SPAN","Spagnolo"],["EDFI","Ed. Fisica"],["RELI","Religione"],["EDCI","Ed. Civica"],["COMP","Comportamento"]];
-const MDIMS=[["ARG","Gli argomenti ti interessano?"],["REA","Sono collegati alla realt\u00e0?"],["DIF","La materia \u00e8 difficile per te?"],["SPG","Capisci quando ti vengono spiegati?"],["ATV","Ti senti attivo o solo ad ascoltare?"],["CON","Capisci cosa ti viene chiesto?"]];
+const SCRIPT='https://script.google.com/macros/s/AKfycbxWhv-dFGBkBTpLfvlsbB3RQfKSfPpBi-_NBcdR8xn0cG4EFe3dm6RWM1hwGvc-w9csaQ/exec';
+const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Geografia"],["MATE","Matematica"],["SCIE","Scienze"],["TECN","Tecnologia"],["ARTE","Arte e Imm."],["MUSI","Musica"],["SPAN","Spagnolo"],["EDFI","Ed. Fisica"],["RELI","Religione"],["EDCI","Ed. Civica"],["COMP","Comportam."]];
+const MDIMS=[
+["ARG","Gli argomenti ti interessano?",["No","Abbastanza","Molto"]],
+["REA","Sono collegati alla realtà?",["No","Un po'","Sì"]],
+["DIF","È difficile per te?",["Facile","Così così","Difficile"]],
+["SPG","Capisci quando ti vengono spiegati?",["No","A volte","Sì"]],
+["ATV","Ti senti attivo o passivo?",["Passivo","Dipende","Attivo"]],
+["CON","Capisci cosa ti viene chiesto?",["No","A volte","Sempre"]]
+];
 const Q={
-S1:["\u2022 Imparo meglio facendo che ascoltando","\u2022 Se non capisco a cosa serve, perdo interesse","\u2022 Ho bisogno di esempi concreti per capire","\u2022 Preferisco costruire qualcosa piuttosto che studiare teoria","\u2022 Se posso provare in pratica, ricordo meglio"],
-S2:["\u2022 La mia attenzione durante una spiegazione cala dopo pochi minuti","\u2022 Ho bisogno di sapere subito se sto andando bene","\u2022 Se un compito \u00e8 lungo, mi scoraggio prima di iniziare","\u2022 Se non capisco subito, mi blocco","\u2022 Preferisco tanti compiti brevi piuttosto che uno lungo"],
-S3:["\u2022 Riesco a seguire una spiegazione senza distrarmi","\u2022 I compagni che disturbano mi impediscono di capire","\u2022 Il rumore in classe mi rende difficile concentrarmi","\u2022 Se qualcuno interrompe durante una spiegazione, perdo il filo","\u2022 In una classe silenziosa imparo molto meglio","\u2022 Il comportamento degli altri influisce sul mio apprendimento","\u2022 Il disturbo in classe andrebbe gestito meglio"],
-S4:["\u2022 Capisco meglio con un video che con un testo scritto","\u2022 Uno schema mi aiuta pi\u00f9 di una spiegazione orale","\u2022 Faccio fatica con concetti astratti senza esempi visivi","\u2022 Leggere un capitolo lungo mi costa molta fatica","\u2022 Capisco meglio se posso vedere o manipolare qualcosa"],
-S5Q:["\u2022 Preferisco lavorare in gruppo che da solo","\u2022 I compagni sono una risorsa per imparare","\u2022 Il confronto con qualcuno mi serve per capire se ho capito","\u2022 In gruppo lavoro meglio quando ci sono ruoli chiari","\u2022 Quando collaboriamo davvero, imparo di pi\u00f9"],
-S6:["\u2022 Mi annoio se la lezione non cambia mai ritmo","\u2022 Un insegnante che mi coinvolge emotivamente mi fa imparare di pi\u00f9","\u2022 Vorrei pi\u00f9 spazio per la creativit\u00e0","\u2022 Vorrei che quello che imparo fosse collegato al mondo reale","\u2022 Un insegnante severo ma giusto mi fa crescere","\u2022 Preferisco chi pretende il massimo ma mi rispetta","\u2022 I compiti ripetitivi e uguali per tutti non mi aiutano","\u2022 Vorrei poter scegliere come affrontare un compito"],
-ICCA:["Quando mi assegnano un compito, capisco subito cosa fare senza bisogno di rileggere","Di solito inizio subito a lavorare, perdere tempo a rileggere non serve","Se la consegna \u00e8 lunga, mi bastano le prime righe per capire cosa fare","I miei compagni mi chiedono \u201cma cosa dobbiamo fare?\u201d \u2014 io invece ho gi\u00e0 capito"],
-ICCB:["Capisco meglio cosa fare se la consegna ha un esempio concreto","Se l'insegnante spiega la consegna a voce oltre che per iscritto, per me cambia tutto","A volte penso di aver capito, ma poi scopro che stavo facendo una cosa diversa","Quando la consegna \u00e8 solo scritta e lunga, faccio pi\u00f9 fatica a partire"]
+S1:{t:"Come imparo",s:"Come arrivo a capire le cose?",c:["gl","g"],q:[
+{q:"Imparo meglio facendo che ascoltando",o:["Imparo bene ascoltando le spiegazioni","Dipende dall'argomento","Se non faccio le cose in pratica, non mi restano"]},
+{q:"Se non capisco a cosa serve, perdo interesse",o:["Studio anche se non ne vedo l'utilità","Ci provo, ma faccio più fatica","Se non capisco a cosa serve, mollo"]},
+{q:"Ho bisogno di esempi concreti per capire",o:["Capisco anche i concetti astratti","Gli esempi aiutano ma non sempre servono","Senza un esempio concreto mi perdo"]},
+{q:"Preferisco costruire qualcosa piuttosto che studiare teoria",o:["La teoria mi basta per capire","Mi piace alternare teoria e pratica","Se non costruisco o creo, non mi resta nulla"]},
+{q:"Se posso provare in pratica, ricordo meglio",o:["Ricordo bene anche solo leggendo","La pratica aiuta ma non è indispensabile","Se non provo, dimentico tutto"]}
+]},
+S2:{t:"Il mio ritmo in classe",s:"Tempo, attenzione e feedback durante le lezioni.",c:["aml","am"],q:[
+{q:"La mia attenzione durante una spiegazione",o:["Seguo fino alla fine senza problemi","Dopo un po' mi distraggo, poi mi riprendo","Dopo pochi minuti ho già la testa altrove"]},
+{q:"Il mio bisogno di feedback",o:["Posso aspettare il risultato con calma","Preferisco saperlo, ma posso aspettare","Se non ho un riscontro immediato, mi perdo"]},
+{q:"Di fronte a un compito lungo",o:["Affronto compiti lunghi senza problemi","Inizio, ma faccio fatica a finire","Se è lungo, non voglio nemmeno iniziare"]},
+{q:"Quando non capisco subito",o:["Ci riprovo con calma","Ci provo un po', poi chiedo aiuto","Mi arrendo"]},
+{q:"Compiti brevi o lunghi?",o:["Preferisco un compito lungo e approfondito","Mi adatto a entrambi","Tanti compiti brevi funzionano meglio per me"]}
+]},
+S3:{t:"Riesco a seguire?",s:"Le distrazioni in classe e il loro impatto.",c:["col","co"],q:[
+{q:"Seguire una spiegazione senza distrarmi",o:["Resto concentrato per tutta la spiegazione","Mi distraggo ogni tanto ma recupero","Mi distraggo continuamente"]},
+{q:"Quando i compagni disturbano",o:["Riesco a concentrarmi anche se c'è disturbo","Mi dà fastidio ma ce la faccio","Non capisco più nulla"]},
+{q:"Il rumore in classe",o:["Non mi disturba","Mi distrae un po' ma reggo","Con il rumore non riesco a seguire"]},
+{q:"Se qualcuno interrompe la spiegazione",o:["Riprendo subito il filo","Faccio fatica ma ci riesco","Perdo completamente il filo"]},
+{q:"Silenzio e apprendimento",o:["Imparo bene in qualsiasi ambiente","Il silenzio aiuta ma non è indispensabile","Senza silenzio non riesco a imparare"]},
+{q:"Il comportamento degli altri e il mio impegno",o:["Il mio impegno non dipende dagli altri","Ogni tanto mi lascio condizionare","Se gli altri non si impegnano, anch'io mollo"]},
+{q:"Come viene gestito il disturbo in classe",o:["In classe c'è abbastanza ordine","A volte il disturbo è un problema","Il disturbo è un problema serio nella mia classe"]}
+]},
+S4:{t:"Come capisco e come studio",s:"Strumenti, media, metodo di studio e cosa mi resta.",c:["pul","pu"],q:[
+{q:"Video o testo scritto?",o:["Preferisco leggere un testo","Dipende dall'argomento","Un video mi fa capire molto di più"]},
+{q:"Schema o spiegazione orale?",o:["Preferisco la spiegazione orale","Entrambi mi servono","Senza uno schema non ci arrivo"]},
+{q:"I simulatori digitali",o:["Imparo bene anche senza digitale","Il digitale aiuta ma non è fondamentale","Sperimentare al computer mi fa capire molto di più"]},
+{q:"Cartaceo o digitale?",o:["Preferisco gli strumenti digitali","Uso entrambi senza preferenze","Carta e quaderno funzionano meglio per me"]},
+{q:"Vedere e manipolare per capire",o:["Capisco bene anche solo ascoltando","Vedere aiuta ma non sempre","Se non vedo o tocco, faccio fatica"]},
+{q:"I concetti astratti",o:["Non mi creano problemi","A volte faccio fatica, dipende","Senza un esempio visivo non ci arrivo"]},
+{q:"Come mi preparo per una verifica",o:["Cerco di capire, non ripeto a memoria","Un po' a memoria, un po' ragionando","Ripeto finché non mi entra in testa"]},
+{q:"Schemi e mappe per studiare",o:["Non uso schemi, studio direttamente","A volte li faccio, a volte no","Senza schemi o mappe non riesco"]},
+{q:"Cosa mi resta dopo qualche giorno",o:["Quello che studio mi resta a lungo","Qualcosa mi resta, qualcosa no","Dopo pochi giorni ho già dimenticato quasi tutto"]},
+{q:"Ricordare e passione",o:["Ricordo anche le cose che non mi appassionano","Le cose che mi piacciono le ricordo meglio","Se non mi appassiona, non mi resta nulla"]},
+{q:"Studio per il voto o per imparare?",o:["Studio perché voglio capire davvero","Un po' per il voto, un po' per interesse","Studio solo perché c'è la verifica"]},
+{q:"Quando non capisco qualcosa",o:["Cerco un altro modo per capire","A volte rileggo, a volte cerco alternative","Rileggo le stesse cose sperando che entrino"]}
+]},
+S5:{t:"Io e gli altri in classe",s:"Come lavoro con i compagni.",c:["tll","tl"],q:[
+{q:"Lavorare in gruppo o da solo?",o:["Preferisco lavorare da solo","Mi adatto, dipende dal compito","In gruppo imparo e lavoro meglio"]},
+{q:"I compagni come risorsa",o:["Imparo meglio per conto mio","A volte i compagni aiutano","Confrontarmi coi compagni è fondamentale"]},
+{q:"Il confronto per capire se ho capito",o:["So da solo se ho capito","A volte mi serve un confronto","Se non ne parlo con qualcuno, non so se ho capito"]},
+{q:"Ruoli chiari nel gruppo",o:["Mi adatto a qualsiasi situazione","I ruoli aiutano ma non sono indispensabili","Senza ruoli chiari il gruppo non funziona"]},
+{q:"Collaborare davvero",o:["Imparo di più studiando da solo","Dipende dal tipo di collaborazione","La vera collaborazione mi fa imparare il doppio"]}
+]},
+S6:{t:"Cosa mi aspetto dalla scuola",s:"Il tipo di didattica che funziona per me.",c:["skl","sk"],q:[
+{q:"Il ritmo delle lezioni",o:["Le lezioni sempre uguali non mi disturbano","Ogni tanto vorrei più varietà","Se non cambia ritmo, mi spengo"]},
+{q:"Il coinvolgimento emotivo",o:["Imparo bene anche con lezioni tradizionali","Il coinvolgimento aiuta ma non è tutto","Se non mi coinvolge, non mi arriva nulla"]},
+{q:"Spazio per la creatività",o:["Il programma così com'è va bene","Un po' più di creatività non guasterebbe","Ho bisogno di esprimermi e creare"]},
+{q:"Collegamento col mondo reale",o:["Non mi serve il collegamento con la realtà","A volte vorrei capire a cosa serve","Se non è collegato alla realtà, non ha senso"]},
+{q:"L'insegnante severo ma giusto",o:["Preferisco un insegnante meno esigente","Dipende dalla situazione","Chi pretende il massimo mi tira fuori il meglio"]},
+{q:"Esigenza e rispetto",o:["Non mi piace chi pretende troppo","Il rispetto è importante, l'esigenza dipende","Rispetto e alta aspettativa: combinazione perfetta"]},
+{q:"I compiti ripetitivi e uguali per tutti",o:["Mi aiutano a esercitarmi","Alcuni sì, altri no","Sono una perdita di tempo"]},
+{q:"Scegliere come affrontare un compito",o:["Preferisco che mi dicano esattamente cosa fare","Un po' di guida con un po' di scelta","Lavoro meglio quando decido il mio approccio"]}
+]},
+ICCA:{t:"Tu e la consegna",s:"Come affronti un compito quando ti viene assegnato?",c:["aml","am"],q:[
+{q:"Quando mi assegnano un compito",o:["Rileggo sempre la consegna con attenzione","La leggo veloce, poi se serve torno","Capisco al volo, non rileggo"]},
+{q:"Prima di iniziare",o:["Mi prendo il tempo per capire bene","Do un'occhiata rapida e parto","Parto subito, tanto ho capito"]},
+{q:"Se la consegna è lunga",o:["Leggo tutto con attenzione","Leggo più o meno tutto, in fretta","Le prime righe mi bastano"]},
+{q:"Mentre i compagni chiedono spiegazioni",o:["Anch'io a volte ho dubbi","Di solito capisco, ma non sempre","Io ho già capito mentre gli altri chiedono"]}
+]},
+ICCB:{t:"",s:"E quando la consegna...",c:["aml","am"],q:[
+{q:"Un esempio concreto nella consegna",o:["La consegna scritta mi basta","Un esempio a volte aiuta","Senza esempio non so da dove partire"]},
+{q:"Spiegazione a voce della consegna",o:["Capisco bene anche solo leggendo","La spiegazione a voce aiuta un po'","Se non me la spiegano a voce, non capisco"]},
+{q:"Capire vs fare",o:["Faccio sempre quello che mi chiedono","Ogni tanto sbaglio il senso della consegna","Mi capita spesso di fare una cosa diversa"]},
+{q:"Consegna scritta e lunga",o:["Leggo anche quelle lunghe senza problemi","Quelle lunghe mi rallentano","Se è lunga, non la leggo nemmeno tutta"]}
+]},
+S10:{t:"Cittadinanza digitale",s:"Il percorso sulla sicurezza online a scuola.",c:["skl","sk"],q:[
+{q:"Riconoscere i rischi online",o:["Non mi hanno insegnato molto","Ho imparato qualcosa","So riconoscere i pericoli grazie alla scuola"]},
+{q:"Phishing e truffe online",o:["Non saprei riconoscerli","A volte li riconosco","Li riconosco subito"]},
+{q:"Cyberbullismo: cosa fare",o:["Non saprei come reagire","Ho un'idea ma non sono sicuro","So cosa fare e a chi rivolgermi"]},
+{q:"Il mio comportamento online dopo le attività",o:["Mi comporto come prima","Qualcosa è cambiato","È molto cambiato"]},
+{q:"Simulazioni vs spiegazioni tradizionali",o:["Le spiegazioni tradizionali funzionano","Entrambi i metodi funzionano","Le simulazioni insegnano molto di più"]},
+{q:"Parlare con i genitori di sicurezza online",o:["Non ne parlo mai coi genitori","Ogni tanto ne parliamo","Ne parlo spesso grazie alla scuola"]},
+{q:"La mia immagine online",o:["Non ci penso molto","Ci penso ogni tanto","Sono molto attento/a"]},
+{q:"Distinguere info vere da false",o:["Faccio fatica","A volte ci riesco","Controllo sempre le fonti"]},
+{q:"Quanto mi hanno coinvolto queste attività",o:["Non particolarmente","Abbastanza coinvolgenti","Tra le più coinvolgenti della scuola"]}
+]}
 };
-const S9Q=[{t:"Le regole della scuola sono giuste"},{t:"Le regole mi vengono spiegate col motivo"},{t:"Quando ricevo una nota, mi aiuta a migliorare"},{t:"Le note disciplinari sono uno strumento efficace"},{t:"La sospensione \u00e8 utile per chi la riceve"},{t:"I miei insegnanti sono equi nelle regole"},{t:"Se trattato con rispetto mi comporto meglio"},{t:"Le punizioni: responsabilit\u00e0 non umiliazione"},{t:"Preferirei il dialogo alla punizione"},{t:"Il disturbo dei compagni andrebbe gestito meglio"},{t:"Quando faccio un errore a scuola, mi sento...",tp:"emo",opts:["Umiliato/a","Scoraggiato/a","Indifferente","Stimolato/a","Motivato/a"]},{t:"Quando ho una verifica, mi sento...",tp:"emo",opts:["Ansioso/a","Sotto pressione","Indifferente","Preparato/a","Sicuro/a"]}];
-const S10Q=["Le attivit\u00e0 di cittadinanza digitale mi hanno aiutato a riconoscere i rischi","So riconoscere un tentativo di phishing o truffa","So cosa fare se un coetaneo viene cyberbullizzato","Ho cambiato il mio comportamento online","Le simulazioni mi hanno insegnato pi\u00f9 delle spiegazioni","Parlo con i miei genitori di sicurezza online grazie alla scuola","Sono pi\u00f9 consapevole dei rischi legati alla mia immagine online","So distinguere un'informazione attendibile da una falsa","Le attivit\u00e0 di cittadinanza digitale sono tra le pi\u00f9 coinvolgenti"];
+const S9Q=[
+{q:"Le regole della scuola",o:["Molte non hanno senso","Alcune sì, altre no","Sono giuste e servono"]},
+{q:"Mi spiegano il perché delle regole",o:["Mi vengono solo imposte","A volte sì, a volte no","Mi spiegano sempre il perché"]},
+{q:"Quando ricevo una nota",o:["Non cambia nulla","Dipende dalla situazione","Mi fa capire cosa migliorare"]},
+{q:"Le note come strumento",o:["Sono inutili","A volte funzionano","Servono a far capire i limiti"]},
+{q:"La sospensione",o:["Non serve a nulla","Dipende dalla persona","Fa riflettere"]},
+{q:"Equità nell'applicare le regole",o:["Non vengono applicate in modo uguale","Più o meno equi","Tutti trattati allo stesso modo"]},
+{q:"Rispetto e comportamento",o:["Non dipende da come mi trattano","Il rispetto aiuta, ma non è tutto","Se mi rispettano, do il massimo"]},
+{q:"Le punizioni come mi fanno sentire",o:["Solo umiliato/a","Dipende da come vengono date","Capisco che è per il mio bene"]},
+{q:"Dialogo o punizione",o:["Le punizioni servono più delle parole","Dipende dalla situazione","Parlarne è sempre meglio"]},
+{q:"Il disturbo dei compagni",o:["C'è abbastanza disciplina","Ci sono problemi ma si gestiscono","È un problema serio"]},
+{q:"Quando faccio un errore, mi sento...",tp:"emo",opts:["Umiliato/a","Scoraggiato/a","Indifferente","Stimolato/a","Motivato/a"]},
+{q:"Quando ho una verifica, mi sento...",tp:"emo",opts:["Ansioso/a","Sotto pressione","Indifferente","Preparato/a","Sicuro/a"]}
+];
 const RKS=["Andare bene a scuola","Amicizie","Sport","Famiglia","Passione/hobby","Stare bene con me stesso/a","Costruire il mio futuro"];
-
+const SECS=['S1','S2','S3','S4','S5','S6'];
 const STEPS=['s1','s2','s3','s4','s5','s6','matrix','icc','rules','digital','ranking','voice','done'];
-const SLBL=['Come imparo','Il mio ritmo','Concentrazione','Come capisco','Io e gli altri','Aspettative','Le materie','La consegna','Regole','Citt. digitale','Priorit\u00e0','Spazio libero',''];
-const SDIM=['Apprendimento','Velocit\u00e0','Concentrazione','Pref. linguistiche','Socialit\u00e0','Aspettative'];
+const SDIM=['Apprendimento','Velocità','Concentrazione','Comprensione e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 
 let ST={step:0,nome:'',cls:null,a:{},rk:[],_nav:false};
 const $=id=>document.getElementById(id);
 
-// === LOGIN ===
-["1\u00aa","2\u00aa","3\u00aa"].forEach(c=>{const d=document.createElement('div');d.className='cls-o';d.textContent=c;d.onclick=()=>{ST.cls=c;document.querySelectorAll('.cls-o').forEach(x=>x.classList.remove('on'));d.classList.add('on');ck();};$('cls-opts').appendChild(d);});
+// LOGIN
+["1ª","2ª","3ª"].forEach(c=>{const d=document.createElement('div');d.className='cls-o';d.textContent=c;d.onclick=()=>{ST.cls=c;document.querySelectorAll('.cls-o').forEach(x=>x.classList.remove('on'));d.classList.add('on');ck();};$('cls-opts').appendChild(d);});
 $('inp-nome').oninput=function(){ST.nome=this.value.trim();ck();};
 function ck(){$('btn-s').disabled=!(ST.nome.length>2&&ST.cls);}
 function startApp(){if(!(ST.nome.length>2&&ST.cls))return;$('login').style.display='none';$('main').style.display='block';ST._nav=true;go();}
 
-// === CORE ===
+// CORE
 function go(){
   $('pf').style.width=(ST.step/(STEPS.length-1)*100)+'%';
   let h='',s=STEPS[ST.step];
-  if(s==='s1')h=rLk('S1',Q.S1,'Come imparo','Imparo meglio quando...','gl','g','S1');
-  else if(s==='s2')h=rLk('S2',Q.S2,'Il mio ritmo in classe','Il tempo e l\'attenzione durante le lezioni.','aml','am','S2');
-  else if(s==='s3')h=rLk('S3',Q.S3,'Riesco a seguire?','Le distrazioni in classe e il loro impatto.','col','co','S3');
-  else if(s==='s4')h=rLk('S4',Q.S4,'Come capisco meglio','I canali attraverso cui arrivo ai concetti.','pul','pu','S4');
-  else if(s==='s5')h=rLk('S5',Q.S5Q,'Io e gli altri in classe','Come lavoro con i compagni.','tll','tl','S5');
-  else if(s==='s6')h=rLk('S6',Q.S6,'Cosa mi aspetto dalla scuola','Il tipo di didattica che funziona per me.','skl','sk','S6');
+  if(s.startsWith('s')&&s!=='score'&&Q[s.toUpperCase()])h=rTri(s.toUpperCase());
   else if(s==='matrix')h=rMat();
   else if(s==='icc')h=rICC();
   else if(s==='rules')h=rRules();
-  else if(s==='digital')h=rLk('S10',S10Q,'Cittadinanza digitale','Il percorso sulla sicurezza online a scuola.','skl','sk','F');
+  else if(s==='digital')h=rTri('S10');
   else if(s==='ranking')h=rRank();
   else if(s==='voice')h=rVoice();
   else if(s==='done')h=rDone();
@@ -127,131 +205,119 @@ function go(){
   if(ST._nav){el.style.opacity='0';setTimeout(()=>{el.innerHTML=h;scr.scrollTop=0;el.style.opacity='1';rNv();rP();ST._nav=false;},80);}
   else{const sp=scr.scrollTop;el.innerHTML=h;scr.scrollTop=sp;rNv();rP();}
 }
-function rNv(){const s=STEPS[ST.step];if(s==='done'){$('nv').innerHTML='';return;}const bk=ST.step>0,ok=canGo();$('nv').innerHTML=(bk?'<button class="bt bt-b" onclick="pv()">Indietro</button>':'')+'<button class="bt bt-g"'+(ok?'':' disabled')+' onclick="nx()">'+(s==='voice'?'Invia':'Avanti')+'</button>';}
+function rNv(){const s=STEPS[ST.step];if(s==='done'){$('nv').innerHTML='';return;}$('nv').innerHTML=(ST.step>0?'<button class="bt bt-b" onclick="pv()">Indietro</button>':'')+'<button class="bt bt-g"'+(canGo()?'':' disabled')+' onclick="nx()">'+(s==='voice'?'Invia':'Avanti')+'</button>';}
 function pv(){ST._nav=true;ST.step--;go();}
 function nx(){if(!canGo())return;if(STEPS[ST.step]==='voice')send();ST._nav=true;ST.step++;go();}
 function sa(k,v){ST.a[k]=v;go();}
 
 function canGo(){
-  const s=STEPS[ST.step],m={'s1':['S1',5],'s2':['S2',5],'s3':['S3',7],'s4':['S4',5],'s5':['S5',5],'s6':['S6',8],'digital':['S10',9]};
-  if(m[s]){const[p,n]=m[s];for(let i=0;i<n;i++){if(!ST.a[p+'_'+i])return false;}return true;}
+  const s=STEPS[ST.step];
+  if(s.startsWith('s')&&Q[s.toUpperCase()]){const sec=Q[s.toUpperCase()];for(let i=0;i<sec.q.length;i++){if(!ST.a[s.toUpperCase()+'_'+i])return false;}return true;}
   if(s==='matrix'){for(let i=0;i<SUBS.length;i++)for(let j=0;j<MDIMS.length;j++){if(!ST.a['M_'+i+'_'+j])return false;}return true;}
   if(s==='icc'){for(let i=0;i<4;i++){if(!ST.a['IA_'+i]||!ST.a['IB_'+i])return false;}return true;}
   if(s==='rules'){for(let i=0;i<S9Q.length;i++){if(!ST.a['S9_'+i])return false;}return true;}
+  if(s==='digital'){for(let i=0;i<Q.S10.q.length;i++){if(!ST.a['S10_'+i])return false;}return true;}
   if(s==='ranking')return ST.rk.length===RKS.length;
   return true;
 }
 
-// === PANELS ===
+// PANELS
 function rP(){rPL();rPR();}
 function rPL(){
   let h='<h3>Il mio profilo</h3>';
-  const secs=[['S1',5],['S2',5],['S3',7],['S4',5],['S5',5],['S6',8]];
-  secs.forEach(([p,n],si)=>{
-    let sum=0,cnt=0;for(let i=0;i<n;i++){const v=ST.a[p+'_'+i];if(v){sum+=v;cnt++;}}
-    const avg=cnt?sum/cnt:0;const pct=avg/5*100;
-    h+='<div class="pi"><div class="pl"><span>'+SDIM[si]+'</span><span class="pv" style="color:'+SCOL[si]+'">'+(avg?avg.toFixed(1):'-')+'</span></div>';
+  SECS.forEach((sec,si)=>{
+    const items=Q[sec].q;let sum=0,cnt=0;
+    items.forEach((_,i)=>{const v=ST.a[sec+'_'+i];if(v){sum+=v;cnt++;}});
+    const avg=cnt?sum/cnt:0;const pct=avg/3*100;
+    h+='<div class="pi"><div class="pl"><span>'+SDIM[si]+'</span><span class="pv" style="color:'+SCOL[si]+'">'+(avg?avg.toFixed(1):'-')+'/3</span></div>';
     h+='<div class="pr"><div class="prf" style="width:'+pct+'%;background:'+SCOL[si]+'"></div></div></div>';
   });
-  // ICC
   let ia=0,ib=0,ca=0,cb=0;
-  for(let i=0;i<4;i++){if(ST.a['IA_'+i]){ia+=(6-ST.a['IA_'+i]);ca++;}if(ST.a['IB_'+i]){ib+=ST.a['IB_'+i];cb++;}}
-  if(ca||cb){
-    h+='<div style="margin-top:10px;padding:8px;background:var(--aml);border-radius:var(--r);font-size:9px;line-height:1.5">';
-    h+='<strong>Consegna</strong><br>';
-    if(ca)h+='Studente: '+(ia/ca).toFixed(1)+'/5<br>';
-    if(cb)h+='Consegna: '+(ib/cb).toFixed(1)+'/5';
-    h+='</div>';
-  }
+  for(let i=0;i<4;i++){if(ST.a['IA_'+i]){ia+=(4-ST.a['IA_'+i]);ca++;}if(ST.a['IB_'+i]){ib+=ST.a['IB_'+i];cb++;}}
+  if(ca||cb){h+='<div style="margin-top:10px;padding:6px 8px;background:var(--aml);border-radius:var(--r);font-size:9px;line-height:1.5"><strong>ICC Consegna</strong><br>';if(ca)h+='Studente: '+(ia/ca).toFixed(1)+'/3<br>';if(cb)h+='Consegna: '+(ib/cb).toFixed(1)+'/3';h+='</div>';}
   $('pnL').innerHTML=h;
 }
 function rPR(){
   let h='<h3>Cosa funziona per me</h3>';
-  // Aggregate from matrix
-  const dims=[['ARG','Interesse contenuti',0],['REA','Aggancio realt\u00e0',1],['SPG','Chiarezza metodo',3],['ATV','Attivazione',4],['CON','Capisco consegna',5]];
-  dims.forEach(([code,name,di])=>{
-    let sum=0,cnt=0;
-    for(let i=0;i<SUBS.length;i++){const v=ST.a['M_'+i+'_'+di];if(v){sum+=v;cnt++;}}
-    const avg=cnt?sum/cnt:0;const pct=avg/5*100;
-    h+='<div class="pi"><div class="pl"><span>'+name+'</span><span class="pv">'+(avg?avg.toFixed(1):'-')+'</span></div>';
+  const dims=[[0,'Interesse'],[1,'Realtà'],[3,'Chiarezza'],[4,'Attivazione'],[5,'Capisco consegna']];
+  dims.forEach(([di,name])=>{
+    let sum=0,cnt=0;for(let i=0;i<SUBS.length;i++){const v=ST.a['M_'+i+'_'+di];if(v){sum+=v;cnt++;}}
+    const avg=cnt?sum/cnt:0;const pct=avg/3*100;
+    h+='<div class="pi"><div class="pl"><span>'+name+'</span><span class="pv">'+(avg?avg.toFixed(1):'-')+'/3</span></div>';
     h+='<div class="pr"><div class="prf" style="width:'+pct+'%;background:var(--tl)"></div></div></div>';
   });
-  // Aspettative chiave
-  const ak=[[4,'Autorevol.'],[5,'Pretende+rispetta'],[6,'No ripetitivi'],[7,'Scelta autonoma']];
-  let hasA=false;
-  ak.forEach(([i])=>{if(ST.a['S6_'+i])hasA=true;});
-  if(hasA){
-    h+='<div style="margin-top:10px;padding:8px;background:var(--skl);border-radius:var(--r);font-size:9px;line-height:1.6"><strong>L\'insegnante ideale</strong><br>';
-    ak.forEach(([i,lbl])=>{const v=ST.a['S6_'+i];if(v)h+=lbl+': <strong>'+v+'/5</strong><br>';});
-    h+='</div>';
-  }
+  const ak=[[4,'Autorevolezza'],[5,'Pretende+rispetta'],[6,'No ripetitivi'],[7,'Scelta autonoma']];
+  let has=false;ak.forEach(([i])=>{if(ST.a['S6_'+i])has=true;});
+  if(has){h+='<div style="margin-top:10px;padding:6px 8px;background:var(--skl);border-radius:var(--r);font-size:9px;line-height:1.6"><strong>Insegnante ideale</strong><br>';ak.forEach(([i,l])=>{const v=ST.a['S6_'+i];if(v)h+=l+': <strong>'+v+'/3</strong><br>';});h+='</div>';}
   $('pnR').innerHTML=h;
 }
 
-// === RENDERERS ===
-function rLk(pre,items,title,sub,bgc,fc,tag){
-  const done=items.filter((_,i)=>ST.a[pre+'_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--'+bgc+');color:var(--'+fc+')">'+tag+'</span><h2>'+title+'</h2><p>'+sub+'</p></div>';
-  h+='<div class="cnt">'+done+'/'+items.length+'</div>';
-  items.forEach((q,i)=>{const ok=ST.a[pre+'_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt"><span class="qn">'+(i+1)+'.</span> '+q+'</div><div class="lk">';
-    S5.forEach((l,v)=>{h+='<div class="lb'+(ST.a[pre+'_'+i]===(v+1)?' on':'')+'" onclick="sa(\''+pre+'_'+i+"',"+(v+1)+')">'+l+'</div>';});
+// RENDER: TRI-OPTION SECTIONS
+function rTri(sec){
+  const S=Q[sec],done=S.q.filter((_,i)=>ST.a[sec+'_'+i]).length;
+  let h='<div class="sh"><span class="sht" style="background:var(--'+S.c[0]+');color:var(--'+S.c[1]+')">'+sec+'</span><h2>'+S.t+'</h2><p>'+S.s+'</p></div>';
+  h+='<div class="cnt">'+done+'/'+S.q.length+'</div>';
+  S.q.forEach((item,i)=>{const ok=ST.a[sec+'_'+i];
+    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\''+sec+'_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   return h;
 }
 
+// MATRIX
 function rMat(){
   const tot=SUBS.length*MDIMS.length;let done=0;
   SUBS.forEach((_,i)=>MDIMS.forEach((_,j)=>{if(ST.a['M_'+i+'_'+j])done++;}));
-  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Le tue materie, una per una</h2>';
-  h+='<p>Per ogni domanda, giudica ciascuna materia. 50% contenuto, 50% esperienza.</p></div>';
+  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Le tue materie, una per una</h2><p>Per ogni domanda, giudica ciascuna materia.</p></div>';
   h+='<div class="cnt">'+done+'/'+tot+'</div>';
-  MDIMS.forEach(([dc,dt],di)=>{
+  MDIMS.forEach(([dc,dt,labels],di)=>{
     h+='<div class="mx"><div class="mx-q">'+dt+'</div>';
     SUBS.forEach(([sc,sn],si)=>{
       h+='<div class="mx-row"><div class="mx-lab">'+sn+'</div><div class="mx-btns">';
-      S5.forEach((l,v)=>{h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';});
+      labels.forEach((l,v)=>{h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';});
       h+='</div></div>';});
     h+='</div>';});
   return h;
 }
 
+// ICC
 function rICC(){
-  let doneA=Q.ICCA.filter((_,i)=>ST.a['IA_'+i]).length;
-  let doneB=Q.ICCB.filter((_,i)=>ST.a['IB_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--aml);color:var(--am)">ICC</span><h2>Tu e la consegna</h2>';
-  h+='<p>Come affronti un compito quando ti viene assegnato?</p></div>';
-  h+='<div class="cnt">'+(doneA+doneB)+'/8</div>';
-  Q.ICCA.forEach((q,i)=>{const ok=ST.a['IA_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt"><span class="qn">'+(i+1)+'.</span> '+q+'</div><div class="lk">';
-    S5.forEach((l,v)=>{h+='<div class="lb'+(ST.a['IA_'+i]===(v+1)?' on':'')+'" onclick="sa(\'IA_'+i+"',"+(v+1)+')">'+l+'</div>';});
+  const A=Q.ICCA,B=Q.ICCB;
+  let dA=A.q.filter((_,i)=>ST.a['IA_'+i]).length,dB=B.q.filter((_,i)=>ST.a['IB_'+i]).length;
+  let h='<div class="sh"><span class="sht" style="background:var(--aml);color:var(--am)">ICC</span><h2>'+A.t+'</h2><p>'+A.s+'</p></div>';
+  h+='<div class="cnt">'+(dA+dB)+'/8</div>';
+  A.q.forEach((item,i)=>{const ok=ST.a['IA_'+i];
+    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IA_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
-  h+='<div style="margin:12px 0 8px;padding:8px 10px;background:var(--aml);border-radius:var(--r);font-size:11px;font-weight:500;color:var(--am)">E quando la consegna...</div>';
-  Q.ICCB.forEach((q,i)=>{const ok=ST.a['IB_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt"><span class="qn">'+(i+5)+'.</span> '+q+'</div><div class="lk">';
-    S5.forEach((l,v)=>{h+='<div class="lb'+(ST.a['IB_'+i]===(v+1)?' on':'')+'" onclick="sa(\'IB_'+i+"',"+(v+1)+')">'+l+'</div>';});
+  h+='<div class="divider" style="background:var(--aml);color:var(--am)">'+B.s+'</div>';
+  B.q.forEach((item,i)=>{const ok=ST.a['IB_'+i];
+    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IB_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   return h;
 }
 
+// RULES
 function rRules(){
   const done=S9Q.filter((_,i)=>ST.a['S9_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--col);color:var(--co)">REG</span><h2>Regole, note e conseguenze</h2><p>Rispondi con sincerit\u00e0.</p></div>';
+  let h='<div class="sh"><span class="sht" style="background:var(--col);color:var(--co)">REG</span><h2>Regole, note e conseguenze</h2><p>Rispondi con sincerità.</p></div>';
   h+='<div class="cnt">'+done+'/'+S9Q.length+'</div>';
-  S9Q.forEach((q,i)=>{const ok=ST.a['S9_'+i];
-    if(q.tp==='emo'){
-      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt"><span class="qn">'+(i+1)+'.</span> '+q.t+'</div><div class="emo">';
-      q.opts.forEach((l,v)=>{h+='<div class="eb'+(ST.a['S9_'+i]===(v+1)?' on':'')+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+l+'</div>';});
+  S9Q.forEach((item,i)=>{const ok=ST.a['S9_'+i];
+    if(item.tp==='emo'){
+      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="emo">';
+      item.opts.forEach((l,v)=>{h+='<div class="eb'+(ok===(v+1)?' on':'')+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+l+'</div>';});
       h+='</div></div>';
     }else{
-      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt"><span class="qn">'+(i+1)+'.</span> '+q.t+'</div><div class="lk">';
-      S5.forEach((l,v)=>{h+='<div class="lb'+(ST.a['S9_'+i]===(v+1)?' on':'')+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+l+'</div>';});
+      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+      item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+opt+'</div>';});
       h+='</div></div>';}});
   return h;
 }
 
+// RANKING
 function rRank(){
-  let h='<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">PRI</span><h2>Cosa conta per te</h2><p>Tocca in ordine di importanza. Prima = pi\u00f9 importante.</p></div>';
+  let h='<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">PRI</span><h2>Cosa conta per te</h2><p>Tocca in ordine di importanza.</p></div>';
   h+='<div class="cnt">'+ST.rk.length+'/'+RKS.length+'</div>';
   if(ST.rk.length)h+='<div style="text-align:right;margin-bottom:4px"><span style="font-size:10px;color:var(--co);cursor:pointer;font-weight:600" onclick="ST.rk=[];go();">Ricomincia</span></div>';
   RKS.forEach((item,i)=>{const p=ST.rk.indexOf(i);h+='<div class="ri'+(p!==-1?' rk':'')+'" onclick="tR('+i+')"><div class="rn">'+(p!==-1?p+1:'')+'</div><div>'+item+'</div></div>';});
@@ -266,20 +332,19 @@ function rVoice(){
 }
 function rDone(){
   return '<div class="done"><svg viewBox="0 0 64 64" width="60" fill="none"><circle cx="32" cy="32" r="30" stroke="#1B6D3F" stroke-width="2.5"/><path d="M18 34l9 9 19-20" stroke="#1B6D3F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo \u00e8 stato registrato.<br>Queste risposte ci aiuteranno a costruire una scuola migliore.</p></div>';
+  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo è stato registrato.</p></div>';
 }
 
-// === SUBMIT ===
+// SUBMIT
 function send(){
   const p=new URLSearchParams();
   p.append('ts',new Date().toISOString());p.append('nome',ST.nome);p.append('classe',ST.cls);
-  ['S1','S2','S3','S4','S6'].forEach(s=>{const n={'S1':5,'S2':5,'S3':7,'S4':5,'S6':8}[s];p.append(s,Array.from({length:n},(_,i)=>ST.a[s+'_'+i]||'').join(','));});
-  p.append('S5',Array.from({length:5},(_,i)=>ST.a['S5_'+i]||'').join(','));
+  SECS.forEach(sec=>{p.append(sec,Q[sec].q.map((_,i)=>ST.a[sec+'_'+i]||'').join(','));});
   SUBS.forEach(([code],si)=>{p.append('M_'+code,MDIMS.map((_,di)=>ST.a['M_'+si+'_'+di]||'').join(','));});
-  p.append('ICCA',Array.from({length:4},(_,i)=>ST.a['IA_'+i]||'').join(','));
-  p.append('ICCB',Array.from({length:4},(_,i)=>ST.a['IB_'+i]||'').join(','));
+  p.append('ICCA',Q.ICCA.q.map((_,i)=>ST.a['IA_'+i]||'').join(','));
+  p.append('ICCB',Q.ICCB.q.map((_,i)=>ST.a['IB_'+i]||'').join(','));
   p.append('S9',S9Q.map((_,i)=>ST.a['S9_'+i]||'').join(','));
-  p.append('S10',S10Q.map((_,i)=>ST.a['S10_'+i]||'').join(','));
+  p.append('S10',Q.S10.q.map((_,i)=>ST.a['S10_'+i]||'').join(','));
   p.append('R',RKS.map((_,i)=>{const pos=ST.rk.indexOf(i);return pos!==-1?pos+1:'';}).join(','));
   p.append('TESTO',(ST.a.voice||'').substring(0,1000));
   try{new Image().src=SCRIPT+'?'+p.toString();}catch(e){console.log(e);}
@@ -287,4 +352,5 @@ function send(){
 
 document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['u','s','i','j'].includes(e.key.toLowerCase()))e.preventDefault();});
+console.log('%cTI ASCOLTO! — Progetto Ferraboschi/Cerioli — Tutti i diritti riservati','color:#1B6D3F;font-size:12px;font-weight:bold');
 </script></body></html>
