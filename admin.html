@@ -1,37 +1,73 @@
 <!DOCTYPE html><html lang="it"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Tutti i diritti riservati">
 <title>TI ASCOLTO! — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{--g:#1B6D3F;--gl:#E8F5EE;--gd:#145230;--tl:#1A7F6D;--am:#C28B0A;--co:#B8432E;--pu:#6B4FA0;--sk:#2E7CAF;--bg:#F5F5F0;--cd:#FFF;--tx:#2C2C2C;--mu:#7A7A72;--bd:#E8E8E2;--f:'DM Sans',sans-serif;--r:12px}
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--f);background:var(--bg);color:var(--tx)}
-.top{background:var(--g);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
-.top h1{font-size:20px;font-weight:700}.top select{padding:8px 12px;border-radius:var(--r);border:none;font-family:var(--f);font-size:13px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 24px;max-width:1400px;margin:0 auto}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--f);background:var(--bg);color:var(--tx);overflow-x:hidden}
+.top{background:var(--g);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.top h1{font-size:18px;font-weight:700}.top select{padding:6px 10px;border-radius:8px;border:none;font-family:var(--f);font-size:12px}
+
+/* HERO EVIDENCE CARDS */
+.heroes{display:flex;gap:14px;padding:20px 24px;max-width:1400px;margin:0 auto}
+.hero-card{flex:1;background:var(--cd);border-radius:var(--r);padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid}
+.hero-card .n{font-size:36px;font-weight:700;line-height:1}.hero-card .l{font-size:11px;color:var(--mu);margin-top:4px;line-height:1.4}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 40px;max-width:1400px;margin:0 auto}
 .card{background:var(--cd);border-radius:var(--r);padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid var(--bd)}
 .card.full{grid-column:1/-1}
-.card h2{font-size:15px;font-weight:700;color:var(--g);margin-bottom:4px}
-.card .sub{font-size:11px;color:var(--mu);margin-bottom:14px}
-.ev{padding:10px 14px;border-radius:8px;margin-top:10px;font-size:12px;line-height:1.6}
+.card h2{font-size:14px;font-weight:700;color:var(--g);margin-bottom:2px}
+.card .sub{font-size:10px;color:var(--mu);margin-bottom:14px}
+.ev{padding:10px 14px;border-radius:8px;margin-top:12px;font-size:11px;line-height:1.6}
 .ev-warn{background:#FEF3D6;color:#7a5a0a;border-left:4px solid var(--am)}
 .ev-alert{background:#FDECE8;color:#7a2a1a;border-left:4px solid var(--co)}
 .ev-good{background:var(--gl);color:var(--gd);border-left:4px solid var(--g)}
 .ev-info{background:#E8F2FA;color:#1a5a8a;border-left:4px solid var(--sk)}
-.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.stat{flex:1;min-width:100px;text-align:center;padding:12px;background:var(--bg);border-radius:8px}
-.stat .n{font-size:24px;font-weight:700;color:var(--g)}.stat .l{font-size:10px;color:var(--mu);margin-top:2px}
-.bar-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
-.bar-item .name{width:110px;text-align:right;flex-shrink:0}.bar-item .bar{flex:1;height:20px;background:var(--bd);border-radius:4px;overflow:hidden;position:relative}
-.bar-item .fill{height:100%;border-radius:4px;transition:width .4s}.bar-item .val{font-size:10px;font-weight:600;width:30px}
-.phrase-cloud{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.phrase-tag{font-size:10px;padding:4px 8px;border-radius:12px;background:var(--gl);color:var(--gd);font-weight:500}
-.phrase-tag.warn{background:#FEF3D6;color:#7a5a0a}.phrase-tag.alert{background:#FDECE8;color:#7a2a1a}
+canvas{max-height:300px!important}
+
+/* HEATMAP */
+.hm{display:grid;gap:2px;margin-top:8px}.hm-row{display:flex;gap:2px;align-items:center}
+.hm-label{width:80px;font-size:9px;font-weight:500;text-align:right;padding-right:6px;flex-shrink:0}
+.hm-cell{flex:1;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;min-width:0}
+.hm-header{display:flex;gap:2px;padding-left:82px;margin-bottom:2px}.hm-htxt{flex:1;font-size:8px;color:var(--mu);text-align:center}
+
+/* DIVERGENT BARS */
+.div-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:10px}
+.div-label{width:100px;text-align:right;flex-shrink:0;font-weight:500}
+.div-bar{flex:1;height:22px;background:var(--bd);border-radius:4px;position:relative;overflow:hidden}
+.div-left{position:absolute;right:50%;height:100%;border-radius:4px 0 0 4px}
+.div-right{position:absolute;left:50%;height:100%;border-radius:0 4px 4px 0}
+.div-center{position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--mu);opacity:.3}
+.div-val{width:28px;font-size:9px;font-weight:600;text-align:center}
+
+/* GAUGES */
+.gauges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.gauge{width:100px;text-align:center}
+.gauge svg{width:90px;height:50px}
+.gauge .gl{font-size:9px;color:var(--mu);margin-top:2px}
+
+/* LOLLIPOP */
+.lol-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.lol-label{width:140px;font-size:10px;text-align:right;flex-shrink:0}
+.lol-track{flex:1;height:2px;background:var(--bd);position:relative;border-radius:1px}
+.lol-dot{width:14px;height:14px;border-radius:50%;position:absolute;top:-6px;transition:left .3s}
+.lol-line{position:absolute;left:0;top:0;height:2px;border-radius:1px}
+.lol-thresh{position:absolute;top:-10px;width:1px;height:22px;background:var(--mu);opacity:.3}
+.lol-val{width:30px;font-size:10px;font-weight:600}
+
+/* STACKED */
+.stk-row{display:flex;align-items:center;gap:4px;margin-bottom:5px}
+.stk-label{width:130px;font-size:9px;text-align:right;flex-shrink:0;font-weight:500}
+.stk-bar{flex:1;height:22px;display:flex;border-radius:4px;overflow:hidden}
+.stk-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:#fff;transition:width .3s}
+
 .load{text-align:center;padding:60px;font-size:14px;color:var(--mu)}
-canvas{max-height:280px}
 </style></head><body>
-<div id="gate" style="height:100%;display:flex;align-items:center;justify-content:center">
+
+<div id="gate" style="height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
 <div style="background:#fff;padding:40px;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center;max-width:360px;width:100%">
 <h1 style="font-size:24px;color:var(--g);margin-bottom:4px">TI ASCOLTO!</h1>
 <p style="font-size:12px;color:var(--mu);margin-bottom:20px">Area riservata — Dashboard docenti</p>
@@ -39,208 +75,199 @@ canvas{max-height:280px}
 <button onclick="tryPwd()" style="width:100%;padding:12px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer">Accedi</button>
 <p id="pwdErr" style="font-size:11px;color:var(--co);margin-top:8px;display:none">Password errata</p>
 </div></div>
+
 <div id="dash" style="display:none">
-<div class="top">
-<h1>TI ASCOLTO! — Dashboard docenti</h1>
-<div><select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select></div>
-</div>
-<div id="content"><div class="load">Caricamento dati dal foglio...</div></div>
+<div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
+<div><select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select></div></div>
+<div id="heroArea"></div>
+<div class="grid" id="content"></div>
 </div>
 
 <script>
 const PWD='comesei26';
-function tryPwd(){const v=document.getElementById('pwd').value;if(v===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
+function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
 
 const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1621012532&single=true&output=csv';
-
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.'];
-const SUB_CODES=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP'];
-const MDIM_NAMES=['Interesse','Realtà','Difficoltà','Chiarezza','Attivazione','Consegna'];
-const S_LABELS=['Come imparo','Il mio ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
-const S_COLORS=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
+const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP'];
+const MDIM=['Interesse','Realtà','Difficoltà','Chiarezza','Attivazione','Consegna'];
+const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
+const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
+const SNUMS=[5,5,7,12,5,8];
 
-let ALL_DATA=[];
-
-// Load — row 1 = section labels, row 2 = codes, row 3+ = data
+let ALL=[];
 function loadData(){
-fetch(CSV_URL).then(r=>r.text()).then(csv=>{
-  const rows=Papa.parse(csv,{skipEmptyLines:true}).data;
-  if(rows.length<3){document.getElementById('content').innerHTML='<div class="load">Foglio vuoto — compila qualche questionario di prova.</div>';return;}
-  const headers=rows[1];
-  for(let i=2;i<rows.length;i++){
-    const obj={};headers.forEach((h,j)=>{if(h&&h.trim())obj[h.trim()]=rows[i][j]||'';});
-    if(obj.timestamp||obj.nome)ALL_DATA.push(obj);
-  }
-  document.getElementById('filtro').onchange=()=>render();
-  render();
-}).catch(e=>{document.getElementById('content').innerHTML='<div class="load">Errore caricamento. Verifica che il foglio sia pubblicato come CSV.</div>';});
+  fetch(CSV_URL).then(r=>r.text()).then(csv=>{
+    const rows=Papa.parse(csv,{skipEmptyLines:true}).data;
+    if(rows.length<3){document.getElementById('content').innerHTML='<div class="load">Nessun dato.</div>';return;}
+    const hdr=rows[1];
+    for(let i=2;i<rows.length;i++){const o={};hdr.forEach((h,j)=>{if(h&&h.trim())o[h.trim()]=rows[i][j]||'';});if(o.timestamp||o.nome)ALL.push(o);}
+    document.getElementById('filtro').onchange=()=>render();
+    render();
+  }).catch(()=>{document.getElementById('content').innerHTML='<div class="load">Errore CSV.</div>';});
 }
 
-function getData(){
-  const f=document.getElementById('filtro').value;
-  return f==='all'?ALL_DATA:ALL_DATA.filter(r=>r.classe===f);
-}
-
-function avg(rows,key){let s=0,c=0;rows.forEach(r=>{const v=parseFloat(r[key]);if(v){s+=v;c++;}});return c?s/c:0;}
-function pct3(rows,key){let c=0,t=0;rows.forEach(r=>{const v=parseFloat(r[key]);if(v){t++;if(v===3)c++;}});return t?Math.round(c/t*100):0;}
-function pct1(rows,key){let c=0,t=0;rows.forEach(r=>{const v=parseFloat(r[key]);if(v){t++;if(v===1)c++;}});return t?Math.round(c/t*100):0;}
+function D(){const f=document.getElementById('filtro').value;return f==='all'?ALL:ALL.filter(r=>r.classe===f);}
+function avg(R,k){let s=0,c=0;R.forEach(r=>{const v=+r[k];if(v){s+=v;c++;}});return c?s/c:0;}
+function dist(R,k){let d=[0,0,0];R.forEach(r=>{const v=+r[k];if(v>=1&&v<=3)d[v-1]++;});const t=d[0]+d[1]+d[2];return t?d.map(x=>Math.round(x/t*100)):[0,0,0];}
+function pct(R,k,v){let c=0,t=0;R.forEach(r=>{const x=+r[k];if(x){t++;if(x===v)c++;}});return t?Math.round(c/t*100):0;}
 
 function render(){
-  const D=getData();const N=D.length;
-  if(!N){document.getElementById('content').innerHTML='<div class="load">Nessun dato trovato.</div>';return;}
+  const R=D(),N=R.length;if(!N){document.getElementById('content').innerHTML='<div class="load">Nessun dato.</div>';document.getElementById('heroArea').innerHTML='';return;}
 
-  let h='<div class="grid">';
+  // === HERO EVIDENCE CARDS ===
+  const passivePct=pct(R,'M_MATE_ATV',1);
+  const forgetPct=pct(R,'S4_9',3);
+  const votoPct=pct(R,'S4_11',3);
+  const rispPct=pct(R,'S9_7',3);
+  let hh='<div class="heroes">';
+  hh+='<div class="hero-card" style="border-color:var(--co)"><div class="n" style="color:var(--co)">'+passivePct+'%</div><div class="l">si sente passivo<br>in Matematica</div></div>';
+  hh+='<div class="hero-card" style="border-color:var(--am)"><div class="n" style="color:var(--am)">'+forgetPct+'%</div><div class="l">dimentica tutto<br>dopo pochi giorni</div></div>';
+  hh+='<div class="hero-card" style="border-color:var(--pu)"><div class="n" style="color:var(--pu)">'+votoPct+'%</div><div class="l">studia solo<br>per il voto</div></div>';
+  hh+='<div class="hero-card" style="border-color:var(--g)"><div class="n" style="color:var(--g)">'+rispPct+'%</div><div class="l">d\u00e0 il massimo se<br>trattato con rispetto</div></div>';
+  hh+='</div>';
+  document.getElementById('heroArea').innerHTML=hh;
 
-  // === STAT OVERVIEW ===
-  h+='<div class="card full"><div class="stat-row">';
-  h+='<div class="stat"><div class="n">'+N+'</div><div class="l">risposte totali</div></div>';
-  ['1ª','2ª','3ª'].forEach(c=>{const n=D.filter(r=>r.classe===c).length;h+='<div class="stat"><div class="n">'+n+'</div><div class="l">'+c+'</div></div>';});
-  h+='</div></div>';
+  let h='';
 
-  // === PROFILO MEDIO ===
-  h+='<div class="card"><h2>Profilo medio dello studente</h2><div class="sub">Media delle risposte per dimensione (scala 1-3)</div>';
-  h+='<canvas id="chProfilo"></canvas></div>';
+  // === 1. RADAR: PROFILO MEDIO ===
+  h+='<div class="card"><h2>Profilo medio dello studente</h2><div class="sub">Le 6 dimensioni — media su scala 1-3</div><canvas id="chRadar"></canvas></div>';
 
-  // === MATERIE: ATTIVAZIONE ===
-  h+='<div class="card"><h2>Dove si sentono attivi?</h2><div class="sub">% studenti che si sentono ATTIVI (opzione 3) per materia</div>';
-  h+='<canvas id="chAttivi"></canvas>';
-  // Find most passive subjects
-  let passiveData=SUB_CODES.map((sc,i)=>({name:SUBS[i],pct:pct1(D,'M_'+sc+'_ATV')})).sort((a,b)=>b.pct-a.pct).filter(x=>x.pct>30);
-  if(passiveData.length){h+='<div class="ev ev-alert"><strong>Attenzione:</strong> '+passiveData.map(x=>x.name+' ('+x.pct+'% passivi)').join(', ')+'</div>';}
-  h+='</div>';
-
-  // === MATERIE: CHIAREZZA SPIEGAZIONI ===
-  h+='<div class="card"><h2>Capiscono le spiegazioni?</h2><div class="sub">% studenti che NON capiscono (opzione 1) per materia</div>';
-  h+='<canvas id="chCapisce"></canvas>';
-  let noCapisce=SUB_CODES.map((sc,i)=>({name:SUBS[i],pct:pct1(D,'M_'+sc+'_SPG')})).sort((a,b)=>b.pct-a.pct).filter(x=>x.pct>25);
-  if(noCapisce.length){h+='<div class="ev ev-warn"><strong>Da indagare:</strong> '+noCapisce.map(x=>x.name+' ('+x.pct+'% non capisce)').join(', ')+'</div>';}
-  h+='</div>';
-
-  // === ICC CONSEGNA ===
-  h+='<div class="card"><h2>La consegna: chi non legge e cosa non funziona</h2><div class="sub">ICC-Studente (impulsività) vs ICC-Consegna (bisogno supporto)</div>';
-  let iccSAvg=0,iccCAvg=0,iccSC=0,iccCC=0;
-  D.forEach(r=>{
-    let sa=0,sc=0,ca=0,cc=0;
-    for(let i=1;i<=4;i++){const v=parseFloat(r['ICC_A'+i]);if(v){sa+=(4-v);sc++;}}
-    for(let i=1;i<=4;i++){const v=parseFloat(r['ICC_B'+i]);if(v){ca+=v;cc++;}}
-    if(sc){iccSAvg+=sa/sc;iccSC++;}if(cc){iccCAvg+=ca/cc;iccCC++;}
+  // === 2. HEATMAP: MATERIE × DIMENSIONI ===
+  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Ogni cella mostra la media. Colore: verde = alto, rosso = basso</div>';
+  h+='<div class="hm-header">';MDIM.forEach(d=>{h+='<div class="hm-htxt">'+d+'</div>';});h+='</div>';
+  SUBS.forEach((sn,si)=>{
+    h+='<div class="hm-row"><div class="hm-label">'+sn+'</div>';
+    MDIM.forEach((dn,di)=>{
+      const k='M_'+SUB_C[si]+'_'+['ARG','REA','DIF','SPG','ATV','CON'][di];
+      const a=avg(R,k);const c=di===2?hmColRev(a):hmCol(a);// DIF reversed
+      h+='<div class="hm-cell" style="background:'+c+'">'+a.toFixed(1)+'</div>';
+    });
+    h+='</div>';
   });
-  if(iccSC)iccSAvg/=iccSC;if(iccCC)iccCAvg/=iccCC;
-  let iccVerdict='';
-  if(iccSAvg>2&&iccCAvg>2)iccVerdict='<div class="ev ev-alert"><strong>Doppio problema:</strong> gli studenti non leggono le consegne E le consegne non sono abbastanza chiare. Serve agire su entrambi i fronti.</div>';
-  else if(iccSAvg>2)iccVerdict='<div class="ev ev-warn"><strong>Problema studente:</strong> le consegne sono chiare ma gli studenti non le leggono. Serve lavorare sulla metacognizione.</div>';
-  else if(iccCAvg>2)iccVerdict='<div class="ev ev-warn"><strong>Problema consegna:</strong> gli studenti sono attenti ma le consegne hanno bisogno di esempi e spiegazione orale.</div>';
-  else iccVerdict='<div class="ev ev-good"><strong>Buon equilibrio:</strong> studenti attenti e consegne chiare.</div>';
-  h+='<div class="stat-row"><div class="stat"><div class="n">'+iccSAvg.toFixed(1)+'</div><div class="l">ICC Studente<br>(alto=impulsivo)</div></div>';
-  h+='<div class="stat"><div class="n">'+iccCAvg.toFixed(1)+'</div><div class="l">ICC Consegna<br>(alto=da migliorare)</div></div></div>';
-  h+=iccVerdict+'</div>';
-
-  // === ASPETTATIVE: L'INSEGNANTE IDEALE ===
-  h+='<div class="card"><h2>L\'insegnante ideale secondo gli studenti</h2><div class="sub">% che sceglie l\'opzione più estrema (3) su ciascun tema</div>';
-  const aspItems=[
-    ['S6_1','Vuole varietà nel ritmo'],['S6_2','Vuole coinvolgimento emotivo'],
-    ['S6_3','Vuole creatività'],['S6_4','Vuole collegamento col reale'],
-    ['S6_5','Apprezza severità giusta'],['S6_6','Vuole esigenza + rispetto'],
-    ['S6_7','Rifiuta compiti ripetitivi'],['S6_8','Vuole scelta autonoma']
-  ];
-  aspItems.forEach(([key,label])=>{
-    const p=pct3(D,key);const col=p>60?'var(--g)':p>40?'var(--am)':'var(--bd)';
-    h+='<div class="bar-item"><div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+p+'%;background:'+col+'"></div></div><div class="val">'+p+'%</div></div>';
-  });
-  let hiAsp=aspItems.filter(([k])=>pct3(D,k)>60).map(([,l])=>l.toLowerCase());
-  if(hiAsp.length){h+='<div class="ev ev-info"><strong>Messaggio chiaro:</strong> la maggioranza degli studenti '+hiAsp.join(', ')+'. La didattica tradizionale non risponde a queste esigenze.</div>';}
   h+='</div>';
 
-  // === STUDIO E MEMORIA ===
-  h+='<div class="card"><h2>Come studiano e cosa gli resta</h2><div class="sub">Le risposte più rivelatrici sulla sezione studio</div>';
-  const studyItems=[
-    ['S4_7','Studia a memoria','alert'],['S4_9','Dimentica dopo pochi giorni','alert'],
-    ['S4_10','Ricorda solo ciò che appassiona','warn'],['S4_11','Studia solo per la verifica','alert'],
-    ['S4_12','Rilegge sperando che entri','warn']
-  ];
-  studyItems.forEach(([key,label,cls])=>{
-    const p=pct3(D,key);
-    h+='<div class="bar-item"><div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+p+'%;background:'+(p>50?'var(--co)':p>30?'var(--am)':'var(--bd)')+'"></div></div><div class="val">'+p+'%</div></div>';
+  // === 3. DIVERGENT: ATTIVI vs PASSIVI per materia ===
+  h+='<div class="card"><h2>Attivi vs Passivi per materia</h2><div class="sub">Rosso = passivi (opz. 1) | Verde = attivi (opz. 3)</div>';
+  SUBS.forEach((sn,si)=>{
+    const k='M_'+SUB_C[si]+'_ATV';const p1=pct(R,k,1),p3=pct(R,k,3);
+    h+='<div class="div-row"><div class="div-label">'+sn+'</div><div class="div-bar">';
+    h+='<div class="div-left" style="width:'+p1/2+'%;right:50%;background:var(--co)"></div>';
+    h+='<div class="div-right" style="width:'+p3/2+'%;background:var(--g)"></div>';
+    h+='<div class="div-center"></div></div>';
+    h+='<div class="div-val" style="color:var(--co)">'+p1+'</div><div class="div-val" style="color:var(--g)">'+p3+'</div></div>';
   });
-  const memPct=pct3(D,'S4_9');const votoPct=pct3(D,'S4_11');
-  if(memPct>40||votoPct>40){h+='<div class="ev ev-alert"><strong>Dato critico:</strong> '+memPct+'% dimentica tutto dopo pochi giorni, '+votoPct+'% studia solo per il voto. La memorizzazione a breve termine non è apprendimento.</div>';}
+  let worstPassive=SUB_C.map((sc,i)=>({n:SUBS[i],p:pct(R,'M_'+sc+'_ATV',1)})).sort((a,b)=>b.p-a.p)[0];
+  if(worstPassive.p>30)h+='<div class="ev ev-alert"><strong>Evidenza:</strong> in '+worstPassive.n+' il '+worstPassive.p+'% degli studenti si sente passivo. Non \u00e8 il contenuto: \u00e8 il metodo.</div>';
   h+='</div>';
 
-  // === REGOLE ===
-  h+='<div class="card"><h2>Come vivono le regole</h2><div class="sub">% che sceglie l\'opzione estrema</div>';
-  const ruleItems=[
-    ['S9_1','Regole giuste',3,'good'],['S9_2','Spiegate col perché',3,'good'],
-    ['S9_3','Nota aiuta',1,'alert'],['S9_7','Rispetto→comportamento',3,'info'],
-    ['S9_8','Punizione=per il mio bene',3,'good'],['S9_9','Dialogo>punizione',3,'info'],
-    ['S9_10','Disturbo è serio',3,'warn']
-  ];
-  ruleItems.forEach(([key,label,val,cls])=>{
-    const p=val===3?pct3(D,key):pct1(D,key);const col=cls==='alert'?'var(--co)':cls==='warn'?'var(--am)':'var(--g)';
-    h+='<div class="bar-item"><div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+p+'%;background:'+col+'"></div></div><div class="val">'+p+'%</div></div>';
-  });
-  const rispPct=pct3(D,'S9_7');
-  if(rispPct>60){h+='<div class="ev ev-info"><strong>Evidenza forte:</strong> il '+rispPct+'% degli studenti dice che se trattato con rispetto dà il massimo. La relazione educativa è la leva più potente.</div>';}
+  // === 4. SCATTER: ICC QUADRANTI ===
+  h+='<div class="card"><h2>ICC: la consegna sotto la lente</h2><div class="sub">Ogni punto = uno studente. X = impulsivit\u00e0 | Y = bisogno supporto consegna</div><canvas id="chICC"></canvas>';
+  let iccSA=0,iccCA=0,iccSC=0,iccCC=0;
+  R.forEach(r=>{let sa=0,sc=0,ca=0,cc=0;for(let i=1;i<=4;i++){const v=+r['ICC_A'+i];if(v){sa+=(4-v);sc++;}}for(let i=1;i<=4;i++){const v=+r['ICC_B'+i];if(v){ca+=v;cc++;}}if(sc){iccSA+=sa/sc;iccSC++;}if(cc){iccCA+=ca/cc;iccCC++;}});
+  if(iccSC)iccSA/=iccSC;if(iccCC)iccCA/=iccCC;
+  if(iccSA>2&&iccCA>2)h+='<div class="ev ev-alert"><strong>Doppio problema:</strong> gli studenti non leggono E le consegne non sono chiare.</div>';
+  else if(iccSA>2)h+='<div class="ev ev-warn"><strong>Problema studente:</strong> le consegne sono chiare ma non vengono lette.</div>';
+  else if(iccCA>2)h+='<div class="ev ev-warn"><strong>Problema consegna:</strong> servono esempi e spiegazione orale.</div>';
+  else h+='<div class="ev ev-good"><strong>Equilibrio:</strong> studenti attenti e consegne chiare.</div>';
   h+='</div>';
 
-  // === CITTADINANZA DIGITALE ===
-  h+='<div class="card"><h2>Cittadinanza digitale</h2><div class="sub">Efficacia del percorso sulla sicurezza online</div>';
-  const digItems=[
-    ['S10_1','Riconosce rischi'],['S10_2','Riconosce phishing'],['S10_3','Sa gestire cyberbullismo'],
-    ['S10_4','Ha cambiato comportamento'],['S10_5','Simulazioni > spiegazioni'],
-    ['S10_8','Distingue vero da falso'],['S10_9','Tra le più coinvolgenti']
-  ];
-  digItems.forEach(([key,label])=>{
-    const p=pct3(D,key);
-    h+='<div class="bar-item"><div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+p+'%;background:var(--tl)"></div></div><div class="val">'+p+'%</div></div>';
+  // === 5. LOLLIPOP: ASPETTATIVE INSEGNANTE ===
+  h+='<div class="card"><h2>L\'insegnante ideale secondo gli studenti</h2><div class="sub">% che sceglie l\'opzione pi\u00f9 forte. Linea grigia = 50%</div>';
+  const aspI=[['S6_1','Vuole variet\u00e0 di ritmo'],['S6_2','Vuole coinvolgimento emotivo'],['S6_3','Vuole creativit\u00e0'],['S6_4','Vuole legame col reale'],['S6_5','Apprezza severit\u00e0 giusta'],['S6_6','Esigenza + rispetto'],['S6_7','Rifiuta compiti ripetitivi'],['S6_8','Vuole scelta autonoma']];
+  aspI.forEach(([k,l])=>{
+    const p=pct(R,k,3);const col=p>60?'var(--g)':p>40?'var(--am)':'var(--co)';
+    h+='<div class="lol-row"><div class="lol-label">'+l+'</div><div class="lol-track">';
+    h+='<div class="lol-thresh" style="left:50%"></div>';
+    h+='<div class="lol-line" style="width:'+p+'%;background:'+col+'"></div>';
+    h+='<div class="lol-dot" style="left:calc('+p+'% - 7px);background:'+col+'"></div>';
+    h+='</div><div class="lol-val">'+p+'%</div></div>';
   });
-  const simPct=pct3(D,'S10_5');
-  if(simPct>50){h+='<div class="ev ev-good"><strong>Il metodo funziona:</strong> il '+simPct+'% dice che le simulazioni insegnano più delle spiegazioni tradizionali. La didattica esperienziale produce risultati.</div>';}
+  let over60=aspI.filter(([k])=>pct(R,k,3)>60).map(([,l])=>l.toLowerCase());
+  if(over60.length)h+='<div class="ev ev-info"><strong>Messaggio chiaro:</strong> la maggioranza '+over60.join(', ')+'. La didattica tradizionale non risponde.</div>';
   h+='</div>';
 
-  // === CONCENTRAZIONE E DISTURBO ===
-  h+='<div class="card"><h2>Concentrazione e disturbo</h2><div class="sub">L\'impatto dell\'ambiente classe sull\'apprendimento</div>';
-  const concItems=[
-    ['S3_1','Si distrae continuamente',3],['S3_2','Disturbo impedisce capire',3],
-    ['S3_4','Perde il filo se interrotto',3],['S3_6','Condizionato dagli altri',3],
-    ['S3_7','Disturbo è problema serio',3]
-  ];
-  concItems.forEach(([key,label,val])=>{
-    const p=pct3(D,key);const col=p>50?'var(--co)':p>30?'var(--am)':'var(--g)';
-    h+='<div class="bar-item"><div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+p+'%;background:'+col+'"></div></div><div class="val">'+p+'%</div></div>';
+  // === 6. STACKED: STUDIO E MEMORIA ===
+  h+='<div class="card"><h2>Come studiano e cosa resta</h2><div class="sub">Distribuzione completa delle 3 risposte per ogni domanda</div>';
+  const stI=[['S4_7','Prepararsi alla verifica','Capisce','Misto','A memoria'],['S4_9','Cosa resta dopo pochi giorni','Resta','Un po\'','Dimentica tutto'],['S4_10','Memoria e passione','Ricorda tutto','Cose preferite','Solo se appassiona'],['S4_11','Perch\u00e9 studia','Per capire','Misto','Solo per il voto'],['S4_12','Quando non capisce','Cerca alternative','Varie','Rilegge e spera']];
+  stI.forEach(([k,l,l1,l2,l3])=>{
+    const d=dist(R,k);
+    h+='<div class="stk-row"><div class="stk-label">'+l+'</div><div class="stk-bar">';
+    h+='<div class="stk-seg" style="width:'+d[0]+'%;background:var(--g)" title="'+l1+'">'+d[0]+'%</div>';
+    h+='<div class="stk-seg" style="width:'+d[1]+'%;background:var(--am)" title="'+l2+'">'+d[1]+'%</div>';
+    h+='<div class="stk-seg" style="width:'+d[2]+'%;background:var(--co)" title="'+l3+'">'+d[2]+'%</div>';
+    h+='</div></div>';
   });
-  const distPct=pct3(D,'S3_7');
-  if(distPct>40){h+='<div class="ev ev-alert"><strong>Ambiente classe:</strong> il '+distPct+'% considera il disturbo un problema serio. Non è solo disciplina: è un ostacolo all\'apprendimento di chi vuole imparare.</div>';}
+  h+='<div style="display:flex;gap:12px;margin-top:8px;font-size:9px;color:var(--mu)"><span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:var(--g)"></span>Positivo</span><span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:var(--am)"></span>Intermedio</span><span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:var(--co)"></span>Critico</span></div>';
+  const memPct=pct(R,'S4_9',3),vPct=pct(R,'S4_11',3);
+  if(memPct>40||vPct>40)h+='<div class="ev ev-alert"><strong>Dato critico:</strong> '+memPct+'% dimentica tutto dopo giorni, '+vPct+'% studia solo per il voto. Memorizzare non \u00e8 imparare.</div>';
   h+='</div>';
 
-  h+='</div>'; // close grid
+  // === 7. DIVERGENT: REGOLE ===
+  h+='<div class="card"><h2>Come vivono le regole</h2><div class="sub">Sinistra = disaccordo (opz. 1) | Destra = accordo (opz. 3)</div>';
+  const rlI=[['S9_1','Regole giuste'],['S9_2','Spiegate col perch\u00e9'],['S9_3','Nota aiuta'],['S9_6','Insegnanti equi'],['S9_7','Rispetto \u2192 comportamento'],['S9_8','Punizione = responsabilit\u00e0'],['S9_9','Dialogo > punizione'],['S9_10','Disturbo serio']];
+  rlI.forEach(([k,l])=>{
+    const p1=pct(R,k,1),p3=pct(R,k,3);
+    h+='<div class="div-row"><div class="div-label">'+l+'</div><div class="div-bar">';
+    h+='<div class="div-left" style="width:'+p1/2+'%;right:50%;background:var(--co)"></div>';
+    h+='<div class="div-right" style="width:'+p3/2+'%;background:var(--g)"></div>';
+    h+='<div class="div-center"></div></div>';
+    h+='<div class="div-val" style="color:var(--co)">'+p1+'</div><div class="div-val" style="color:var(--g)">'+p3+'</div></div>';
+  });
+  if(pct(R,'S9_7',3)>60)h+='<div class="ev ev-info"><strong>Evidenza forte:</strong> il '+pct(R,'S9_7',3)+'% dice: se trattato con rispetto do il massimo. La relazione \u00e8 la leva pi\u00f9 potente.</div>';
+  h+='</div>';
+
+  // === 8. GAUGES: CITTADINANZA DIGITALE ===
+  h+='<div class="card"><h2>Cittadinanza digitale</h2><div class="sub">Efficacia percepita del percorso — % livello massimo per competenza</div><div class="gauges">';
+  const dgI=[['S10_1','Rischi online'],['S10_2','Phishing'],['S10_3','Cyberbullismo'],['S10_4','Cambiato comp.'],['S10_5','Simulaz. > spiegaz.'],['S10_7','Immagine online'],['S10_8','Vero vs falso'],['S10_9','Coinvolgimento']];
+  dgI.forEach(([k,l])=>{
+    const p=pct(R,k,3);const col=p>60?'#1B6D3F':p>35?'#C28B0A':'#B8432E';
+    const angle=Math.PI*(p/100);const x2=50-40*Math.cos(angle);const y2=45-40*Math.sin(angle);
+    h+='<div class="gauge"><svg viewBox="0 0 100 55"><path d="M10 45 A40 40 0 0 1 90 45" fill="none" stroke="#E8E8E2" stroke-width="7" stroke-linecap="round"/>';
+    h+='<path d="M10 45 A40 40 0 '+(p>50?'0':'0')+' 1 '+x2.toFixed(1)+' '+y2.toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="7" stroke-linecap="round"/>';
+    h+='<text x="50" y="42" text-anchor="middle" font-size="14" font-weight="700" fill="'+col+'" font-family="DM Sans">'+p+'%</text></svg>';
+    h+='<div class="gl">'+l+'</div></div>';
+  });
+  h+='</div>';
+  const simPct=pct(R,'S10_5',3);
+  if(simPct>50)h+='<div class="ev ev-good"><strong>Il metodo funziona:</strong> '+simPct+'% dice che le simulazioni insegnano pi\u00f9 delle spiegazioni. La didattica esperienziale produce risultati.</div>';
+  h+='</div>';
+
+  // === 9. STACKED: CONCENTRAZIONE ===
+  h+='<div class="card"><h2>Concentrazione e disturbo</h2><div class="sub">Distribuzione risposte: impatto dell\'ambiente classe</div>';
+  const cI=[['S3_1','Segue senza distrarsi','Sempre','A volte','Mai'],['S3_2','Disturbo impedisce','No','Un po\'','Totalmente'],['S3_4','Perde il filo','Mai','A volte','Sempre'],['S3_6','Condizionato dagli altri','No','A volte','Sempre'],['S3_7','Disturbo \u00e8 problema','No','Un po\'','Serio']];
+  cI.forEach(([k,l,l1,l2,l3])=>{
+    const d=dist(R,k);
+    h+='<div class="stk-row"><div class="stk-label">'+l+'</div><div class="stk-bar">';
+    h+='<div class="stk-seg" style="width:'+d[0]+'%;background:var(--g)">'+d[0]+'%</div>';
+    h+='<div class="stk-seg" style="width:'+d[1]+'%;background:var(--am)">'+d[1]+'%</div>';
+    h+='<div class="stk-seg" style="width:'+d[2]+'%;background:var(--co)">'+d[2]+'%</div>';
+    h+='</div></div>';
+  });
+  if(pct(R,'S3_7',3)>40)h+='<div class="ev ev-alert"><strong>Ambiente classe:</strong> il '+pct(R,'S3_7',3)+'% considera il disturbo un problema serio. Non \u00e8 disciplina: \u00e8 un ostacolo per chi vuole imparare.</div>';
+  h+='</div>';
+
   document.getElementById('content').innerHTML=h;
 
-  // === DRAW CHARTS ===
-  // Profilo medio radar
-  const profData=[];const profLabels=[];
-  [['S1',5],['S2',5],['S3',7],['S4',12],['S5',5],['S6',8]].forEach(([sec,n],si)=>{
-    let s=0,c=0;
-    for(let i=1;i<=n;i++){const a=avg(D,sec+'_'+i);if(a){s+=a;c++;}}
-    profData.push(c?+(s/c).toFixed(2):0);profLabels.push(S_LABELS[si]);
-  });
-  new Chart(document.getElementById('chProfilo'),{
-    type:'radar',
-    data:{labels:profLabels,datasets:[{label:'Media classe',data:profData,backgroundColor:'rgba(27,109,63,.15)',borderColor:'#1B6D3F',pointBackgroundColor:S_COLORS,borderWidth:2}]},
-    options:{scales:{r:{min:0,max:3,ticks:{stepSize:1,font:{size:10}}}},plugins:{legend:{display:false}}}
-  });
+  // === CHART.JS: RADAR ===
+  const profD=[];SDIM.forEach((l,si)=>{const sec='S'+(si+1),n=SNUMS[si];let s=0,c=0;for(let i=1;i<=n;i++){const a=avg(R,sec+'_'+i);if(a){s+=a;c++;}}profD.push(c?+(s/c).toFixed(2):0);});
+  new Chart(document.getElementById('chRadar'),{type:'radar',data:{labels:SDIM,datasets:[{label:'Media',data:profD,backgroundColor:'rgba(27,109,63,.12)',borderColor:'#1B6D3F',pointBackgroundColor:SCOL,pointRadius:5,borderWidth:2}]},options:{scales:{r:{min:0,max:3,ticks:{stepSize:1,font:{size:9}},pointLabels:{font:{size:10,weight:500}}}},plugins:{legend:{display:false}}}});
 
-  // Attivazione per materia
-  const attData=SUB_CODES.map(sc=>pct3(D,'M_'+sc+'_ATV'));
-  new Chart(document.getElementById('chAttivi'),{
-    type:'bar',data:{labels:SUBS,datasets:[{label:'% attivi',data:attData,backgroundColor:attData.map(v=>v>50?'#1B6D3F':v>30?'#C28B0A':'#B8432E')}]},
-    options:{indexAxis:'y',scales:{x:{max:100}},plugins:{legend:{display:false}}}
+  // === CHART.JS: ICC SCATTER ===
+  const iccPts=[];
+  R.forEach(r=>{
+    let sa=0,sc=0,ca=0,cc=0;
+    for(let i=1;i<=4;i++){const v=+r['ICC_A'+i];if(v){sa+=(4-v);sc++;}}
+    for(let i=1;i<=4;i++){const v=+r['ICC_B'+i];if(v){ca+=v;cc++;}}
+    if(sc&&cc)iccPts.push({x:+(sa/sc).toFixed(2),y:+(ca/cc).toFixed(2)});
   });
+  new Chart(document.getElementById('chICC'),{type:'scatter',data:{datasets:[{label:'Studenti',data:iccPts,backgroundColor:'rgba(107,79,160,.5)',pointRadius:6}]},options:{scales:{x:{title:{display:true,text:'Impulsivit\u00e0 studente \u2192',font:{size:10}},min:0,max:3},y:{title:{display:true,text:'Bisogno supporto consegna \u2192',font:{size:10}},min:0,max:3}},plugins:{legend:{display:false},annotation:false}}});
+}
 
-  // Chiarezza per materia
-  const capData=SUB_CODES.map(sc=>pct1(D,'M_'+sc+'_SPG'));
-  new Chart(document.getElementById('chCapisce'),{
-    type:'bar',data:{labels:SUBS,datasets:[{label:'% non capisce',data:capData,backgroundColor:capData.map(v=>v>30?'#B8432E':v>15?'#C28B0A':'#1B6D3F')}]},
-    options:{indexAxis:'y',scales:{x:{max:100}},plugins:{legend:{display:false}}}
-  });
+function hmCol(v){
+  if(v>=2.5)return '#1B6D3F';if(v>=2)return '#5C9E4A';if(v>=1.5)return '#C28B0A';return '#B8432E';
+}
+function hmColRev(v){// For difficulty: high=hard=red
+  if(v>=2.5)return '#B8432E';if(v>=2)return '#C28B0A';if(v>=1.5)return '#5C9E4A';return '#1B6D3F';
 }
 </script></body></html>
