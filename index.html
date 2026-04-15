@@ -54,6 +54,8 @@
 .rn{width:22px;height:22px;border-radius:50%;background:var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--mu);flex-shrink:0}.ri.rk .rn{background:var(--g);color:#fff}
 .fb textarea{width:100%;border:2px solid var(--bd);border-radius:var(--r);padding:12px;font-family:var(--fb);font-size:13px;resize:vertical;min-height:160px;color:var(--tx);background:var(--cd);line-height:1.6}.fb textarea:focus{outline:none;border-color:var(--g)}
 .done{text-align:center;padding:40px}.done h2{font-size:20px;color:var(--g);margin:12px 0 4px}.done p{color:var(--mu);font-size:12px;line-height:1.6}
+.preview .tri-b,.preview .mx-b,.preview .eb,.preview .ri,.preview .fb textarea{pointer-events:none;opacity:.6}
+.preview .tri-b:hover,.preview .mx-b:hover{transform:none;border-color:var(--bd);background:var(--cd)}
 .divider{margin:12px 0 8px;padding:8px 10px;border-radius:var(--r);font-size:11px;font-weight:500}
 </style></head><body>
 <div id="login"><div class="lc">
@@ -194,10 +196,21 @@ $('inp-nome').oninput=function(){ST.nome=this.value.trim();ck();};
 function ck(){$('btn-s').disabled=!(ST.nome.length>2&&ST.cls&&SURVEY_OPEN);}
 function showClosed(){
   const tb=document.querySelector('.tb');
-  if(tb)tb.innerHTML='<div style="text-align:center;padding:12px"><svg viewBox="0 0 48 48" width="40" fill="none" style="margin-bottom:8px"><rect x="8" y="22" width="32" height="20" rx="3" stroke="#B8432E" stroke-width="2.5"/><path d="M16 22V16a8 8 0 0116 0v6" stroke="#B8432E" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="33" r="3" fill="#B8432E"/></svg><br><strong style="color:#B8432E;font-size:15px">Il sondaggio è attualmente chiuso</strong><br><span style="color:#7A7A72;font-size:12px">Le risposte non possono essere inviate in questo momento.<br>Riprova più tardi o contatta il tuo insegnante.</span></div>';
+  if(tb)tb.innerHTML='<div style="text-align:center;padding:12px"><svg viewBox="0 0 48 48" width="40" fill="none" style="margin-bottom:8px"><rect x="8" y="22" width="32" height="20" rx="3" stroke="#B8432E" stroke-width="2.5"/><path d="M16 22V16a8 8 0 0116 0v6" stroke="#B8432E" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="33" r="3" fill="#B8432E"/></svg><br><strong style="color:#B8432E;font-size:15px">Il sondaggio \u00e8 attualmente chiuso</strong><br><span style="color:#7A7A72;font-size:12px">Le risposte non possono essere inviate in questo momento.</span></div>';
   $('btn-s').disabled=true;$('btn-s').textContent='Sondaggio chiuso';
+  $('btn-s').insertAdjacentHTML('afterend','<button onclick="startPreview()" style="width:100%;padding:12px;background:var(--sk);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer;margin-top:8px">Sfoglia le domande</button>');
   const inputs=document.querySelectorAll('#inp-nome');inputs.forEach(i=>i.disabled=true);
   document.querySelectorAll('.cls-o').forEach(c=>{c.style.pointerEvents='none';c.style.opacity='.5';});
+}
+function startPreview(){
+  ST.nome='Anteprima';ST.cls='\u2014';ST._preview=true;
+  document.body.classList.add('preview');
+  $('login').style.display='none';$('main').style.display='block';
+  const banner=document.createElement('div');
+  banner.style.cssText='background:var(--sk);color:#fff;text-align:center;padding:6px 16px;font-size:12px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:12px';
+  banner.innerHTML='MODALIT\u00c0 ANTEPRIMA \u2014 Le risposte non vengono registrate <button onclick="location.reload()" style="padding:4px 12px;border-radius:6px;border:none;font-family:var(--f);font-size:11px;font-weight:600;background:#fff;color:var(--sk);cursor:pointer">Esci</button>';
+  $('main').querySelector('.layout').insertAdjacentElement('beforebegin',banner);
+  ST._nav=true;go();
 }
 function startApp(){if(!(ST.nome.length>2&&ST.cls&&SURVEY_OPEN))return;$('login').style.display='none';$('main').style.display='block';ST._nav=true;go();}
 
@@ -217,9 +230,12 @@ function go(){
   if(ST._nav){el.style.opacity='0';setTimeout(()=>{el.innerHTML=h;scr.scrollTop=0;el.style.opacity='1';rNv();rP();ST._nav=false;},80);}
   else{const sp=scr.scrollTop;el.innerHTML=h;scr.scrollTop=sp;rNv();rP();}
 }
-function rNv(){const s=STEPS[ST.step];if(s==='done'){$('nv').innerHTML='';return;}$('nv').innerHTML=(ST.step>0?'<button class="bt bt-b" onclick="pv()">Indietro</button>':'')+'<button class="bt bt-g"'+(canGo()?'':' disabled')+' onclick="nx()">'+(s==='voice'?'Invia':'Avanti')+'</button>';}
+function rNv(){const s=STEPS[ST.step];if(s==='done'){$('nv').innerHTML='';return;}
+  const isLast=s==='voice';const canN=ST._preview||canGo();
+  let btnTxt=isLast?(ST._preview?'Fine anteprima':'Invia'):'Avanti';
+  $('nv').innerHTML=(ST.step>0?'<button class="bt bt-b" onclick="pv()">Indietro</button>':'')+'<button class="bt bt-g"'+(canN?'':' disabled')+' onclick="nx()">'+btnTxt+'</button>';}
 function pv(){ST._nav=true;ST.step--;go();}
-function nx(){if(!canGo())return;if(STEPS[ST.step]==='voice')send();ST._nav=true;ST.step++;go();}
+function nx(){if(!ST._preview&&!canGo())return;if(STEPS[ST.step]==='voice'&&!ST._preview)send();ST._nav=true;ST.step++;go();}
 function sa(k,v){ST.a[k]=v;go();}
 
 function canGo(){
@@ -459,8 +475,10 @@ function rVoice(){
   '<div class="fb"><textarea placeholder="Scrivi qui..." oninput="ST.a.voice=this.value" maxlength="1000">'+(ST.a.voice||'')+'</textarea></div>';
 }
 function rDone(){
+  if(ST._preview) return '<div class="done"><svg viewBox="0 0 64 64" width="60" fill="none"><circle cx="32" cy="32" r="30" stroke="var(--sk)" stroke-width="2.5"/><path d="M20 32h24M32 20v24" stroke="var(--sk)" stroke-width="2.5" stroke-linecap="round"/></svg>'+
+  '<h2>Fine anteprima</h2><p>Hai visto tutte le domande del questionario.<br>Nessuna risposta \u00e8 stata registrata.</p></div>';
   return '<div class="done"><svg viewBox="0 0 64 64" width="60" fill="none"><circle cx="32" cy="32" r="30" stroke="#1B6D3F" stroke-width="2.5"/><path d="M18 34l9 9 19-20" stroke="#1B6D3F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo è stato registrato.</p></div>';
+  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo \u00e8 stato registrato.</p></div>';
 }
 
 // SUBMIT
