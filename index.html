@@ -174,7 +174,7 @@ const S9Q=[
 {q:"Quando faccio un errore, mi sento...",tp:"emo",opts:["Umiliato/a","Scoraggiato/a","Indifferente","Stimolato/a","Motivato/a"]},
 {q:"Quando ho una verifica, mi sento...",tp:"emo",opts:["Ansioso/a","Sotto pressione","Indifferente","Preparato/a","Sicuro/a"]}
 ];
-const RKS=["Andare bene a scuola","Amicizie","Sport","Famiglia","Passione/hobby","Stare bene con me stesso/a","Costruire il mio futuro"];
+const RKS=["Andare bene a scuola","Amicizie","Sport","Famiglia","Passione/hobby","Stare bene con me stesso/a","Costruire il mio futuro","Social e chat","Videogiochi e streaming"];
 const SECS=['S1','S2','S3','S4','S5','S6'];
 const STEPS=['s1','s2','s3','s4','s5','s6','matrix','icc','rules','digital','ranking','voice','done'];
 const SDIM=['Apprendimento','Velocità','Concentrazione','Comprensione e studio','Socialità','Aspettative'];
@@ -224,70 +224,82 @@ function canGo(){
 // PANELS — phrase-based, no numbers
 function rP(){rPL();rPR();}
 
-// Phrase maps: [section_key, question_index, answer_value, phrase]
+// Phrase maps: [section_key, question_index, answer_value, phrase, type]
+// type: 's'=strong, 'm'=middle
 const PL_PHRASES=[
 // S1 Come imparo
-['S1',0,3,"Impari facendo, non ascoltando."],['S1',0,1,"Impari bene ascoltando le spiegazioni."],
-['S1',1,3,"Se non vedi l'utilit\u00e0, molli."],['S1',2,3,"Senza esempi concreti ti perdi."],
-['S1',4,3,"Se non provi, dimentichi."],['S1',3,3,"Hai bisogno di costruire e creare."],
+['S1',0,3,"Impari facendo, non ascoltando.",'s'],['S1',0,2,"Alterni ascolto e pratica.",'m'],['S1',0,1,"Impari bene ascoltando.",'s'],
+['S1',1,3,"Se non vedi l'utilit\u00e0, molli.",'s'],['S1',1,2,"L'utilit\u00e0 aiuta ma non \u00e8 tutto.",'m'],
+['S1',2,3,"Senza esempi concreti ti perdi.",'s'],['S1',2,2,"Gli esempi aiutano.",'m'],
+['S1',3,3,"Hai bisogno di costruire e creare.",'s'],['S1',3,2,"Alterni teoria e pratica.",'m'],
+['S1',4,3,"Se non provi, dimentichi.",'s'],['S1',4,2,"La pratica aiuta ma non \u00e8 indispensabile.",'m'],
 // S2 Ritmo
-['S2',0,3,"La tua attenzione cala dopo pochi minuti."],['S2',0,1,"Segui le spiegazioni fino alla fine."],
-['S2',2,3,"I compiti lunghi ti scoraggiano."],['S2',3,3,"Se non capisci subito, ti blocchi."],
-['S2',1,3,"Hai bisogno di feedback immediato."],
+['S2',0,3,"La tua attenzione cala dopo pochi minuti.",'s'],['S2',0,2,"Ti distrai ma recuperi.",'m'],['S2',0,1,"Segui fino alla fine.",'s'],
+['S2',1,3,"Hai bisogno di feedback immediato.",'s'],
+['S2',2,3,"I compiti lunghi ti scoraggiano.",'s'],['S2',2,2,"I compiti lunghi ti costano fatica.",'m'],
+['S2',3,3,"Se non capisci subito, ti blocchi.",'s'],['S2',3,2,"Se non capisci chiedi aiuto.",'m'],
+['S2',4,3,"Preferisci tanti compiti brevi.",'s'],
 // S3 Concentrazione
-['S3',1,3,"Il disturbo dei compagni ti impedisce di capire."],['S3',3,3,"Se qualcuno interrompe, perdi il filo."],
-['S3',5,3,"Il comportamento degli altri ti condiziona."],['S3',6,3,"Il disturbo in classe \u00e8 un problema serio per te."],
-['S3',0,1,"Resti concentrato durante tutta la spiegazione."],
+['S3',0,1,"Resti concentrato per tutta la spiegazione.",'s'],['S3',0,2,"Ti distrai ogni tanto ma recuperi.",'m'],
+['S3',1,3,"Il disturbo dei compagni ti impedisce di capire.",'s'],
+['S3',3,3,"Se qualcuno interrompe, perdi il filo.",'s'],['S3',3,2,"Fai fatica a riprendere dopo un'interruzione.",'m'],
+['S3',5,3,"Il comportamento degli altri ti condiziona.",'s'],
+['S3',6,3,"Il disturbo \u00e8 un problema serio per te.",'s'],['S3',6,2,"Il disturbo a volte \u00e8 un problema.",'m'],
 // S4 Capisco e studio
-['S4',0,3,"I video ti fanno capire molto pi\u00f9 dei testi."],['S4',3,3,"Carta e quaderno funzionano meglio per te."],
-['S4',2,3,"I simulatori digitali ti fanno capire di pi\u00f9."],
-['S4',6,3,"Studi ripetendo a memoria."],['S4',6,1,"Studi per capire, non a memoria."],
-['S4',8,3,"Dopo pochi giorni dimentichi quasi tutto."],['S4',9,3,"Ricordi solo ci\u00f2 che ti appassiona."],
-['S4',10,3,"Studi solo per la verifica."],['S4',10,1,"Studi perch\u00e9 vuoi capire davvero."],
-['S4',11,3,"Quando non capisci, rileggi sperando che entri."],
+['S4',0,3,"I video ti fanno capire molto di pi\u00f9.",'s'],['S4',0,2,"Dipende dall'argomento: a volte video, a volte testo.",'m'],
+['S4',2,3,"I simulatori digitali ti fanno capire di pi\u00f9.",'s'],
+['S4',3,3,"Carta e quaderno funzionano meglio per te.",'s'],['S4',3,1,"Preferisci gli strumenti digitali.",'s'],
+['S4',6,3,"Studi ripetendo a memoria.",'s'],['S4',6,2,"Alterni memoria e ragionamento.",'m'],['S4',6,1,"Studi per capire, non a memoria.",'s'],
+['S4',7,3,"Senza schemi o mappe non riesci.",'s'],['S4',7,2,"Usi schemi ogni tanto.",'m'],
+['S4',8,3,"Dopo pochi giorni dimentichi quasi tutto.",'s'],['S4',8,2,"Qualcosa ti resta, qualcosa no.",'m'],
+['S4',9,3,"Ricordi solo ci\u00f2 che ti appassiona.",'s'],['S4',9,2,"Ricordi meglio le cose che ti piacciono.",'m'],
+['S4',10,3,"Studi solo per la verifica.",'s'],['S4',10,2,"Un po' per il voto, un po' per interesse.",'m'],['S4',10,1,"Studi perch\u00e9 vuoi capire davvero.",'s'],
+['S4',11,3,"Rileggi le stesse cose sperando che entrino.",'s'],['S4',11,1,"Cerchi un altro modo per capire.",'s'],
 // S5 Socialità
-['S5',0,3,"Lavori meglio in gruppo."],['S5',0,1,"Preferisci lavorare da solo."],
-['S5',4,3,"La collaborazione vera ti fa imparare il doppio."],
+['S5',0,3,"Lavori meglio in gruppo.",'s'],['S5',0,2,"Ti adatti: a volte solo, a volte in gruppo.",'m'],['S5',0,1,"Preferisci lavorare da solo.",'s'],
+['S5',4,3,"La collaborazione vera ti fa imparare il doppio.",'s'],
 // S6 Aspettative
-['S6',0,3,"Le lezioni monotone ti spengono."],['S6',1,3,"Senza coinvolgimento emotivo non ti arriva nulla."],
-['S6',3,3,"Vuoi che quello che impari sia collegato alla realt\u00e0."],
-['S6',4,3,"Apprezzi chi pretende il massimo da te."],['S6',6,3,"I compiti ripetitivi ti spengono."],
-['S6',7,3,"Vuoi poter scegliere come affrontare i compiti."],
+['S6',0,3,"Le lezioni monotone ti spengono.",'s'],['S6',0,2,"Vorresti pi\u00f9 variet\u00e0 nel ritmo.",'m'],
+['S6',1,3,"Senza coinvolgimento emotivo non ti arriva nulla.",'s'],['S6',1,2,"Il coinvolgimento aiuta.",'m'],
+['S6',3,3,"Vuoi che quello che impari sia collegato alla realt\u00e0.",'s'],['S6',3,2,"A volte vorresti capire a cosa serve.",'m'],
+['S6',4,3,"Apprezzi chi pretende il massimo da te.",'s'],
+['S6',6,3,"I compiti ripetitivi ti spengono.",'s'],['S6',6,2,"Alcuni compiti ripetitivi s\u00ec, altri no.",'m'],
+['S6',7,3,"Vuoi poter scegliere come affrontare i compiti.",'s'],['S6',7,2,"Un po' di guida con un po' di scelta.",'m'],
 ];
 
 const PR_PHRASES=[
-// ICC-A (studente) — valore 3 = impulsivo
-['IA',0,3,"Non rileggi le consegne."],['IA',1,3,"Parti subito senza pensarci."],
-['IA',2,3,"Ti bastano le prime righe."],['IA',3,3,"Pensi di aver gi\u00e0 capito tutto."],
-['IA',0,1,"Rileggi sempre con attenzione."],
-// ICC-B (consegna) — valore 3 = bisogno supporto
-['IB',0,3,"Hai bisogno di esempi concreti nella consegna."],
-['IB',1,3,"La spiegazione a voce cambia tutto per te."],
-['IB',2,3,"Ti capita spesso di fare una cosa diversa da quella richiesta."],
-['IB',3,3,"Le consegne lunghe scritte non le leggi."],
+['IA',0,3,"Non rileggi le consegne.",'s'],['IA',0,2,"Leggi veloce, poi se serve torni.",'m'],['IA',0,1,"Rileggi sempre con attenzione.",'s'],
+['IA',1,3,"Parti subito senza pensarci.",'s'],['IA',1,2,"Dai un'occhiata rapida e parti.",'m'],
+['IA',2,3,"Ti bastano le prime righe.",'s'],['IA',2,2,"Leggi pi\u00f9 o meno tutto.",'m'],
+['IA',3,3,"Pensi di aver gi\u00e0 capito tutto.",'s'],
+['IB',0,3,"Hai bisogno di esempi nella consegna.",'s'],['IB',0,2,"Un esempio a volte ti aiuta.",'m'],
+['IB',1,3,"Senza spiegazione a voce non capisci.",'s'],['IB',1,2,"La spiegazione a voce ti aiuta un po'.",'m'],
+['IB',2,3,"Fai spesso una cosa diversa da quella richiesta.",'s'],['IB',2,2,"Ogni tanto sbagli il senso della consegna.",'m'],
+['IB',3,3,"Le consegne lunghe non le leggi.",'s'],['IB',3,2,"Le consegne lunghe ti rallentano.",'m'],
 ];
 
 function rPL(){
   let h='<h3>Chi sono io</h3>';
-  let phrases=[];
-  PL_PHRASES.forEach(([sec,qi,val,phrase])=>{
-    if(ST.a[sec+'_'+qi]===val) phrases.push(phrase);
+  let strong=[],middle=[];
+  PL_PHRASES.forEach(([sec,qi,val,phrase,tp])=>{
+    if(ST.a[sec+'_'+qi]===val){if(tp==='s')strong.push(phrase);else middle.push(phrase);}
   });
-  if(phrases.length===0){
+  if(strong.length===0&&middle.length===0){
     h+='<p style="font-size:11px;color:var(--mu);font-style:italic;padding:8px 0">Rispondi alle domande e il tuo profilo si costruir\u00e0 qui, parola dopo parola.</p>';
   } else {
-    phrases.forEach(p=>{
-      h+='<div style="font-size:11px;line-height:1.5;padding:5px 8px;margin-bottom:4px;background:var(--gl);border-radius:6px;color:var(--gd)">'+p+'</div>';
-    });
+    strong.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:5px 8px;margin-bottom:4px;background:var(--gl);border-radius:6px;color:var(--gd)">'+p+'</div>';});
+    if(middle.length){
+      middle.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:5px 8px;margin-bottom:4px;background:#F5F5F0;border-radius:6px;color:var(--mu)">'+p+'</div>';});
+    }
   }
-  // ICC summary as phrases
-  let iccP=[];
-  PR_PHRASES.filter(([s])=>s==='IA'||s==='IB').forEach(([sec,qi,val,phrase])=>{
-    if(ST.a[sec+'_'+qi]===val) iccP.push(phrase);
+  let iccS=[],iccM=[];
+  PR_PHRASES.forEach(([sec,qi,val,phrase,tp])=>{
+    if(ST.a[sec+'_'+qi]===val){if(tp==='s')iccS.push(phrase);else iccM.push(phrase);}
   });
-  if(iccP.length){
+  if(iccS.length||iccM.length){
     h+='<div style="margin-top:8px;padding:6px 8px;background:var(--aml);border-radius:6px;font-size:10px;line-height:1.5;color:#8a6a0a"><strong>Tu e la consegna</strong><br>';
-    iccP.forEach(p=>{h+='\u2022 '+p+'<br>';});
+    iccS.forEach(p=>{h+='\u2022 '+p+'<br>';});
+    iccM.forEach(p=>{h+='<span style="color:#b0a060">\u2022 '+p+'</span><br>';});
     h+='</div>';
   }
   $('pnL').innerHTML=h;
@@ -295,36 +307,53 @@ function rPL(){
 
 function rPR(){
   let h='<h3>La scuola che funziona per me</h3>';
-  // From S6 aspettative
-  let asp=[];
-  if(ST.a.S6_0===3) asp.push("Ha bisogno di variare il ritmo.");
-  if(ST.a.S6_1===3) asp.push("Deve coinvolgermi emotivamente.");
-  if(ST.a.S6_2===3) asp.push("Deve dare spazio alla creativit\u00e0.");
-  if(ST.a.S6_3===3) asp.push("Deve collegare i contenuti alla realt\u00e0.");
-  if(ST.a.S6_4===3) asp.push("Pu\u00f2 essere severa, purch\u00e9 giusta.");
-  if(ST.a.S6_5===3) asp.push("Deve pretendere il massimo e rispettarmi.");
-  if(ST.a.S6_6===3) asp.push("Non deve darmi compiti ripetitivi.");
-  if(ST.a.S6_7===3) asp.push("Deve lasciarmi scegliere come lavorare.");
-  // From matrix — find subjects where student feels passive (ATV=1)
-  let passive=[], noCapisce=[];
+  // Aspettative: strong (3) and middle (2)
+  let aspS=[],aspM=[];
+  const aspMap=[
+    [0,3,"Variare il ritmo."],[0,2,"Un po\' pi\u00f9 di variet\u00e0."],
+    [1,3,"Coinvolgermi emotivamente."],[1,2,"Il coinvolgimento aiuta."],
+    [2,3,"Dare spazio alla creativit\u00e0."],
+    [3,3,"Collegare i contenuti alla realt\u00e0."],[3,2,"Capire a cosa serve."],
+    [4,3,"Pretendere il massimo, con giustizia."],
+    [5,3,"Alta aspettativa + rispetto."],
+    [6,3,"Mai compiti ripetitivi."],[6,2,"Meno compiti uguali per tutti."],
+    [7,3,"Lasciarmi scegliere come lavorare."],[7,2,"Guida + un po\' di scelta."]
+  ];
+  aspMap.forEach(([qi,val,phrase])=>{
+    if(ST.a['S6_'+qi]===val){if(val===3)aspS.push(phrase);else aspM.push(phrase);}
+  });
+  // Matrix: active, passive, understands, doesn't understand
+  let active=[],passive=[],capisce=[],noCapisce=[];
   SUBS.forEach(([sc,sn],si)=>{
+    if(ST.a['M_'+si+'_4']===3) active.push(sn);
     if(ST.a['M_'+si+'_4']===1) passive.push(sn);
+    if(ST.a['M_'+si+'_3']===3) capisce.push(sn);
     if(ST.a['M_'+si+'_3']===1) noCapisce.push(sn);
   });
 
-  if(asp.length===0 && passive.length===0 && noCapisce.length===0){
+  const hasData=aspS.length||aspM.length||active.length||passive.length||capisce.length||noCapisce.length;
+  if(!hasData){
     h+='<p style="font-size:11px;color:var(--mu);font-style:italic;padding:8px 0">Completa le sezioni e scoprirai che tipo di scuola funziona per te.</p>';
   } else {
-    if(asp.length){
-      h+='<div style="font-size:10px;font-weight:600;color:var(--sk);margin:8px 0 4px">L\'insegnante ideale per me:</div>';
-      asp.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:4px 8px;margin-bottom:3px;background:var(--skl);border-radius:6px;color:#1a5a8a">'+p+'</div>';});
+    if(aspS.length||aspM.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--sk);margin:8px 0 4px">La scuola deve:</div>';
+      aspS.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:4px 8px;margin-bottom:3px;background:var(--skl);border-radius:6px;color:#1a5a8a">'+p+'</div>';});
+      aspM.forEach(p=>{h+='<div style="font-size:11px;line-height:1.5;padding:4px 8px;margin-bottom:3px;background:#F5F5F0;border-radius:6px;color:var(--mu)">'+p+'</div>';});
+    }
+    if(active.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--g);margin:8px 0 4px">Mi sento attivo in:</div>';
+      h+='<div style="font-size:11px;padding:4px 8px;background:var(--gl);border-radius:6px;color:var(--gd)">'+active.join(', ')+'</div>';
     }
     if(passive.length){
       h+='<div style="font-size:10px;font-weight:600;color:var(--co);margin:8px 0 4px">Mi sento passivo in:</div>';
       h+='<div style="font-size:11px;padding:4px 8px;background:var(--col);border-radius:6px;color:#7a2a1a">'+passive.join(', ')+'</div>';
     }
+    if(capisce.length){
+      h+='<div style="font-size:10px;font-weight:600;color:var(--tl);margin:8px 0 4px">Capisco bene le spiegazioni in:</div>';
+      h+='<div style="font-size:11px;padding:4px 8px;background:var(--tll);border-radius:6px;color:#0a5a4a">'+capisce.join(', ')+'</div>';
+    }
     if(noCapisce.length){
-      h+='<div style="font-size:10px;font-weight:600;color:var(--am);margin:8px 0 4px">Non capisco le spiegazioni in:</div>';
+      h+='<div style="font-size:10px;font-weight:600;color:var(--am);margin:8px 0 4px">Faccio fatica a capire in:</div>';
       h+='<div style="font-size:11px;padding:4px 8px;background:var(--aml);border-radius:6px;color:#7a5a0a">'+noCapisce.join(', ')+'</div>';
     }
   }
