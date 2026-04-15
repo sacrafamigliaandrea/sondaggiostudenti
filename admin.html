@@ -320,7 +320,7 @@ function render(){
 
   // === 10. RANKING PRIORITÀ ===
   h+='<div class="card"><h2>Cosa conta per loro</h2><div class="sub">Classifica media delle priorit\u00e0 — posizione 1 = pi\u00f9 importante</div>';
-  const RK_LABELS=['Andare bene a scuola','Amicizie','Sport','Famiglia','Passione/hobby','Stare bene con me','Costruire il futuro','Social e chat','Videogiochi e streaming'];
+  const RK_LABELS=['Andare bene a scuola','Amicizie','Sport','Famiglia','Passione/hobby','Stare bene con me','Costruire il futuro','Social e chat','Videogiochi e streaming','Essere accettato/a'];
   const rkAvgs=RK_LABELS.map((_,i)=>{let s=0,c=0;R.forEach(r=>{const v=+r['R_'+(i+1)];if(v){s+=v;c++;}});return{label:RK_LABELS[i],avg:c?s/c:99,idx:i};}).sort((a,b)=>a.avg-b.avg);
   rkAvgs.forEach((item,pos)=>{
     const isSchool=item.idx===0;const col=isSchool?'var(--g)':'var(--mu)';const bg=isSchool?'var(--gl)':'var(--bg)';
@@ -332,9 +332,11 @@ function render(){
   });
   const schoolPos=rkAvgs.findIndex(x=>x.idx===0)+1;
   const socialPos=rkAvgs.findIndex(x=>x.idx===7)+1;const gamePos=rkAvgs.findIndex(x=>x.idx===8)+1;
-  if(schoolPos>=4)h+='<div class="ev ev-warn"><strong>La scuola \u00e8 al '+schoolPos+'\u00ba posto</strong> su 9 priorit\u00e0. Non \u00e8 colpa degli studenti: \u00e8 il contesto in cui crescono. La sfida \u00e8 rendere la scuola pi\u00f9 rilevante nella loro vita.</div>';
+  if(schoolPos>=4)h+='<div class="ev ev-warn"><strong>La scuola \u00e8 al '+schoolPos+'\u00ba posto</strong> su 10 priorit\u00e0. Non \u00e8 colpa degli studenti: \u00e8 il contesto in cui crescono. La sfida \u00e8 rendere la scuola pi\u00f9 rilevante nella loro vita.</div>';
   else if(schoolPos<=2)h+='<div class="ev ev-good"><strong>La scuola \u00e8 al '+schoolPos+'\u00ba posto:</strong> gli studenti la considerano importante. Un dato su cui costruire.</div>';
   if(socialPos<schoolPos||gamePos<schoolPos)h+='<div class="ev ev-alert" style="margin-top:6px"><strong>Il digitale batte la scuola:</strong> '+(socialPos<schoolPos?'Social e chat ('+socialPos+'\u00ba)':'')+(socialPos<schoolPos&&gamePos<schoolPos?' e ':'')+(gamePos<schoolPos?'Videogiochi ('+gamePos+'\u00ba)':'')+' si posizionano davanti alla scuola ('+schoolPos+'\u00ba). Il mondo digitale commerciale occupa pi\u00f9 spazio nella loro vita di quanto ne occupi l\'apprendimento.</div>';
+  const acceptPos=rkAvgs.findIndex(x=>x.idx===9)+1;
+  if(acceptPos<=3)h+='<div class="ev ev-info" style="margin-top:6px"><strong>Pressione sociale:</strong> \u201cEssere accettato/a dagli altri\u201d \u00e8 al '+acceptPos+'\u00ba posto. La paura del giudizio e dell\'esclusione pesa pi\u00f9 dello studio.</div>';
   h+='</div>';
 
   // === 11. SPAZIO LIBERO — LE LORO PAROLE ===
@@ -415,12 +417,12 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     }
 
     // Ranking
-    const RK_L=['Andare bene a scuola','Amicizie','Sport','Famiglia','Passione/hobby','Stare bene con me','Costruire il futuro','Social e chat','Videogiochi e streaming'];
+    const RK_L=['Andare bene a scuola','Amicizie','Sport','Famiglia','Passione/hobby','Stare bene con me','Costruire il futuro','Social e chat','Videogiochi e streaming','Essere accettato/a'];
     const rkA=RK_L.map((_,i)=>{let s=0,c=0;R.forEach(r=>{const v=+r['R_'+(i+1)];if(v){s+=v;c++;}});return{l:RK_L[i],a:c?s/c:99,i:i};}).sort((a,b)=>a.a-b.a);
     doc+='<h3>Classifica delle priorit\u00e0</h3>';
     rkA.forEach((it,p)=>{doc+='<div class="rank-row"><div class="rank-n'+(it.i===0?' hl':'')+'">'+(p+1)+'</div><span'+(it.i===0?' style="font-weight:700;color:#1B6D3F"':'')+'>'+it.l+'</span><span style="margin-left:auto;font-size:9px;color:#7A7A72">'+it.a.toFixed(1)+'\u00ba</span></div>';});
     const sPos=rkA.findIndex(x=>x.i===0)+1;
-    if(sPos>=4)doc+='<div class="ev ev-w"><strong>La scuola \u00e8 al '+sPos+'\u00ba posto</strong> su 9 priorit\u00e0.</div>';
+    if(sPos>=4)doc+='<div class="ev ev-w"><strong>La scuola \u00e8 al '+sPos+'\u00ba posto</strong> su 10 priorit\u00e0.</div>';
     const socialPos=rkA.findIndex(x=>x.i===7)+1;const gamePos=rkA.findIndex(x=>x.i===8)+1;
     if(socialPos<sPos||gamePos<sPos)doc+='<div class="ev ev-a">Social e/o videogiochi si posizionano davanti alla scuola nella classifica delle priorit\u00e0.</div>';
 
