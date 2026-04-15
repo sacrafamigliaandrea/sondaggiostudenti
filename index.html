@@ -17,7 +17,7 @@
 .cls-opts{display:flex;gap:8px}.cls-o{flex:1;padding:12px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
 .btn-s{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;margin-top:10px}.btn-s:hover{background:var(--gd)}.btn-s:disabled{background:var(--bd);color:var(--mu);cursor:default}
 .copy{text-align:center;font-size:9px;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)}
-#main{display:none;height:100%}.layout{display:flex;height:100%}
+#main{display:none;height:100%;flex-direction:column}.layout{display:flex;flex:1;min-height:0}
 .pn{width:250px;flex-shrink:0;overflow-y:auto;padding:14px;background:var(--cd)}.pn:first-child{border-right:1px solid var(--bd)}.pn:last-child{border-left:1px solid var(--bd)}.pn::-webkit-scrollbar{width:3px}.pn::-webkit-scrollbar-thumb{background:var(--bd)}
 .pn h3{font-size:11px;font-weight:700;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid var(--g);text-transform:uppercase;letter-spacing:.5px;color:var(--g)}
 .ct{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -205,14 +205,14 @@ function showClosed(){
 function startPreview(){
   ST.nome='Anteprima';ST.cls='\u2014';ST._preview=true;
   document.body.classList.add('preview');
-  $('login').style.display='none';$('main').style.display='block';
-  const banner=document.createElement('div');
-  banner.style.cssText='background:var(--sk);color:#fff;text-align:center;padding:6px 16px;font-size:12px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:12px';
+  $('login').style.display='none';$('main').style.display='flex';
+  const banner=document.createElement('div');banner.id='prevBanner';
+  banner.style.cssText='background:var(--sk);color:#fff;text-align:center;padding:6px 16px;font-size:12px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0';
   banner.innerHTML='MODALIT\u00c0 ANTEPRIMA \u2014 Le risposte non vengono registrate <button onclick="location.reload()" style="padding:4px 12px;border-radius:6px;border:none;font-family:var(--f);font-size:11px;font-weight:600;background:#fff;color:var(--sk);cursor:pointer">Esci</button>';
-  $('main').querySelector('.layout').insertAdjacentElement('beforebegin',banner);
+  $('main').insertAdjacentElement('afterbegin',banner);
   ST._nav=true;go();
 }
-function startApp(){if(!(ST.nome.length>2&&ST.cls&&SURVEY_OPEN))return;$('login').style.display='none';$('main').style.display='block';ST._nav=true;go();}
+function startApp(){if(!(ST.nome.length>2&&ST.cls&&SURVEY_OPEN))return;$('login').style.display='none';$('main').style.display='flex';ST._nav=true;go();}
 
 // CORE
 function go(){
