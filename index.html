@@ -308,6 +308,20 @@ const PR_PHRASES=[
 
 function rPL(){
   let h='<h3>Chi sono io</h3>';
+  if(ST._preview){
+    h+='<div style="font-size:11px;line-height:1.6;color:var(--mu);padding:4px 0">';
+    h+='<p style="margin-bottom:8px">Questo pannello si costruisce <strong style="color:var(--gd)">parola dopo parola</strong> mentre lo studente risponde.</p>';
+    h+='<p style="margin-bottom:8px">Le risposte pi\u00f9 nette generano frasi in <span style="background:var(--gl);padding:1px 6px;border-radius:4px;color:var(--gd)">verde</span> che descrivono il profilo. Le intermedie compaiono in <span style="background:#F5F5F0;padding:1px 6px;border-radius:4px">grigio</span>.</p>';
+    h+='<p style="margin-bottom:8px">Esempi di frasi che possono comparire:</p>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:var(--gl);border-radius:6px;color:var(--gd)">Impari facendo, non ascoltando.</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:var(--gl);border-radius:6px;color:var(--gd)">La tua attenzione cala dopo pochi minuti.</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:#F5F5F0;border-radius:6px;color:var(--mu)">Alterni memoria e ragionamento.</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:var(--gl);border-radius:6px;color:var(--gd)">Ricordi solo ci\u00f2 che ti appassiona.</div>';
+    h+='<div style="margin-top:10px;padding:6px 8px;background:var(--aml);border-radius:6px;font-size:10px;line-height:1.5;color:#8a6a0a"><strong>Tu e la consegna</strong><br>\u2022 Non rileggi le consegne.<br>\u2022 Le consegne lunghe ti rallentano.</div>';
+    h+='<p style="margin-top:10px;font-style:italic;font-size:10px">Lo studente si legge e dice: \u201cs\u00ec, sono io.\u201d Quello \u00e8 il momento metacognitivo.</p>';
+    h+='</div>';
+    $('pnL').innerHTML=h;return;
+  }
   let strong=[],middle=[];
   PL_PHRASES.forEach(([sec,qi,val,phrase,tp])=>{
     if(ST.a[sec+'_'+qi]===val){if(tp==='s')strong.push(phrase);else middle.push(phrase);}
@@ -335,6 +349,24 @@ function rPL(){
 
 function rPR(){
   let h='<h3>La scuola che funziona per me</h3>';
+  if(ST._preview){
+    h+='<div style="font-size:11px;line-height:1.6;color:var(--mu);padding:4px 0">';
+    h+='<p style="margin-bottom:8px">Questo pannello mostra <strong style="color:var(--sk)">cosa serve</strong> allo studente per imparare meglio.</p>';
+    h+='<p style="margin-bottom:8px">Si compone di tre aree:</p>';
+    h+='<div style="font-size:10px;font-weight:600;color:var(--sk);margin:8px 0 4px">La scuola deve:</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:var(--skl);border-radius:6px;color:#1a5a8a">Coinvolgermi emotivamente.</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:var(--skl);border-radius:6px;color:#1a5a8a">Collegare i contenuti alla realt\u00e0.</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;margin:3px 0;background:#F5F5F0;border-radius:6px;color:var(--mu)">Un po\' di guida con un po\' di scelta.</div>';
+    h+='<div style="font-size:10px;font-weight:600;color:var(--g);margin:8px 0 4px">Mi sento attivo in:</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;background:var(--gl);border-radius:6px;color:var(--gd)">Tecnologia, Ed. Fisica</div>';
+    h+='<div style="font-size:10px;font-weight:600;color:var(--co);margin:8px 0 4px">Mi sento passivo in:</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;background:var(--col);border-radius:6px;color:#7a2a1a">Matematica, Storia</div>';
+    h+='<div style="font-size:10px;font-weight:600;color:var(--am);margin:8px 0 4px">Faccio fatica a capire in:</div>';
+    h+='<div style="font-size:10px;padding:4px 8px;background:var(--aml);border-radius:6px;color:#7a5a0a">Inglese</div>';
+    h+='<p style="margin-top:10px;font-style:italic;font-size:10px">Ogni materia viene nominata: il dato \u00e8 specifico, non generico.</p>';
+    h+='</div>';
+    $('pnR').innerHTML=h;return;
+  }
   // Aspettative: strong (3) and middle (2)
   let aspS=[],aspM=[];
   const aspMap=[
