@@ -79,15 +79,50 @@ canvas{max-height:300px!important}
 
 <div id="dash" style="display:none">
 <div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
-<div style="display:flex;gap:8px;align-items:center"><select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select>
-<button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button></div></div>
+<div style="display:flex;gap:8px;align-items:center">
+<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span>
+<select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select>
+<button onclick="toggleSurvey()" id="btnToggle" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--am);cursor:pointer">Chiudi sondaggio</button>
+<button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button>
+<button onclick="clearData()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--co);cursor:pointer">Cancella dati</button>
+</div></div>
 <div id="heroArea"></div>
 <div class="grid" id="content"></div>
 </div>
 
 <script>
 const PWD='comesei26';
-function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxWhv-dFGBkBTpLfvlsbB3RQfKSfPpBi-_NBcdR8xn0cG4EFe3dm6RWM1hwGvc-w9csaQ/exec';
+let surveyOpen=true;
+
+function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';checkStatus();loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
+
+function checkStatus(){
+  fetch(SCRIPT_URL+'?action=status').then(r=>r.json()).then(d=>{
+    surveyOpen=d.status!=='closed';updateStatusUI();
+  }).catch(()=>{});
+}
+function updateStatusUI(){
+  const badge=document.getElementById('statusBadge');const btn=document.getElementById('btnToggle');
+  if(surveyOpen){badge.textContent='APERTO';badge.style.background='var(--gl)';badge.style.color='var(--g)';btn.textContent='Chiudi sondaggio';btn.style.color='var(--am)';}
+  else{badge.textContent='CHIUSO';badge.style.background='var(--col)';badge.style.color='var(--co)';btn.textContent='Apri sondaggio';btn.style.color='var(--g)';}
+}
+function toggleSurvey(){
+  const action=surveyOpen?'chiudere':'aprire';
+  if(!confirm('Vuoi '+action+' il sondaggio?'))return;
+  fetch(SCRIPT_URL+'?action=toggle&pwd='+PWD).then(r=>r.json()).then(d=>{
+    if(d.status){surveyOpen=d.status!=='closed';updateStatusUI();alert('Sondaggio '+(surveyOpen?'aperto':'chiuso')+'.');}
+    else alert('Errore: '+JSON.stringify(d));
+  }).catch(e=>alert('Errore di rete.'));
+}
+function clearData(){
+  if(!confirm('ATTENZIONE: stai per cancellare TUTTI i dati delle risposte. Questa operazione è irreversibile.\n\nSei sicuro?'))return;
+  if(!confirm('Conferma definitiva: cancellare tutti i dati?'))return;
+  fetch(SCRIPT_URL+'?action=clear&pwd='+PWD).then(r=>r.json()).then(d=>{
+    if(d.cleared){alert('Cancellati '+d.deletedRows+' record. Ricarico la pagina.');location.reload();}
+    else alert('Errore: '+JSON.stringify(d));
+  }).catch(e=>alert('Errore di rete.'));
+}
 
 const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1621012532&single=true&output=csv';
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.'];
