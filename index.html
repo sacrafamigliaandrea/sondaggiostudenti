@@ -64,6 +64,7 @@
 .mx-ext.ok{border-color:var(--g50)}
 .mx-ext .mx-qn{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:.6px;margin-bottom:4px}
 .mx-ext .mx-name{font-size:13px;font-weight:600;color:var(--g);margin-bottom:2px;line-height:1.3}
+.mx-ext .mx-intro{font-size:12px;color:var(--pu);font-weight:500;margin:2px 0 8px;line-height:1.4}
 .mx-ext .mx-desc{font-size:10px;color:var(--mu);font-style:italic;margin-bottom:8px;line-height:1.4}
 .mx-ext .tri{gap:4px}
 .mx-ext .tri-b{min-height:44px;font-size:11px;padding:8px 6px}
@@ -96,14 +97,21 @@ const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Ge
 // ============================================================
 // SUBJ_CONFIG — componenti disciplinari per materie speciali
 // ITAL, MATE, COMP sostituiscono le 6 dimensioni generiche
+// 
+// LINGUAGGIO DELLE OPZIONI:
+// - ITAL/MATE: externalizing — l'opzione [1] attribuisce la difficoltà
+//   all'oggetto di studio (i testi, le formule, le regole), non allo studente
+// - COMP: ogni componente ha una frase introduttiva che contestualizza.
+//   Alternanza tra ancoraggio temporale ("Quest'anno...") e
+//   riformulazione situazionale ("Quando succede X...")
 // ============================================================
 const SUBJ_CONFIG={
 ITAL:{
 dims:[
-{code:'ANT',name:'Antologia / Lettura',o:['Leggo poco, i testi non mi coinvolgono','Leggo, ma dipende molto dal tipo di testo','Amo leggere, mi immergo nelle storie']},
-{code:'EPL',name:'Epica e Letteratura',o:['Sono parti lontane da me, faccio fatica a starci dietro','Qualcosa mi colpisce, altro mi scivola addosso','Mi affascina scoprire da dove vengono i testi']},
-{code:'GRA',name:'Grammatica',o:['Mi confonde, non ricordo le regole quando servono','La capisco se studio, ma mi stanca','Mi piace smontare la lingua e capire come funziona']},
-{code:'SCR',name:'Scrittura',o:['Mi blocco davanti al foglio, non so cosa scrivere','Scrivo se ho una traccia chiara, altrimenti fatico','Mi piace scrivere, trovo le mie parole']}
+{code:'ANT',name:'Antologia / Lettura',o:['I testi che leggiamo a scuola sono spesso pesanti o noiosi','Dipende molto dal tipo di testo: alcuni prendono, altri no','Mi piace leggere, certe storie riescono a coinvolgermi']},
+{code:'EPL',name:'Epica e Letteratura',o:['Questi testi sono davvero lontani dalla vita di oggi','Qualcosa colpisce, ma è faticoso seguirli','Mi affascina scoprire le origini delle storie e della lingua']},
+{code:'GRA',name:'Grammatica',o:['Le regole grammaticali sono confuse e difficili da ricordare','Si capiscono studiando, ma sono pesanti','È interessante smontare la lingua e capire come funziona']},
+{code:'SCR',name:'Scrittura',o:['Le tracce di scrittura proposte a scuola sono spesso difficili o noiose','Se la traccia è chiara riesco, altrimenti faccio fatica','Mi piace scrivere e trovo parole per dire quello che penso']}
 ],
 contenuti:{
 1:{ANT:'in 1ª: favola, fiaba, mito, testo descrittivo, avventura e fantasy, primi approcci al testo poetico',EPL:'in 1ª: epica classica — origini del mito, poemi omerici (Iliade, Odissea), cenni di Eneide',GRA:'in 1ª: morfologia, fonologia, ortografia, le 9 parti del discorso',SCR:'in 1ª: riassunto, testo descrittivo e narrativo, riscrittura creativa'},
@@ -113,10 +121,10 @@ contenuti:{
 },
 MATE:{
 dims:[
-{code:'ARI',name:'Aritmetica e Algebra',o:['I numeri mi confondono, sbaglio anche i calcoli semplici','Ci arrivo con metodo, ma mi serve tanto esercizio','Con i numeri mi muovo con sicurezza']},
-{code:'GEO',name:'Geometria',o:['Non "vedo" le figure, mi perdo tra formule e disegni','Capisco se visualizzo, ma le dimostrazioni mi costano','Ragiono bene nello spazio, le figure mi piacciono']},
-{code:'REL',name:'Relazioni e funzioni',o:['Tabelle e grafici mi sembrano astratti','Li leggo, ma fatico a usarli per risolvere problemi','Mi aiutano a vedere come le cose si collegano']},
-{code:'DAT',name:'Dati e previsioni',o:['Statistica e probabilità mi entrano poco','Li uso se servono, ma non mi interessano molto','Mi incuriosisce capire cosa dicono i numeri del mondo']}
+{code:'ARI',name:'Aritmetica e Algebra',o:['I calcoli e i numeri sono davvero complicati, pieni di trappole','Con metodo ed esercizio ci si arriva, ma richiede fatica','Mi piace ragionare con i numeri, mi riescono bene']},
+{code:'GEO',name:'Geometria',o:['Le figure e le formule geometriche sono difficili da mettere insieme','Se si visualizza la figura funziona, ma le dimostrazioni sono toste','Mi piace ragionare nello spazio, le figure le "vedo" bene']},
+{code:'REL',name:'Relazioni e funzioni',o:['Tabelle, grafici e funzioni sembrano astratti, scollegati dalla realtà','Si capiscono, ma applicarli ai problemi è difficile','Sono utili: fanno vedere come le cose si collegano tra loro']},
+{code:'DAT',name:'Dati e previsioni',o:['Statistica e probabilità sono argomenti difficili e poco chiari','Si usano se servono, ma non sono argomenti appassionanti','Mi incuriosisce capire cosa dicono i numeri del mondo']}
 ],
 contenuti:{
 1:{ARI:'in 1ª: numeri naturali e decimali, 4 operazioni, potenze, divisibilità (MCD, mcm), frazioni',GEO:'in 1ª: enti geometrici fondamentali, segmenti, angoli, rette, poligoni, triangoli, quadrilateri',REL:'in 1ª: insiemi elementari, costruzione e lettura di tabelle',DAT:'in 1ª: rappresentazione dei dati — istogrammi, ideogrammi, areogrammi'},
@@ -126,13 +134,13 @@ contenuti:{
 },
 COMP:{
 dims:[
-{code:'REG',name:'Rispetto delle regole',o:['Le ignoro o le trasgredisco di frequente','Le rispetto, ma a volte sgarro o mi richiamano','Le rispetto sempre e ne capisco il senso']},
-{code:'LIN',name:'Uso del linguaggio',o:['Uso lo stesso linguaggio con tutti, a volte provoco o offendo','Adatto il tono, ma non sempre in modo appropriato','Scelgo registro e parole in base al contesto e resto rispettoso']},
-{code:'SAN',name:'Sanzioni ricevute',o:['Ho ricevuto note o sospensioni','Ho avuto qualche richiamo verbale o scritto','Non ho mai ricevuto sanzioni']},
-{code:'RES',name:'Responsabilità e assunzione del compito',o:['Evito o rifiuto i compiti che mi vengono assegnati','Mi assumo le responsabilità solo se guidato','Prendo decisioni responsabili in autonomia']},
-{code:'PAR',name:'Partecipazione e lavoro di squadra',o:['Partecipo poco e nei gruppi ostacolo il lavoro','Partecipo, ma nei gruppi ho scarsa iniziativa','Partecipo attivamente e nei gruppi collaboro davvero']},
-{code:'AUT',name:'Autocontrollo',o:['Fatico a gestire le emozioni, reagisco d\'impulso','Controllo le reazioni, con qualche difficoltà','Gestisco emozioni e reazioni con maturità']},
-{code:'FRE',name:'Frequenza',o:['Ho frequenza irregolare, assenze o ritardi frequenti','Qualche ritardo o assenza, ma in generale sono regolare','Sono sempre puntuale, non salto le lezioni']}
+{code:'REG',name:'Rispetto delle regole',intro:"Quest'anno, davanti alle regole scolastiche...",o:['Mi è capitato più volte di trasgredirle o ignorarle','Le rispetto, ma qualche volta mi capita di sgarrare','Le rispetto e ne capisco il senso']},
+{code:'LIN',name:'Uso del linguaggio',intro:'Quando parli con compagni, professori o adulti...',o:['Uso più o meno lo stesso tono con tutti, a volte un po\' forte','Cerco di adattarmi, ma non sempre ci riesco','Cambio tono in base alla persona e al contesto']},
+{code:'SAN',name:'Sanzioni ricevute',intro:"Quest'anno scolastico, dal punto di vista disciplinare...",o:['Ho ricevuto una o più note disciplinari','Ho avuto qualche richiamo verbale, ma niente di scritto','Non ho ricevuto sanzioni']},
+{code:'RES',name:'Responsabilità e assunzione del compito',intro:'Quando ti viene assegnato un compito o una consegna...',o:['Tendo a rimandarlo o a farlo solo se qualcuno mi spinge','Ci provo, ma funziona meglio se qualcuno mi guida','Mi organizzo e lo porto avanti in autonomia']},
+{code:'PAR',name:'Partecipazione e lavoro di squadra',intro:"Nei lavori di gruppo fatti quest'anno in classe...",o:['Sono rimasto più spesso in disparte, lasciando fare agli altri','Ho partecipato, ma senza prendere troppe iniziative','Ho proposto idee e contribuito davvero al lavoro']},
+{code:'AUT',name:'Autocontrollo',intro:'Quando in classe succede qualcosa che ti fa arrabbiare...',o:['Rispondi subito, senza pensarci troppo','Cerchi di trattenerti, ma non sempre ci riesci','Respiri, ci pensi, poi decidi come reagire']},
+{code:'FRE',name:'Frequenza',intro:"Quest'anno scolastico, tra presenze e ritardi...",o:['Ho accumulato più assenze o ritardi del solito','Ho avuto qualche ritardo o assenza, niente di speciale','Sono stato sempre presente e puntuale']}
 ]
 }
 };
@@ -142,14 +150,12 @@ function getSubjDims(code,classe){
     const cfg=SUBJ_CONFIG[code];
     const anno=classe?parseInt(classe[0]):null;
     return cfg.dims.map(d=>({
-      code:d.code,name:d.name,o:d.o,
+      code:d.code,name:d.name,o:d.o,intro:d.intro||null,
       desc:(cfg.contenuti&&anno)?cfg.contenuti[anno]?.[d.code]:null
     }));
   }
-  // Fallback: 6 dimensioni generiche — formattate come le speciali
-  return MDIMS.map(m=>({code:m[0],name:m[1],o:m[2],desc:null}));
+  return MDIMS.map(m=>({code:m[0],name:m[1],o:m[2],desc:null,intro:null}));
 }
-// Conta totale sotto-domande matrice (varia per classe? NO — ITAL/MATE/COMP hanno sempre stesso numero di componenti)
 function countMatrixSubs(){
   let n=0;
   SUBS.forEach(([code])=>{ n+=getSubjDims(code,null).length; });
@@ -566,6 +572,7 @@ function rMat(){
         h+='<div class="mx-ext'+(ok?' ok':'')+'">';
         h+='<div class="mx-qn">Domanda '+QNUMS.MATRIX+'.'+subNum+' · '+sn+'</div>';
         h+='<div class="mx-name">'+d.name+'</div>';
+        if(d.intro)h+='<div class="mx-intro">'+d.intro+'</div>';
         if(d.desc)h+='<div class="mx-desc">'+d.desc+'</div>';
         h+='<div class="tri">';
         d.o.forEach((opt,v)=>{
