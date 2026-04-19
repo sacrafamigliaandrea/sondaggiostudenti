@@ -74,7 +74,7 @@
 <div class="pn" id="pnR"></div>
 </div></div>
 <script>
-const SCRIPT='https://script.google.com/macros/s/AKfycbwbiFmbUl58NoV1Gz_HauzyRTpI5mEThDuGvKZ_CUXRWrybBn0C1P3khPuWltUK5oZOJg/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbxWUQOrq-4SdwsGvswn1AzhkuIcnx1-51YwDErDAV_as5_UzQnaJLwg0xLSyPQt_JxEhg/exec';
 let SURVEY_OPEN=true;
 // Check status on load
 fetch(SCRIPT+'?action=status').then(r=>r.json()).then(d=>{
@@ -665,19 +665,15 @@ function exportDaimonPDF(){
 function saveToDrive(){
   const {data:P}=buildNarrative();
   const btn=$('btnDrive');btn.textContent='Salvataggio...';btn.disabled=true;
-  const summary=JSON.stringify({nome:ST.nome,classe:ST.cls,data:new Date().toISOString(),
-    forza:P.forza,crescita:P.crescita,studio:P.studio,scuola:P.scuola,
-    matAtt:P.matAtt,matPass:P.matPass,matCap:P.matCap,matNoCap:P.matNoCap});
-  // Hidden iframe + form POST
-  let iframe=document.getElementById('driveFrame');
-  if(!iframe){iframe=document.createElement('iframe');iframe.id='driveFrame';iframe.name='driveFrame';iframe.style.display='none';document.body.appendChild(iframe);}
-  const form=document.createElement('form');form.method='POST';form.action=SCRIPT;form.target='driveFrame';form.style.display='none';
-  const f1=document.createElement('input');f1.name='action';f1.value='saveProfile';form.appendChild(f1);
-  const f2=document.createElement('input');f2.name='profile';f2.value=summary;form.appendChild(f2);
-  document.body.appendChild(form);
-  iframe.onload=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';form.remove();};
-  form.submit();
-  setTimeout(()=>{if(btn.textContent==='Salvataggio...'){btn.textContent='\u2713 Inviato';btn.style.background='var(--g)';form.remove();}},5000);
+  const s={nome:ST.nome,classe:ST.cls,
+    forza:P.forza.slice(0,6),crescita:P.crescita.slice(0,6),
+    studio:P.studio.slice(0,4),scuola:P.scuola.slice(0,4),
+    matAtt:P.matAtt,matPass:P.matPass,matCap:P.matCap,matNoCap:P.matNoCap};
+  const url=SCRIPT+'?action=saveProfile&profile='+encodeURIComponent(JSON.stringify(s));
+  const img=new Image();
+  img.onload=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';};
+  img.onerror=()=>{btn.textContent='\u2713 Inviato';btn.style.background='var(--g)';};
+  img.src=url;
 }
 
 // SUBMIT
