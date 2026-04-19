@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="it"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Progetto Ferraboschi/Cerioli - Scuola Sacra Famiglia. Tutti i diritti riservati.">
+<meta name="author" content="Progetto Andrea Cerioli"><meta name="copyright" content="2026 Progetto Andrea Cerioli - Scuola Sacra Famiglia. Tutti i diritti riservati.">
 <title>TI ASCOLTO!</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -78,7 +78,7 @@
 <div class="fd-row"><div class="fd"><label>Nome e cognome</label><input type="text" id="inp-nome" placeholder="Nome Cognome" autocomplete="off"></div>
 <div class="fd"><label>Classe</label><div class="cls-opts" id="cls-opts"></div></div></div>
 <button class="btn-s" id="btn-s" disabled onclick="startApp()">Iniziamo</button>
-<div class="copy"><a href="admin.html" style="color:var(--g);text-decoration:none;font-size:11px;display:inline-block;margin-bottom:6px;padding:4px 12px;background:var(--gl);border-radius:6px;font-weight:600">&#9881; Area riservata</a><br>© 2026 Progetto Ferraboschi/Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
+<div class="copy"><a href="admin.html" style="color:var(--g);text-decoration:none;font-size:11px;display:inline-block;margin-bottom:6px;padding:4px 12px;background:var(--gl);border-radius:6px;font-weight:600">&#9881; Area riservata</a><br>© 2026 Progetto Andrea Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
 </div></div>
 <div id="main"><div class="layout">
 <div class="pn" id="pnL"></div>
@@ -86,7 +86,7 @@
 <div class="pn" id="pnR"></div>
 </div></div>
 <script>
-const SCRIPT='https://script.google.com/macros/s/AKfycbx8BQ8yvmXWXuulJ2tuBnJ-LnNyRD2mystBTFUbqSESe3Ys_3ldyn3Qm870eZCheKMNWA/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbzPyEMTOH8_1_LvlCrOq1Ecwyn4A4-T_BPgcXN7KgCM8IQS7avIbpj2imStBzF_21t5NQ/exec';
 let SURVEY_OPEN=true;
 // Check status on load
 fetch(SCRIPT+'?action=status').then(r=>r.json()).then(d=>{
@@ -164,11 +164,8 @@ function countMatrixSubs(){
 
 const MDIMS=[
 ["ARG","Gli argomenti ti interessano?",["No","Abbastanza","Molto"]],
-["REA","Sono collegati alla realtà?",["No","Un po'","Sì"]],
-["DIF","È difficile per te?",["Facile","Così così","Difficile"]],
 ["SPG","Capisci quando ti vengono spiegati?",["No","A volte","Sì"]],
-["ATV","Ti senti attivo o passivo?",["Passivo","Dipende","Attivo"]],
-["CON","Capisci cosa ti viene chiesto?",["No","A volte","Sempre"]]
+["ATV","Ti senti attivo o passivo?",["Passivo","Dipende","Attivo"]]
 ];
 const Q={
 S1:{t:"Come imparo",s:"Come arrivo a capire le cose?",c:["gl","g"],q:[
@@ -802,7 +799,7 @@ function showDaimon(){
   h+='<button onclick="exportDaimonPDF()" style="padding:12px 24px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva PDF</button>';
   h+='<button onclick="saveToDrive()" id="btnDrive" style="padding:12px 24px;background:var(--sk);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva su Drive</button>';
   h+='</div>';
-  h+='<div style="text-align:center;margin-top:12px;font-size:10px;color:var(--mu)">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi</div>';
+  h+='<div style="text-align:center;margin-top:12px;font-size:10px;color:var(--mu)">\u00a9 2026 Progetto Andrea Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi</div>';
   h+='</div>';
   el.innerHTML=h;$('cs').scrollTop=0;
 }
@@ -818,23 +815,70 @@ function exportDaimonPDF(){
 
 function saveToDrive(){
   const btn=$('btnDrive');btn.textContent='Salvataggio...';btn.disabled=true;
-  // Extract the rendered narrative text from the page
-  const content=$('daimonContent');
-  if(!content){btn.textContent='Errore';return;}
-  // Get all paragraphs with their styling context
-  const paras=[];
-  content.querySelectorAll('p,strong').forEach(el=>{
-    const t=el.innerText.trim();if(t&&t.length>3)paras.push(t);
-  });
-  // Also grab text directly
-  const fullText=content.innerText;
-  const s={nome:ST.nome,classe:ST.cls,letter:fullText.substring(0,6000)};
-  const url=SCRIPT+'?action=saveProfile&profile='+encodeURIComponent(JSON.stringify(s));
+  // Rigenero la narrazione strutturata direttamente dai dati (niente DOM → niente bottoni finiti nel PDF)
+  const {data:P}=buildNarrative();
+  const nome=ST.nome;
+  const dataOggi=new Date().toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'});
+  
+  // Costruisco i paragrafi delle sezioni solo se ci sono dati
+  const sections=[];
+  
+  // Ecco cosa so di te
+  if(P.forza.length){
+    const forzaMain=P.forza.slice(0,4);
+    const forzaExtra=P.forza.slice(4);
+    let body=capFirst(forzaMain[0]);
+    for(let i=1;i<forzaMain.length;i++) body+='. E poi: '+forzaMain[i];
+    body+='.';
+    if(forzaExtra.length) body+=' C\'è di più: '+forzaExtra.join('. ')+'. Queste sono le tue fondamenta.';
+    sections.push({title:"Ecco cosa so di te",color:"#1B6D3F",body:body});
+  }
+  
+  // Il tuo modo di studiare
+  if(P.studio.length){
+    let body=P.studio.map((s,i)=>i===0?capFirst(s):s).join('. ')+'.';
+    sections.push({title:"Il tuo modo di studiare",color:"#6B4FA0",body:body});
+  }
+  
+  // Le tue materie parlano di te
+  if(P.matAtt.length||P.matPass.length||P.matCap.length||P.matNoCap.length){
+    let body='';
+    if(P.matAtt.length) body+='Ti senti vivo e presente in '+P.matAtt.join(', ')+'. ';
+    if(P.matPass.length) body+='Invece in '+P.matPass.join(', ')+' ti senti spento — non è colpa tua: forse è il modo in cui ti arrivano. ';
+    if(P.matCap.length) body+='Capisci bene quando ti spiegano '+P.matCap.join(', ')+'. ';
+    if(P.matNoCap.length) body+='Fai più fatica con '+P.matNoCap.join(', ')+' — non significa che non puoi farcela: significa che hai bisogno di un\'altra strada.';
+    sections.push({title:"Le tue materie parlano di te",color:"#2E7CAF",body:body.trim()});
+  }
+  
+  // Dove puoi crescere
+  if(P.crescita.length){
+    let body='';
+    P.crescita.forEach((c,i)=>{body+=(i===0?capFirst(c):c)+(i<P.crescita.length-1?'. ':'.');});
+    sections.push({title:"Adesso ti dico dove puoi crescere",color:"#C28B0A",subtitle:"non per ferirti, ma perché vedersi chiaramente è il primo passo per migliorare.",body:body});
+  }
+  
+  // La scuola che funziona per te
+  if(P.scuola.length){
+    const body='È una scuola capace di '+P.scuola.join(', ')+'. Non stai chiedendo troppo: stai chiedendo ciò che ti serve.';
+    sections.push({title:"La scuola che funziona per te",color:"#2E7CAF",body:body});
+  }
+  
+  const payload={
+    nome:nome,
+    classe:ST.cls,
+    data:dataOggi,
+    opener:"Io sono la parte di te che osserva senza giudicare. Sono qui per dirti chi sei davvero, non chi dovresti essere.",
+    sections:sections,
+    closing:"Non esiste uno studente perfetto. Esiste "+nome.split(' ')[0]+", con le sue forze e i suoi spazi aperti. E questo profilo è la mappa da cui partire."
+  };
+  
+  const url=SCRIPT+'?action=saveProfile&profile='+encodeURIComponent(JSON.stringify(payload));
   const img=new Image();
   img.onload=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';};
   img.onerror=()=>{btn.textContent='\u2713 Inviato';btn.style.background='var(--g)';};
   img.src=url;
 }
+function capFirst(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
 
 // SUBMIT
 function send(){
@@ -860,5 +904,5 @@ document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['u','s','i','j'].includes(e.key.toLowerCase()))e.preventDefault();});
 // Admin access: triple click on logo
 let _ac=0,_at=0;document.getElementById('adm-trigger').onclick=()=>{const n=Date.now();if(n-_at>800)_ac=0;_ac++;_at=n;if(_ac>=3){_ac=0;window.open('admin.html','_blank');}};
-console.log('%cTI ASCOLTO! — Progetto Ferraboschi/Cerioli — Tutti i diritti riservati','color:#1B6D3F;font-size:12px;font-weight:bold');
+console.log('%cTI ASCOLTO! — Progetto Andrea Cerioli — Tutti i diritti riservati','color:#1B6D3F;font-size:12px;font-weight:bold');
 </script></body></html>

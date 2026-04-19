@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="it"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Tutti i diritti riservati">
+<meta name="author" content="Progetto Andrea Cerioli"><meta name="copyright" content="2026 Tutti i diritti riservati">
 <title>TI ASCOLTO! — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -92,7 +92,7 @@ canvas{max-height:300px!important}
 
 <script>
 const PWD='comesei26';
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbx8BQ8yvmXWXuulJ2tuBnJ-LnNyRD2mystBTFUbqSESe3Ys_3ldyn3Qm870eZCheKMNWA/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzPyEMTOH8_1_LvlCrOq1Ecwyn4A4-T_BPgcXN7KgCM8IQS7avIbpj2imStBzF_21t5NQ/exec';
 let surveyOpen=true;
 
 function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';checkStatus();loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
@@ -124,10 +124,10 @@ function clearData(){
   }).catch(e=>alert('Errore di rete.'));
 }
 
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRHAWAYvrlNKiI6tewGhXTR2UbdENC-fwDi7-LJrjiU14v2xdjrNsP1Vn7LmOg9bLEZ3rc3SY5x5cvo/pub?gid=202387932&single=true&output=csv';
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRHAWAYvrlNKiI6tewGhXTR2UbdENC-fwDi7-LJrjiU14v2xdjrNsP1Vn7LmOg9bLEZ3rc3SY5x5cvo/pub?gid=632189738&single=true&output=csv';
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.','Informatica'];
 const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP','INFO'];
-const MDIM=['Interesse','Realtà','Difficoltà','Chiarezza','Attivazione','Consegna'];
+const MDIM=['Interesse','Chiarezza','Attivazione'];
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 const SNUMS=[5,5,7,12,5,8];
@@ -138,7 +138,7 @@ const SNUMS=[5,5,7,12,5,8];
 // Italiano/Matematica/Comportamento: componenti specifiche
 // ============================================================
 const SUBJ_DIMS_MAP={
-  _default:['ARG','REA','DIF','SPG','ATV','CON'],
+  _default:['ARG','SPG','ATV'],
   ITAL:['ANT','EPL','GRA','SCR'],
   MATE:['ARI','GEO','REL','DAT'],
   COMP:['REG','LIN','SAN','RES','PAR','AUT','FRE']
@@ -266,15 +266,15 @@ function render(){
   h+='<div class="card"><h2>Profilo medio dello studente</h2><div class="sub">Le 6 dimensioni — media su scala 1-3</div><canvas id="chRadar"></canvas></div>';
 
   // === 2. HEATMAP: MATERIE × DIMENSIONI ===
-  const HM_WORDS=[['No','Un po\'','Molto'],['No','Un po\'','S\u00ec'],['Facile','Cos\u00ec','Difficile'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo'],['No','A volte','Sempre']];
-  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Colore e parola: la sintesi delle 12 materie sulle 6 dimensioni generiche. Italiano, Matematica e Comportamento hanno sezioni dedicate sotto.</div>';
+  const HM_WORDS=[['No','Un po\'','Molto'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo']];
+  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Colore e parola: le 12 materie generiche su 3 dimensioni chiave (Interesse, Chiarezza, Attivazione). Italiano, Matematica e Comportamento in sezioni dedicate sotto.</div>';
   h+='<div class="hm-header">';MDIM.forEach(d=>{h+='<div class="hm-htxt">'+d+'</div>';});h+='</div>';
   SUBS.forEach((sn,si)=>{
     if(isSpecial(si))return; // Salto ITAL/MATE/COMP
     h+='<div class="hm-row"><div class="hm-label">'+sn+'</div>';
     MDIM.forEach((dn,di)=>{
-      const k='M_'+SUB_C[si]+'_'+['ARG','REA','DIF','SPG','ATV','CON'][di];
-      const a=avg(R,k);const c=di===2?hmColRev(a):hmCol(a);
+      const k='M_'+SUB_C[si]+'_'+['ARG','SPG','ATV'][di];
+      const a=avg(R,k);const c=hmCol(a);
       const wi=a<1.5?0:a<2.5?1:2;const word=HM_WORDS[di][wi];
       h+='<div class="hm-cell" style="background:'+c+'">'+word+'</div>';
     });
@@ -491,7 +491,7 @@ table.hm{border-collapse:collapse;width:100%;margin:6px 0}table.hm td,table.hm t
 </style></head><body>`;
 
   doc+=`<div class="cover"><h1>TI ASCOLTO!</h1><div class="sub">Profilo studente 2026 \u2014 Dossier analitico</div>
-<div class="info">Scuola Sacra Famiglia \u2014 Orzinuovi<br>Progetto Ferraboschi/Cerioli<br><br>
+<div class="info">Scuola Sacra Famiglia \u2014 Orzinuovi<br>Progetto Andrea Cerioli<br><br>
 ${ALL.length} studenti | Generato il ${new Date().toLocaleDateString('it-IT')}<br><br>
 Questo dossier contiene i risultati del questionario di profilazione<br>
 somministrato agli studenti della scuola secondaria di I grado.<br><br>
@@ -551,15 +551,15 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     doc+=pl('ICC_B3','Capire vs fare',['Fa quello che chiedono','Ogni tanto sbaglia','Fa spesso cosa diversa']);
 
     // Heatmap — solo 12 materie generiche
-    const HMW=[['No','Un po\'','Molto'],['No','Un po\'','S\u00ec'],['Facile','Cos\u00ec','Difficile'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo'],['No','A volte','Sempre']];
+    const HMW=[['No','Un po\'','Molto'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo']];
     doc+='<h3>Materie generiche: mappa termica</h3><table class="hm"><tr><th></th>';
     MDIM.forEach(d=>{doc+='<th>'+d+'</th>';});doc+='</tr>';
     SUBS.forEach((sn,si)=>{
       if(isSpecial(si))return;
       doc+='<tr><td style="text-align:left;font-weight:500">'+sn+'</td>';
       MDIM.forEach((dn,di)=>{
-        const k='M_'+SUB_C[si]+'_'+['ARG','REA','DIF','SPG','ATV','CON'][di];
-        const a=avg(R,k);const c=di===2?hmColRev(a):hmCol(a);
+        const k='M_'+SUB_C[si]+'_'+['ARG','SPG','ATV'][di];
+        const a=avg(R,k);const c=hmCol(a);
         const wi=a<1.5?0:a<2.5?1:2;
         doc+='<td style="background:'+c+';color:#fff">'+HMW[di][wi]+'</td>';
       });doc+='</tr>';
@@ -629,7 +629,7 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
       }
     }
 
-    doc+='<div class="footer">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi \u2014 Tutti i diritti riservati</div></div>';
+    doc+='<div class="footer">\u00a9 2026 Progetto Andrea Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi \u2014 Tutti i diritti riservati</div></div>';
   });
 
   doc+='</body></html>';
