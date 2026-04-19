@@ -81,7 +81,7 @@ canvas{max-height:300px!important}
 <div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
 <div style="display:flex;gap:8px;align-items:center">
 <span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span>
-<select id="filtro"><option value="all">Tutte le classi</option><option value="1ª">1ª</option><option value="2ª">2ª</option><option value="3ª">3ª</option></select>
+<select id="filtro"><option value="all">Tutte le classi</option><optgroup label="Per anno"><option value="y1">Tutte le prime</option><option value="y2">Tutte le seconde</option><option value="y3">Tutte le terze</option></optgroup><optgroup label="Per sezione"><option value="1A">1A</option><option value="1B">1B</option><option value="1C">1C</option><option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="3A">3A</option><option value="3B">3B</option><option value="3C">3C</option></optgroup></select>
 <button onclick="toggleSurvey()" id="btnToggle" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--am);cursor:pointer">Chiudi sondaggio</button>
 <button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button>
 <button onclick="clearData()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--co);cursor:pointer">Cancella dati</button>
@@ -144,7 +144,7 @@ function loadData(){
   }).catch(()=>{document.getElementById('content').innerHTML='<div class="load">Errore CSV.</div>';});
 }
 
-function D(){const f=document.getElementById('filtro').value;return f==='all'?ALL:ALL.filter(r=>r.classe===f);}
+function D(){const f=document.getElementById('filtro').value;if(f==='all')return ALL;if(f==='y1')return ALL.filter(r=>r.classe&&r.classe.startsWith('1'));if(f==='y2')return ALL.filter(r=>r.classe&&r.classe.startsWith('2'));if(f==='y3')return ALL.filter(r=>r.classe&&r.classe.startsWith('3'));return ALL.filter(r=>r.classe===f);}
 function avg(R,k){let s=0,c=0;R.forEach(r=>{const v=+r[k];if(v){s+=v;c++;}});return c?s/c:0;}
 function dist(R,k){let d=[0,0,0];R.forEach(r=>{const v=+r[k];if(v>=1&&v<=3)d[v-1]++;});const t=d[0]+d[1]+d[2];return t?d.map(x=>Math.round(x/t*100)):[0,0,0];}
 function pct(R,k,v){let c=0,t=0;R.forEach(r=>{const x=+r[k];if(x){t++;if(x===v)c++;}});return t?Math.round(c/t*100):0;}
@@ -383,7 +383,7 @@ function hmColRev(v){// For difficulty: high=hard=red
 
 function genDossier(){
   if(!ALL.length){alert('Nessun dato caricato.');return;}
-  const groups=[{label:'Tutte le classi',data:ALL},{label:'Classe 1\u00aa',data:ALL.filter(r=>r.classe==='1\u00aa')},{label:'Classe 2\u00aa',data:ALL.filter(r=>r.classe==='2\u00aa')},{label:'Classe 3\u00aa',data:ALL.filter(r=>r.classe==='3\u00aa')}];
+  const groups=[{label:'Tutte le classi',data:ALL},{label:'Tutte le prime',data:ALL.filter(r=>r.classe&&r.classe.startsWith('1'))},{label:'Tutte le seconde',data:ALL.filter(r=>r.classe&&r.classe.startsWith('2'))},{label:'Tutte le terze',data:ALL.filter(r=>r.classe&&r.classe.startsWith('3'))},{label:'1A',data:ALL.filter(r=>r.classe==='1A')},{label:'1B',data:ALL.filter(r=>r.classe==='1B')},{label:'1C',data:ALL.filter(r=>r.classe==='1C')},{label:'2A',data:ALL.filter(r=>r.classe==='2A')},{label:'2B',data:ALL.filter(r=>r.classe==='2B')},{label:'2C',data:ALL.filter(r=>r.classe==='2C')},{label:'3A',data:ALL.filter(r=>r.classe==='3A')},{label:'3B',data:ALL.filter(r=>r.classe==='3B')},{label:'3C',data:ALL.filter(r=>r.classe==='3C')}];
   const w=window.open('','_blank');
   let doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dossier TI ASCOLTO!</title>
 <style>

@@ -14,7 +14,7 @@
 .tb{background:rgba(27,109,63,.1);border-left:4px solid var(--g);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin:10px 0;font-family:var(--fb);font-size:13px;line-height:1.6;color:var(--gd)}
 .fd-row{display:flex;gap:16px}.fd{flex:1;margin:10px 0}.fd label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
 .fd input{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:var(--r);font-family:var(--f);font-size:16px;background:rgba(255,255,255,.9)}.fd input:focus{outline:none;border-color:var(--g)}
-.cls-opts{display:flex;gap:8px}.cls-o{flex:1;padding:12px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
+.cls-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.cls-o{padding:10px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
 .btn-s{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;margin-top:10px}.btn-s:hover{background:var(--gd)}.btn-s:disabled{background:var(--bd);color:var(--mu);cursor:default}
 .copy{text-align:center;font-size:9px;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)}
 #main{display:none;height:100%;flex-direction:column}.layout{display:flex;flex:1;min-height:0}
@@ -191,7 +191,7 @@ let ST={step:0,nome:'',cls:null,a:{},rk:[],_nav:false};
 const $=id=>document.getElementById(id);
 
 // LOGIN
-["1ª","2ª","3ª"].forEach(c=>{const d=document.createElement('div');d.className='cls-o';d.textContent=c;d.onclick=()=>{ST.cls=c;document.querySelectorAll('.cls-o').forEach(x=>x.classList.remove('on'));d.classList.add('on');ck();};$('cls-opts').appendChild(d);});
+["1A","1B","1C","2A","2B","2C","3A","3B","3C"].forEach(c=>{const d=document.createElement('div');d.className='cls-o';d.textContent=c;d.onclick=()=>{ST.cls=c;document.querySelectorAll('.cls-o').forEach(x=>x.classList.remove('on'));d.classList.add('on');ck();};$('cls-opts').appendChild(d);});
 $('inp-nome').oninput=function(){ST.nome=this.value.trim();ck();};
 function ck(){$('btn-s').disabled=!(ST.nome.length>2&&ST.cls&&SURVEY_OPEN);}
 function showClosed(){
@@ -516,7 +516,171 @@ function rDone(){
   if(ST._preview) return '<div class="done"><svg viewBox="0 0 64 64" width="60" fill="none"><circle cx="32" cy="32" r="30" stroke="var(--sk)" stroke-width="2.5"/><path d="M20 32h24M32 20v24" stroke="var(--sk)" stroke-width="2.5" stroke-linecap="round"/></svg>'+
   '<h2>Fine anteprima</h2><p>Hai visto tutte le domande del questionario.<br>Nessuna risposta \u00e8 stata registrata.</p></div>';
   return '<div class="done"><svg viewBox="0 0 64 64" width="60" fill="none"><circle cx="32" cy="32" r="30" stroke="#1B6D3F" stroke-width="2.5"/><path d="M18 34l9 9 19-20" stroke="#1B6D3F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo \u00e8 stato registrato.</p></div>';
+  '<h2>Grazie, '+ST.nome.split(' ')[0]+'!</h2><p>Il tuo profilo \u00e8 stato registrato.</p>'+
+  '<button onclick="showDaimon()" style="margin-top:16px;padding:14px 28px;background:linear-gradient(135deg,#1B6D3F,#1A7F6D);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(27,109,63,.3)">Ascolta la tua voce interiore</button></div>';
+}
+
+function buildNarrative(){
+  const nome=ST.nome.split(' ')[0];
+  const P={forza:[],crescita:[],studio:[],scuola:[],matAtt:[],matPass:[],matCap:[],matNoCap:[]};
+  // Collect raw data
+  const map=[
+  ['S1',0,1,'sai ascoltare e trarre il meglio da una spiegazione','forza'],['S1',0,3,'hai bisogno di toccare, fare, costruire per capire davvero','forza'],
+  ['S1',2,1,'riesci a muoverti anche nel pensiero astratto','forza'],['S1',2,3,'gli esempi concreti sono la tua porta d\'ingresso verso i concetti','crescita'],
+  ['S1',3,3,'creare qualcosa \u00e8 il tuo modo naturale di imparare','forza'],
+  ['S1',4,3,'la pratica \u00e8 ci\u00f2 che trasforma le parole in ricordi','forza'],
+  ['S2',0,1,'hai il dono raro della concentrazione prolungata','forza'],['S2',0,3,'la tua attenzione \u00e8 intensa ma breve \u2014 hai bisogno che il ritmo cambi','crescita'],
+  ['S2',3,1,'di fronte alla difficolt\u00e0 non molli, cerchi un\'altra strada','forza'],['S2',3,3,'quando qualcosa non \u00e8 chiaro subito, rischi di fermarti','crescita'],
+  ['S2',2,3,'i compiti lunghi ti tolgono energia prima ancora di cominciare','crescita'],
+  ['S3',0,1,'sai isolarti dal rumore e restare dentro ci\u00f2 che conta','forza'],['S3',0,3,'il silenzio \u00e8 il tuo alleato: ne hai bisogno per pensare','crescita'],
+  ['S3',5,3,'sei permeabile a ci\u00f2 che fanno gli altri \u2014 il loro disimpegno ti contagia','crescita'],
+  ['S4',6,1,'studi per capire il perch\u00e9, non per ripetere. Questo ti porter\u00e0 lontano','forza'],['S4',6,3,'studi ancora ripetendo a memoria \u2014 prova a chiederti il perch\u00e9 delle cose, non solo il cosa','crescita'],
+  ['S4',8,1,'ci\u00f2 che impari ti resta: la tua mente trattiene','forza'],['S4',8,3,'dimentichi in fretta \u2014 forse il modo in cui studi non \u00e8 quello giusto per te','crescita'],
+  ['S4',9,3,'la passione \u00e8 il tuo vero motore: ricordi ci\u00f2 che ti emoziona','forza'],
+  ['S4',10,1,'studi perch\u00e9 vuoi sapere, non per un numero sul registro. \u00c8 raro e prezioso','forza'],['S4',10,3,'studi solo quando c\'\u00e8 la verifica \u2014 chiediti: cosa vorrei davvero sapere fare?','crescita'],
+  ['S4',11,1,'quando non capisci, cambi strategia. Questa flessibilit\u00e0 \u00e8 una forza','forza'],['S4',11,3,'quando non capisci, rileggi le stesse cose sperando che entrino \u2014 prova a cambiare strada','crescita'],
+  ['S5',0,3,'il gruppo \u00e8 il tuo ambiente naturale: cresci nel confronto','forza'],['S5',0,1,'nella solitudine trovi la concentrazione: \u00e8 una risorsa, non un limite','forza'],
+  ['S5',4,3,'quando la collaborazione \u00e8 vera, impari il doppio','forza'],
+  ['S6',4,3,'apprezzi chi ti sfida e pretende il massimo: sei pronto a crescere','forza'],
+  ['S6',2,3,'hai bisogno di creare, di esprimerti, di mettere qualcosa di tuo in ci\u00f2 che fai','forza'],
+  ['IA',0,1,'leggi le consegne con attenzione prima di partire: un\'abitudine preziosa','forza'],['IA',0,3,'non ti fermi a leggere le consegne \u2014 rallenta: un minuto di lettura ti fa risparmiare dieci di errori','crescita'],
+  ['IA',1,3,'parti troppo in fretta \u2014 il tuo istinto \u00e8 veloce, ma a volte la velocit\u00e0 ti tradisce','crescita'],
+  ];
+  map.forEach(([sec,qi,val,phrase,type])=>{if(ST.a[sec+'_'+qi]===val)P[type].push(phrase);});
+
+  // Studio
+  if(ST.a.S4_0===3) P.studio.push('i video sono il canale che apre la tua comprensione');
+  if(ST.a.S4_0===1) P.studio.push('la lettura \u00e8 il tuo strumento: il testo scritto parla la tua lingua');
+  if(ST.a.S4_2===3) P.studio.push('i simulatori e gli strumenti digitali ti permettono di sperimentare e capire');
+  if(ST.a.S4_3===3) P.studio.push('la carta e il quaderno sono i tuoi alleati pi\u00f9 fidati');
+  if(ST.a.S4_7===3) P.studio.push('costruisci sempre schemi e mappe: hai gi\u00e0 un metodo, e questo conta');
+  if(ST.a.S4_1===3) P.studio.push('uno schema visivo vale pi\u00f9 di mille parole per te');
+
+  // Materie
+  SUBS.forEach(([sc,sn],si)=>{
+    if(ST.a['M_'+si+'_4']===3) P.matAtt.push(sn);
+    if(ST.a['M_'+si+'_4']===1) P.matPass.push(sn);
+    if(ST.a['M_'+si+'_3']===3) P.matCap.push(sn);
+    if(ST.a['M_'+si+'_3']===1) P.matNoCap.push(sn);
+  });
+
+  // Scuola
+  if(ST.a.S6_0===3) P.scuola.push('variare il ritmo');
+  if(ST.a.S6_1===3) P.scuola.push('coinvolgerti emotivamente');
+  if(ST.a.S6_3===3) P.scuola.push('collegare ci\u00f2 che impari al mondo reale');
+  if(ST.a.S6_5===3) P.scuola.push('pretendere il massimo con rispetto');
+  if(ST.a.S6_7===3) P.scuola.push('lasciarti scegliere come affrontare le cose');
+  if(ST.a.S6_6===3) P.scuola.push('non darti compiti ripetitivi');
+
+  // Build flowing narrative
+  let text='';
+  const FLAME='<svg viewBox="0 0 40 56" width="32" style="display:block;margin:0 auto 12px"><path d="M20 2c0 0-14 18-14 32a14 14 0 0028 0C34 20 20 2 20 2z" fill="none" stroke="#C28B0A" stroke-width="2"/><path d="M20 16c0 0-6 10-6 18a6 6 0 0012 0c0-8-6-18-6-18z" fill="#C28B0A" opacity=".3"/><path d="M20 28c0 0-2 4-2 7a2 2 0 004 0c0-3-2-7-2-7z" fill="#C28B0A"/></svg>';
+
+  text+=FLAME;
+  text+='<div style="text-align:center;margin-bottom:16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--am)">La tua voce interiore</div>';
+  text+='<div style="text-align:center;margin-bottom:20px"><span style="font-size:22px;font-weight:700;color:var(--g)">'+ST.nome+'</span><br><span style="font-size:11px;color:var(--mu)">Classe '+ST.cls+' \u2014 '+new Date().toLocaleDateString('it-IT')+'</span></div>';
+
+  // Opening
+  text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:var(--tx);font-style:italic;text-align:center">Io sono la parte di te che osserva senza giudicare.<br>Sono qui per dirti chi sei davvero, non chi dovresti essere.</p>';
+
+  text+='<div style="width:40px;height:2px;background:var(--am);margin:16px auto;border-radius:1px"></div>';
+
+  // Come impari
+  if(P.forza.length||P.crescita.length){
+    let paraForza=P.forza.slice(0,4);
+    if(paraForza.length){
+      text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:var(--gd)"><strong style="color:var(--g)">Ecco cosa so di te.</strong> '+paraForza[0].charAt(0).toUpperCase()+paraForza[0].slice(1);
+      for(let i=1;i<paraForza.length;i++) text+='. E poi: '+paraForza[i];
+      text+='.</p>';
+    }
+    if(P.forza.length>4){
+      text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:var(--gd)">C\'\u00e8 di pi\u00f9: '+P.forza.slice(4).join('. ')+'. Queste sono le tue fondamenta.</p>';
+    }
+  }
+
+  // Studio
+  if(P.studio.length){
+    text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:#4a3a7a"><strong style="color:var(--pu)">Il tuo modo di studiare.</strong> '+P.studio.map((s,i)=>i===0?s.charAt(0).toUpperCase()+s.slice(1):s).join('. ')+'.</p>';
+  }
+
+  // Materie
+  if(P.matAtt.length||P.matPass.length){
+    let matP='<p style="font-size:13px;line-height:1.8;margin-bottom:14px"><strong style="color:var(--sk)">Le tue materie parlano di te.</strong> ';
+    if(P.matAtt.length) matP+='Ti senti vivo e presente in <strong style="color:var(--g)">'+P.matAtt.join(', ')+'</strong>. ';
+    if(P.matPass.length) matP+='Invece in <strong style="color:var(--co)">'+P.matPass.join(', ')+'</strong> ti senti spento \u2014 non \u00e8 colpa tua: forse \u00e8 il modo in cui ti arrivano. ';
+    if(P.matCap.length) matP+='Capisci bene quando ti spiegano <strong style="color:var(--tl)">'+P.matCap.join(', ')+'</strong>. ';
+    if(P.matNoCap.length) matP+='Fai pi\u00f9 fatica con <strong style="color:var(--am)">'+P.matNoCap.join(', ')+'</strong> \u2014 non significa che non puoi farcela: significa che hai bisogno di un\'altra strada.';
+    matP+='</p>';
+    text+=matP;
+  }
+
+  // Dove crescere
+  if(P.crescita.length){
+    text+='<div style="width:40px;height:2px;background:var(--am);margin:16px auto;border-radius:1px"></div>';
+    text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:#7a5a0a"><strong style="color:var(--am)">Adesso ti dico dove puoi crescere</strong> \u2014 non per ferirti, ma perch\u00e9 vedersi chiaramente \u00e8 il primo passo per migliorare.</p>';
+    text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:#7a5a0a">';
+    P.crescita.forEach((c,i)=>{text+=(i===0?c.charAt(0).toUpperCase()+c.slice(1):c)+(i<P.crescita.length-1?'. ':'.');});
+    text+='</p>';
+  }
+
+  // La scuola che ti serve
+  if(P.scuola.length){
+    text+='<div style="width:40px;height:2px;background:var(--sk);margin:16px auto;border-radius:1px"></div>';
+    text+='<p style="font-size:13px;line-height:1.8;margin-bottom:14px;color:#1a5a8a"><strong style="color:var(--sk)">La scuola che funziona per te</strong> \u00e8 una scuola capace di '+P.scuola.join(', ')+'. Non stai chiedendo troppo: stai chiedendo ci\u00f2 che ti serve.</p>';
+  }
+
+  // Closing
+  text+='<div style="width:40px;height:2px;background:var(--g);margin:20px auto;border-radius:1px"></div>';
+  text+='<p style="font-size:13px;line-height:1.8;margin-bottom:6px;text-align:center;font-style:italic;color:var(--gd)">Non esiste uno studente perfetto.<br>Esiste <strong>'+nome+'</strong>, con le sue forze e i suoi spazi aperti.<br>E questo profilo \u00e8 la mappa da cui partire.</p>';
+
+  return {text:text, data:P};
+}
+
+function showDaimon(){
+  const {text}=buildNarrative();
+  const el=$('cc');
+  let h='<div style="max-width:540px;margin:0 auto;padding:20px 0">';
+  h+=text;
+  h+='<div style="text-align:center;margin-top:24px;display:flex;gap:10px;justify-content:center">';
+  h+='<button onclick="exportDaimonPDF()" style="padding:12px 24px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva come PDF</button>';
+  h+='<button onclick="saveToDrive()" id="btnDrive" style="padding:12px 24px;background:var(--sk);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva su Drive</button>';
+  h+='</div>';
+  h+='<div style="text-align:center;margin-top:12px;font-size:10px;color:var(--mu)">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi</div>';
+  h+='</div>';
+  el.innerHTML=h;$('cs').scrollTop=0;
+}
+
+function exportDaimonPDF(){
+  const {text}=buildNarrative();
+  const w=window.open('','_blank');
+  let d='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+ST.nome+' \u2014 La tua voce interiore</title><style>';
+  d+='@page{size:A4;margin:24mm 20mm}*{margin:0;padding:0;box-sizing:border-box}';
+  d+='body{font-family:"DM Sans",Georgia,serif;color:#2C2C2C;line-height:1.8;max-width:520px;margin:0 auto;padding:20px}';
+  d+='p{margin-bottom:14px;font-size:13px}strong{font-weight:700}';
+  d+='.foot{text-align:center;font-size:8px;color:#7A7A72;margin-top:30px;padding-top:8px;border-top:1px solid #E8E8E2}';
+  d+='</style></head><body>';
+  d+=text;
+  d+='<div class="foot">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi \u2014 Tutti i diritti riservati</div>';
+  d+='</body></html>';
+  w.document.write(d);w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+function saveToDrive(){
+  const {data:P}=buildNarrative();
+  const btn=$('btnDrive');btn.textContent='Salvataggio...';btn.disabled=true;
+  const summary={nome:ST.nome,classe:ST.cls,data:new Date().toISOString(),
+    forza:P.forza,crescita:P.crescita,studio:P.studio,scuola:P.scuola,
+    matAtt:P.matAtt,matPass:P.matPass,matCap:P.matCap,matNoCap:P.matNoCap};
+  const p=new URLSearchParams();
+  p.append('action','saveProfile');
+  p.append('profile',JSON.stringify(summary));
+  try{
+    fetch(SCRIPT+'?'+p.toString()).then(r=>r.json()).then(d=>{
+      if(d.saved){btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';}
+      else{btn.textContent='Errore';btn.style.background='var(--co)';setTimeout(()=>{btn.textContent='Salva su Drive';btn.style.background='var(--sk)';btn.disabled=false;},2000);}
+    }).catch(()=>{btn.textContent='Errore rete';setTimeout(()=>{btn.textContent='Salva su Drive';btn.style.background='var(--sk)';btn.disabled=false;},2000);});
+  }catch(e){btn.textContent='Errore';}
 }
 
 // SUBMIT
