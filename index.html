@@ -79,7 +79,7 @@ let SURVEY_OPEN=true;
 fetch(SCRIPT+'?action=status').then(r=>r.json()).then(d=>{
   if(d.status==='closed'){SURVEY_OPEN=false;showClosed();}
 }).catch(()=>{});
-const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Geografia"],["MATE","Matematica"],["SCIE","Scienze"],["TECN","Tecnologia"],["ARTE","Arte e Imm."],["MUSI","Musica"],["SPAN","Spagnolo"],["EDFI","Ed. Fisica"],["RELI","Religione"],["EDCI","Ed. Civica"],["COMP","Comportam."]];
+const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Geografia"],["MATE","Matematica"],["SCIE","Scienze"],["TECN","Tecnologia"],["ARTE","Arte e Imm."],["MUSI","Musica"],["SPAN","Spagnolo"],["EDFI","Ed. Fisica"],["RELI","Religione"],["EDCI","Ed. Civica"],["COMP","Comportam."],["INFO","Informatica"]];
 const MDIMS=[
 ["ARG","Gli argomenti ti interessano?",["No","Abbastanza","Molto"]],
 ["REA","Sono collegati alla realtà?",["No","Un po'","Sì"]],
@@ -183,7 +183,7 @@ const S9Q=[
 ];
 const RKS=["Andare bene a scuola","Amicizie","Sport","Famiglia","Passione/hobby","Stare bene con me stesso/a","Costruire il mio futuro","Social e chat","Videogiochi e streaming","Essere accettato/a dagli altri"];
 const SECS=['S1','S2','S3','S4','S5','S6'];
-const STEPS=['s1','s2','s3','s4','s5','s6','matrix','icc','rules','digital','ranking','voice','done'];
+const STEPS=['s1','s2','s3','s4','s5','s6','matrix','icc','rules','digital','ranking','newsubject','voice','done'];
 const SDIM=['Apprendimento','Velocità','Concentrazione','Comprensione e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 
@@ -224,6 +224,7 @@ function go(){
   else if(s==='rules')h=rRules();
   else if(s==='digital')h=rTri('S10');
   else if(s==='ranking')h=rRank();
+  else if(s==='newsubject')h=rNewSubject();
   else if(s==='voice')h=rVoice();
   else if(s==='done')h=rDone();
   const el=$('cc'),scr=$('cs');
@@ -501,6 +502,11 @@ function rRank(){
 }
 function tR(i){const p=ST.rk.indexOf(i);if(p!==-1)ST.rk=ST.rk.filter(x=>x!==i);else ST.rk.push(i);go();}
 
+function rNewSubject(){
+  return '<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">NEW</span><h2>La materia che manca</h2><p>Se potessi aggiungere una materia nuova a quelle che studi, quale sceglieresti?</p></div>'+
+  '<div class="tb">Non esiste una risposta giusta o sbagliata. Scrivi quello che vorresti davvero imparare a scuola e che oggi non c\'\u00e8.</div>'+
+  '<div class="fb"><textarea placeholder="Quale materia aggiungeresti?" oninput="ST.a.newsubject=this.value" maxlength="500">'+(ST.a.newsubject||'')+'</textarea></div>';
+}
 function rVoice(){
   return '<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">TXT</span><h2>Spazio libero</h2><p>Scrivi quello che vuoi sulla tua esperienza a scuola.</p></div>'+
   '<div class="tb">Completamente anonimo nei risultati. Anche una sola frase conta.</div>'+
@@ -525,6 +531,7 @@ function send(){
   p.append('S9',S9Q.map((_,i)=>ST.a['S9_'+i]||'').join(','));
   p.append('S10',Q.S10.q.map((_,i)=>ST.a['S10_'+i]||'').join(','));
   p.append('R',RKS.map((_,i)=>{const pos=ST.rk.indexOf(i);return pos!==-1?pos+1:'';}).join(','));
+  p.append('MATERIA_NUOVA',(ST.a.newsubject||'').substring(0,500));
   p.append('TESTO',(ST.a.voice||'').substring(0,1000));
   try{new Image().src=SCRIPT+'?'+p.toString();}catch(e){console.log(e);}
 }

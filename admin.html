@@ -124,9 +124,9 @@ function clearData(){
   }).catch(e=>alert('Errore di rete.'));
 }
 
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1621012532&single=true&output=csv';
-const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.'];
-const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP'];
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1534327246&single=true&output=csv';
+const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.','Informatica'];
+const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP','INFO'];
 const MDIM=['Interesse','Realtà','Difficoltà','Chiarezza','Attivazione','Consegna'];
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
@@ -339,7 +339,24 @@ function render(){
   if(acceptPos<=3)h+='<div class="ev ev-info" style="margin-top:6px"><strong>Pressione sociale:</strong> \u201cEssere accettato/a dagli altri\u201d \u00e8 al '+acceptPos+'\u00ba posto. La paura del giudizio e dell\'esclusione pesa pi\u00f9 dello studio.</div>';
   h+='</div>';
 
-  // === 11. SPAZIO LIBERO — LE LORO PAROLE ===
+  // === 11. LA MATERIA CHE MANCA ===
+  const materie=R.map(r=>(r.MATERIA_NUOVA||'').trim()).filter(t=>t.length>1);
+  if(materie.length){
+    // Count frequencies
+    const freq={};materie.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
+    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+    h+='<div class="card"><h2>La materia che manca</h2><div class="sub">'+materie.length+' studenti su '+N+' hanno proposto una materia nuova</div>';
+    sorted.forEach(([nome,count])=>{
+      const pctM=Math.round(count/materie.length*100);
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:12px;font-weight:600;width:140px;text-align:right;text-transform:capitalize">'+nome+'</div>';
+      h+='<div style="flex:1;height:18px;background:var(--bd);border-radius:4px;overflow:hidden"><div style="width:'+pctM+'%;height:100%;background:var(--pu);border-radius:4px"></div></div>';
+      h+='<div style="font-size:11px;font-weight:600;color:var(--pu);width:50px">'+count+'x ('+pctM+'%)</div></div>';
+    });
+    if(sorted.length&&sorted[0][1]>=3)h+='<div class="ev ev-info"><strong>Richiesta ricorrente:</strong> \u201c'+sorted[0][0]+'\u201d \u00e8 la materia pi\u00f9 richiesta con '+sorted[0][1]+' proposte. Un segnale da non ignorare.</div>';
+    h+='</div>';
+  }
+
+  // === 12. SPAZIO LIBERO — LE LORO PAROLE ===
   const testi=R.map(r=>(r.TESTO||'').trim()).filter(t=>t.length>3);
   if(testi.length){
     h+='<div class="card full"><h2>Le loro parole</h2><div class="sub">'+testi.length+' studenti su '+N+' hanno scritto qualcosa nello spazio libero</div>';
@@ -496,6 +513,15 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     doc+=pl('S3_2','Quando i compagni disturbano',['Si concentra lo stesso','Fastidio ma regge','Non capisce pi\u00f9 nulla']);
     doc+=pl('S3_7','Il disturbo in classe',['Abbastanza ordine','A volte problema','Problema serio']);
     if(pct(R,'S3_7',3)>40)doc+='<div class="ev ev-a"><strong>'+pct(R,'S3_7',3)+'%</strong> considera il disturbo un problema serio.</div>';
+
+    // La materia che manca
+    const matN=R.map(r=>(r.MATERIA_NUOVA||'').trim()).filter(t=>t.length>1);
+    if(matN.length){
+      const freq={};matN.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
+      const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+      doc+='<h3>La materia che manca ('+matN.length+' proposte)</h3>';
+      sorted.forEach(([nome,count])=>{doc+='<div style="margin:2px 0;font-size:10px"><strong style="text-transform:capitalize">'+nome+'</strong> \u2014 '+count+'x</div>';});
+    }
 
     // Testi liberi solo nel sommativo
     if(gi===0){
