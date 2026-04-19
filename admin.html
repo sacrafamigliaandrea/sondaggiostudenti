@@ -82,7 +82,7 @@ canvas{max-height:300px!important}
 <div id="dash" style="display:none">
 <div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
 <div style="display:flex;gap:8px;align-items:center">
-<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span><div id="sessionCodeBox" style="display:none;padding:6px 14px;background:var(--pul);border:2px solid var(--pu);border-radius:8px;align-items:center;gap:10px"><div style="display:flex;flex-direction:column;align-items:flex-start"><span style="font-size:9px;font-weight:700;color:var(--pu);letter-spacing:1px;text-transform:uppercase">Codice sessione</span><span id="sessionCodeValue" style="font-size:20px;font-weight:700;color:var(--pu);letter-spacing:4px;font-family:Menlo,Monaco,monospace;line-height:1">—</span></div><button onclick="copySessionCode()" id="btnCopyCode" style="padding:4px 10px;border-radius:6px;border:1px solid var(--pu);background:#fff;color:var(--pu);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--f)">Copia</button></div>
+<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span><div id="sessionCodeBox" style="display:none;padding:7px 14px;background:#fff;border:2px solid var(--am);border-radius:8px;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(194,139,10,.25)"><div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1"><span style="font-size:9px;font-weight:700;color:var(--am);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Codice sessione</span><span id="sessionCodeValue" style="font-size:22px;font-weight:700;color:#2C2C2C;letter-spacing:5px;font-family:Menlo,Monaco,monospace">—</span></div><button onclick="copySessionCode()" id="btnCopyCode" style="padding:5px 12px;border-radius:6px;border:none;background:var(--am);color:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--f);letter-spacing:.5px">Copia</button></div>
 <select id="filtro"><option value="all">Tutte le classi</option><optgroup label="Per anno"><option value="y1">Tutte le prime</option><option value="y2">Tutte le seconde</option><option value="y3">Tutte le terze</option></optgroup><optgroup label="Per sezione"><option value="1A">1A</option><option value="1B">1B</option><option value="1C">1C</option><option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="3A">3A</option><option value="3B">3B</option><option value="3C">3C</option></optgroup></select>
 <button onclick="toggleSurvey()" id="btnToggle" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--am);cursor:pointer">Chiudi sondaggio</button>
 <button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button>
@@ -356,7 +356,7 @@ function render(){
   let h='';
 
   // === 1. RADAR: PROFILO MEDIO ===
-  h+='<div class="card"><h2>Profilo medio dello studente</h2><div class="sub">Le 6 dimensioni — media su scala 1-3</div><canvas id="chRadar"></canvas></div>';
+  h+='<div class="card"><h2>Profilo medio dello studente</h2><div class="sub">Le 6 macrodimensioni — media su scala 1-3. Zone colorate: <span style="color:#B8432E">rosa</span> = critica, <span style="color:#1B6D3F">verde</span> = consolidata.</div><div style="display:grid;grid-template-columns:minmax(380px,1fr) minmax(280px,400px);gap:20px;align-items:start;margin-top:10px"><div style="position:relative;min-height:420px;width:100%;max-width:520px;justify-self:center"><canvas id="chRadar" style="max-height:440px"></canvas></div><div id="radarEvidence" style="padding-top:8px"></div></div></div>';
 
   // === 2. HEATMAP: MATERIE × DIMENSIONI ===
   const HM_WORDS=[['No','Un po\'','Molto'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo']];
@@ -538,9 +538,133 @@ function render(){
 
   document.getElementById('content').innerHTML=h;
 
-  // === CHART.JS: RADAR ===
+  // === CHART.JS: RADAR — con zone colorate, valori nelle label, evidenze ===
   const profD=[];SDIM.forEach((l,si)=>{const sec='S'+(si+1),n=SNUMS[si];let s=0,c=0;for(let i=1;i<=n;i++){const a=avg(R,sec+'_'+i);if(a){s+=a;c++;}}profD.push(c?+(s/c).toFixed(2):0);});
-  new Chart(document.getElementById('chRadar'),{type:'radar',data:{labels:SDIM,datasets:[{label:'Media',data:profD,backgroundColor:'rgba(27,109,63,.12)',borderColor:'#1B6D3F',pointBackgroundColor:SCOL,pointRadius:5,borderWidth:2}]},options:{scales:{r:{min:0,max:3,ticks:{stepSize:1,font:{size:9}},pointLabels:{font:{size:10,weight:500}}}},plugins:{legend:{display:false}}}});
+  
+  // Colore interpretativo in base al valore medio
+  function profColor(v){
+    if(v>=2.5) return '#1B6D3F';     // consolidata
+    if(v>=2.0) return '#5C9E4A';     // buona
+    if(v>=1.8) return '#C28B0A';     // attenzione
+    return '#B8432E';                // critica
+  }
+  function profStatus(v){
+    if(v>=2.5) return {tag:'consolidata',col:'#1B6D3F'};
+    if(v>=2.0) return {tag:'buona',col:'#5C9E4A'};
+    if(v>=1.8) return {tag:'attenzione',col:'#C28B0A'};
+    return {tag:'critica',col:'#B8432E'};
+  }
+  
+  // Labels che mostrano "Dimensione — 2.4"
+  const labelsWithValues = SDIM.map((l,i)=>l+'  '+(profD[i]?profD[i].toFixed(1):'–'));
+  
+  // Plugin per disegnare le bande colorate di fondo
+  const zonePlugin = {
+    id: 'zoneBands',
+    beforeDatasetsDraw(chart) {
+      const {ctx, scales:{r}} = chart;
+      if (!r) return;
+      const cx = r.xCenter, cy = r.yCenter;
+      ctx.save();
+      // Banda verde pallida: raggio 2.5 → 3
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(27,109,63,0.08)';
+      ctx.arc(cx, cy, r.getDistanceFromCenterForValue(3), 0, 2*Math.PI);
+      ctx.arc(cx, cy, r.getDistanceFromCenterForValue(2.5), 0, 2*Math.PI, true);
+      ctx.fill();
+      // Banda rosa pallida: raggio 0 → 1.8
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(184,67,46,0.08)';
+      ctx.arc(cx, cy, r.getDistanceFromCenterForValue(1.8), 0, 2*Math.PI);
+      ctx.fill();
+      ctx.restore();
+    }
+  };
+  
+  new Chart(document.getElementById('chRadar'),{
+    type:'radar',
+    data:{
+      labels: labelsWithValues,
+      datasets:[{
+        label:'Media',
+        data: profD,
+        backgroundColor:'rgba(27,109,63,.18)',
+        borderColor:'#1B6D3F',
+        pointBackgroundColor: profD.map(v=>profColor(v)),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 7,
+        pointHoverRadius: 9,
+        borderWidth: 2.5
+      }]
+    },
+    options:{
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1,
+      scales:{
+        r:{
+          min:0, max:3,
+          ticks:{ stepSize:1, font:{size:11}, color:'#7A7A72', backdropColor:'transparent' },
+          pointLabels:{ font:{size:13, weight:'600'}, color:'#2C2C2C', padding:12 },
+          grid:{ color:'#E0E0DC' },
+          angleLines:{ color:'#E0E0DC' }
+        }
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label: function(ctx){ return 'Media: '+ctx.parsed.r.toFixed(2)+' / 3'; }
+          }
+        }
+      }
+    },
+    plugins: [zonePlugin]
+  });
+  
+  // === EVIDENZE PEDAGOGICHE AFFIANCO AL RADAR ===
+  // Per ogni dimensione, pesco l'evidenza più saliente dalle risposte
+  function topEvidence(sectionIdx, R) {
+    const sec = 'S' + (sectionIdx+1);
+    // Per ogni domanda della sezione, trovo la percentuale max di opzione "3" (polo forte)
+    // e poi restituisco la frase più rilevante.
+    // Logica semplificata: guardo % di opzione 3 (polo positivo/negativo a seconda dimensione)
+    const evidenceMap = {
+      0: {q:'S1_3',v:3,text:'prefers costruire a studiare teoria'},    // Come imparo
+      1: {q:'S2_0',v:3,text:"si distrae dopo pochi minuti di spiegazione"}, // Ritmo
+      2: {q:'S3_6',v:3,text:"il disturbo in classe è un problema serio"}, // Concentrazione
+      3: {q:'S4_6',v:3,text:"studia ancora ripetendo a memoria"},     // Capisco e studio
+      4: {q:'S5_0',v:3,text:"lavora meglio in gruppo"},               // Socialità
+      5: {q:'S6_3',v:3,text:"vuole che quello che impara sia collegato alla realtà"} // Aspettative
+    };
+    const ev = evidenceMap[sectionIdx];
+    if (!ev) return null;
+    const p = pct(R, ev.q, ev.v);
+    return {pct: p, text: ev.text};
+  }
+  
+  let evH = '<div style="font-size:12px;line-height:1.45;color:var(--tx)">';
+  evH += '<div style="font-weight:700;color:#1B6D3F;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-size:11px">Cosa leggere nel radar</div>';
+  SDIM.forEach((dim,i)=>{
+    const v = profD[i];
+    const st = profStatus(v);
+    const ev = topEvidence(i, R);
+    evH += '<div style="padding:8px 10px;margin-bottom:6px;background:'+(i%2===0?'var(--bg)':'#fff')+';border-left:3px solid '+st.col+';border-radius:4px">';
+    evH += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">';
+    evH += '<strong style="color:'+st.col+'">'+dim+'</strong>';
+    evH += '<span style="font-size:11px;color:'+st.col+';font-weight:600">'+(v?v.toFixed(2):'—')+' · '+st.tag+'</span>';
+    evH += '</div>';
+    if (ev && ev.pct >= 20) {
+      evH += '<div style="font-size:11px;color:var(--mu);line-height:1.4"><strong>'+ev.pct+'%</strong> '+ev.text+'</div>';
+    } else {
+      evH += '<div style="font-size:11px;color:var(--mu);font-style:italic">Dato stabile sulla sezione.</div>';
+    }
+    evH += '</div>';
+  });
+  evH += '</div>';
+  const evBox = document.getElementById('radarEvidence');
+  if (evBox) evBox.innerHTML = evH;
 
 }
 
@@ -581,6 +705,34 @@ h3{font-size:13px;color:#2E7CAF;margin:14px 0 6px}
 table.hm{border-collapse:collapse;width:100%;margin:6px 0}table.hm td,table.hm th{padding:3px 4px;text-align:center;font-size:8px;border:1px solid #E8E8E2}table.hm th{background:#F5F5F0;font-weight:600}
 .footer{text-align:center;font-size:8px;color:#7A7A72;margin-top:20px;padding-top:6px;border-top:1px solid #E8E8E2}
 .ap{display:flex;gap:4px;margin:2px 0;font-size:10px}.ap-n{width:90px;text-align:right}.ap-r{color:#B8432E;width:30px;text-align:right}.ap-g{color:#1B6D3F;width:30px}
+.prof-row{display:grid;grid-template-columns:130px 1fr 50px 85px;gap:8px;align-items:center;padding:6px 8px;margin-bottom:4px;border-radius:4px;background:#FAFAF6;page-break-inside:avoid}
+.prof-row.s-cri{background:#FDECE8;border-left:3px solid #B8432E}
+.prof-row.s-att{background:#FEF3D6;border-left:3px solid #C28B0A}
+.prof-row.s-buo{background:#E8F5EE;border-left:3px solid #5C9E4A}
+.prof-row.s-con{background:#D6EADA;border-left:3px solid #1B6D3F}
+.prof-lab{font-size:11px;font-weight:600;text-align:right}
+.prof-trk{height:9px;background:#fff;border-radius:5px;overflow:hidden;border:1px solid #E8E8E2}
+.prof-fil{height:100%;border-radius:5px}
+.prof-val{font-size:11px;font-weight:700;text-align:left;font-family:Menlo,monospace}
+.prof-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;text-align:right}
+.prof-ev{grid-column:1 / -1;font-size:9.5px;color:#555;padding:3px 0 0 14px;line-height:1.4;font-style:italic}
+.open-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}
+.open-col{min-width:0;break-inside:avoid}
+.open-col h3{margin-top:0}
+.emerge-intro{font-size:10px;color:#555;margin-bottom:10px;padding:8px 10px;background:#F5F5F0;border-left:3px solid #1B6D3F;font-style:italic;line-height:1.5}
+.emerge-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.emerge-block{min-width:0}
+.emerge-block h4{font-size:10px;font-weight:700;color:#1B6D3F;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #E8E8E2}
+.emerge-block.growth h4{color:#C28B0A;border-bottom-color:#F0D9A6}
+.emerge-item{display:grid;grid-template-columns:38px 1fr;gap:6px;align-items:baseline;padding:3px 0;font-size:10px;line-height:1.45}
+.emerge-pct{font-weight:700;font-family:Menlo,monospace;color:#1B6D3F;text-align:right}
+.emerge-block.growth .emerge-pct{color:#C28B0A}
+.emerge-txt{color:#2C2C2C}
+.emerge-scuola{margin-top:6px}
+.emerge-scuola h4{font-size:10px;font-weight:700;color:#2E7CAF;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #D6E6F0}
+.emerge-bar-row{display:grid;grid-template-columns:220px 1fr 38px;gap:8px;align-items:center;margin-bottom:4px;font-size:10px}
+.emerge-bar-trk{height:8px;background:#F5F5F0;border-radius:4px;overflow:hidden}
+.emerge-bar-fil{height:100%;background:#2E7CAF;border-radius:4px}
 </style></head><body>`;
 
   doc+=`<div class="cover"><h1>TI ASCOLTO!</h1><div class="sub">Profilo studente 2026 \u2014 Dossier analitico</div>
@@ -595,6 +747,49 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     const R=grp.data,N=R.length;
     if(!N)return;
     doc+=`<div class="section"><h2>${grp.label} \u2014 ${N} studenti</h2>`;
+
+    // === PROFILO SULLE 6 MACRODIMENSIONI (equivalente PDF del radar) ===
+    (function(){
+      const profD=[];
+      SDIM.forEach((l,si)=>{
+        const sec='S'+(si+1),n=SNUMS[si];
+        let s=0,c=0;
+        for(let i=1;i<=n;i++){const a=avg(R,sec+'_'+i);if(a){s+=a;c++;}}
+        profD.push(c?+(s/c).toFixed(2):0);
+      });
+      function pStatus(v){
+        if(v>=2.5) return {tag:'consolidata',cls:'s-con',col:'#1B6D3F'};
+        if(v>=2.0) return {tag:'buona',cls:'s-buo',col:'#5C9E4A'};
+        if(v>=1.8) return {tag:'attenzione',cls:'s-att',col:'#C28B0A'};
+        return {tag:'critica',cls:'s-cri',col:'#B8432E'};
+      }
+      // Stessa mappa evidenze del radar a schermo
+      const evidenceMap = {
+        0:{q:'S1_3',v:3,text:'preferisce costruire a studiare teoria'},
+        1:{q:'S2_0',v:3,text:'si distrae dopo pochi minuti di spiegazione'},
+        2:{q:'S3_6',v:3,text:'il disturbo in classe \u00e8 un problema serio'},
+        3:{q:'S4_6',v:3,text:'studia ancora ripetendo a memoria'},
+        4:{q:'S5_0',v:3,text:'lavora meglio in gruppo'},
+        5:{q:'S6_3',v:3,text:'vuole che ci\u00f2 che impara sia collegato alla realt\u00e0'}
+      };
+      doc+='<h3>Profilo sulle 6 macrodimensioni</h3>';
+      SDIM.forEach((dim,i)=>{
+        const v=profD[i];
+        const st=pStatus(v);
+        const fillPct=(v/3)*100;
+        const ev=evidenceMap[i];
+        const evPct=ev?pct(R,ev.q,ev.v):0;
+        doc+='<div class="prof-row '+st.cls+'">';
+        doc+='<div class="prof-lab" style="color:'+st.col+'">'+dim+'</div>';
+        doc+='<div class="prof-trk"><div class="prof-fil" style="width:'+fillPct+'%;background:'+st.col+'"></div></div>';
+        doc+='<div class="prof-val" style="color:'+st.col+'">'+(v?v.toFixed(2):'\u2014')+'</div>';
+        doc+='<div class="prof-tag" style="color:'+st.col+'">'+st.tag+'</div>';
+        if(ev && evPct>=20){
+          doc+='<div class="prof-ev"><strong>'+evPct+'%</strong> '+ev.text+'</div>';
+        }
+        doc+='</div>';
+      });
+    })();
 
     function pl(key,question,opts){
       const d=dist(R,key);const cols=['#1B6D3F','#C28B0A','#B8432E'];
@@ -704,21 +899,155 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     doc+=pl('S3_7','Il disturbo in classe',['Abbastanza ordine','A volte problema','Problema serio']);
     if(pct(R,'S3_7',3)>40)doc+='<div class="ev ev-a"><strong>'+pct(R,'S3_7',3)+'%</strong> considera il disturbo un problema serio.</div>';
 
-    // La materia che manca
+    // Domande aperte — 2 colonne (materia che manca | testi liberi)
     const matN=R.map(r=>(r.MATERIA_NUOVA||'').trim()).filter(t=>t.length>1);
-    if(matN.length){
-      const freq={};matN.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
-      const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
-      doc+='<h3>La materia che manca ('+matN.length+' proposte)</h3>';
-      sorted.forEach(([nome,count])=>{doc+='<div style="margin:2px 0;font-size:10px"><strong style="text-transform:capitalize">'+nome+'</strong> \u2014 '+count+'x</div>';});
-    }
-
-    // Testi liberi solo nel sommativo
-    if(gi===0){
-      const testi=R.map(r=>(r.TESTO||'').trim()).filter(t=>t.length>3);
+    const testi=R.map(r=>(r.TESTO||'').trim()).filter(t=>t.length>3);
+    if(matN.length || testi.length){
+      doc+='<div class="open-cols">';
+      // Colonna sinistra: materia che manca
+      doc+='<div class="open-col">';
+      if(matN.length){
+        const freq={};matN.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
+        const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+        doc+='<h3>La materia che manca ('+matN.length+' proposte)</h3>';
+        sorted.forEach(([nome,count])=>{doc+='<div style="margin:3px 0;font-size:10px;line-height:1.4"><strong style="text-transform:capitalize">'+nome+'</strong> \u2014 '+count+'x</div>';});
+      } else {
+        doc+='<h3>La materia che manca</h3><div style="font-size:10px;color:#888;font-style:italic">Nessuna proposta in questo gruppo.</div>';
+      }
+      doc+='</div>';
+      // Colonna destra: testi liberi
+      doc+='<div class="open-col">';
       if(testi.length){
         doc+='<h3>Le loro parole ('+testi.length+' testi)</h3>';
         testi.forEach(t=>{doc+='<div class="quote">\u201c'+t+'\u201d</div>';});
+      } else {
+        doc+='<h3>Le loro parole</h3><div style="font-size:10px;color:#888;font-style:italic">Nessun testo libero in questo gruppo.</div>';
+      }
+      doc+='</div>';
+      doc+='</div>';
+    }
+
+    // === LETTURA EMERGENTE — aggregazione dei profili daimon ===
+    // Solo nel gruppo sommativo, dove la statistica ha senso
+    if(gi===0 && N>=5){
+      // Replica della mappa presente in index.html buildNarrative()
+      const daimonMap = [
+        ['S1',0,1,'sai ascoltare e trarre il meglio da una spiegazione','forza'],
+        ['S1',0,3,'hai bisogno di toccare, fare, costruire per capire davvero','forza'],
+        ['S1',2,1,'riesci a muoverti anche nel pensiero astratto','forza'],
+        ['S1',2,3,'gli esempi concreti sono la tua porta d\'ingresso verso i concetti','crescita'],
+        ['S1',3,3,'creare qualcosa \u00e8 il tuo modo naturale di imparare','forza'],
+        ['S1',4,3,'la pratica trasforma le parole in ricordi','forza'],
+        ['S2',0,1,'hai il dono raro della concentrazione prolungata','forza'],
+        ['S2',0,3,'la tua attenzione \u00e8 intensa ma breve, hai bisogno che il ritmo cambi','crescita'],
+        ['S2',3,1,'di fronte alla difficolt\u00e0 non molli, cerchi un\'altra strada','forza'],
+        ['S2',3,3,'quando qualcosa non \u00e8 chiaro subito, rischi di fermarti','crescita'],
+        ['S2',2,3,'i compiti lunghi ti tolgono energia prima ancora di cominciare','crescita'],
+        ['S3',0,1,'sai isolarti dal rumore e restare dentro ci\u00f2 che conta','forza'],
+        ['S3',0,3,'il silenzio \u00e8 il tuo alleato: ne hai bisogno per pensare','crescita'],
+        ['S3',5,3,'sei permeabile al disimpegno degli altri','crescita'],
+        ['S4',6,1,'studi per capire il perch\u00e9, non per ripetere','forza'],
+        ['S4',6,3,'studi ancora ripetendo a memoria','crescita'],
+        ['S4',8,1,'ci\u00f2 che impari ti resta: la tua mente trattiene','forza'],
+        ['S4',8,3,'dimentichi in fretta','crescita'],
+        ['S4',9,3,'la passione \u00e8 il tuo vero motore','forza'],
+        ['S4',10,1,'studi perch\u00e9 vuoi sapere, non per un numero sul registro','forza'],
+        ['S4',10,3,'studi solo quando c\'\u00e8 la verifica','crescita'],
+        ['S4',11,1,'quando non capisci, cambi strategia. Flessibilit\u00e0 rara','forza'],
+        ['S4',11,3,'quando non capisci, rileggi sperando che entri','crescita'],
+        ['S5',0,3,'il gruppo \u00e8 il tuo ambiente naturale','forza'],
+        ['S5',0,1,'nella solitudine trovi la concentrazione','forza'],
+        ['S5',4,3,'quando la collaborazione \u00e8 vera, impari il doppio','forza'],
+        ['S6',4,3,'apprezzi chi ti sfida e pretende il massimo','forza'],
+        ['S6',2,3,'hai bisogno di creare, di esprimerti','forza'],
+        ['ICC_A',1,1,'leggi le consegne con attenzione prima di partire','forza'],
+        ['ICC_A',1,3,'non ti fermi a leggere le consegne','crescita'],
+        ['ICC_A',2,3,'parti troppo in fretta','crescita']
+      ];
+      // Nota: i codici ICC_A vs IA divergono fra index e foglio. Nell\'admin i campi
+      // sono ICC_A1..A4 e ICC_B1..B4, mentre index usava IA. Uso ICC_A come approx.
+      
+      // Conteggi
+      const countForza = {};
+      const countCresc = {};
+      const countScuola = {};
+      
+      daimonMap.forEach(([sec,qi,val,phrase,type])=>{
+        // Per ICC_A la colonna nel foglio è ICC_A1 / ICC_A2 (senza underscore tra A e numero)
+        // Per tutte le altre sezioni il formato è SEC_N (S1_0, S2_3, ecc.)
+        const key = sec.startsWith('ICC_') ? sec + qi : sec + '_' + qi;
+        let hits = 0;
+        R.forEach(r=>{ if (+r[key] === val) hits++; });
+        if (hits > 0) {
+          const bag = type === 'forza' ? countForza : countCresc;
+          bag[phrase] = (bag[phrase]||0) + hits;
+        }
+      });
+      
+      // Scuola che serve (stessa logica di P.scuola)
+      const scuolaMap = [
+        ['S6_0','variare il ritmo'],
+        ['S6_1','coinvolgervi emotivamente'],
+        ['S6_3','collegare ci\u00f2 che imparano al mondo reale'],
+        ['S6_5','pretendere il massimo con rispetto'],
+        ['S6_7','lasciarli scegliere come affrontare le cose'],
+        ['S6_6','non dare compiti ripetitivi']
+      ];
+      scuolaMap.forEach(([k,phrase])=>{
+        let hits = 0;
+        R.forEach(r=>{ if (+r[k] === 3) hits++; });
+        if (hits > 0) countScuola[phrase] = hits;
+      });
+      
+      // Ordino e prendo top 10 per forza/crescita, tutte per scuola
+      const topF = Object.entries(countForza).sort((a,b)=>b[1]-a[1]).slice(0,10);
+      const topC = Object.entries(countCresc).sort((a,b)=>b[1]-a[1]).slice(0,10);
+      const topS = Object.entries(countScuola).sort((a,b)=>b[1]-a[1]);
+      
+      if (topF.length || topC.length || topS.length) {
+        doc+='<h3>Lettura emergente \u2014 cosa raccontano i profili individuali</h3>';
+        doc+='<div class="emerge-intro">Questa sezione aggrega ci\u00f2 che il sistema ha identificato come tratto saliente in ogni profilo individuale. Non sono semplici risposte: sono caratteristiche emerse dal sistema di lettura dimensionale che genera la voce interiore di ogni studente. Base: '+N+' profili.</div>';
+        
+        doc+='<div class="emerge-cols">';
+        // Forze
+        doc+='<div class="emerge-block">';
+        doc+='<h4>Le forze pi\u00f9 ricorrenti</h4>';
+        if(topF.length){
+          topF.forEach(([phrase,count])=>{
+            const p = Math.round((count/N)*100);
+            doc+='<div class="emerge-item"><div class="emerge-pct">'+p+'%</div><div class="emerge-txt">'+phrase+'</div></div>';
+          });
+        } else {
+          doc+='<div style="font-size:10px;color:#888;font-style:italic">Nessuna forza dominante rilevata.</div>';
+        }
+        doc+='</div>';
+        
+        // Aree di crescita
+        doc+='<div class="emerge-block growth">';
+        doc+='<h4>Le aree di crescita pi\u00f9 ricorrenti</h4>';
+        if(topC.length){
+          topC.forEach(([phrase,count])=>{
+            const p = Math.round((count/N)*100);
+            doc+='<div class="emerge-item"><div class="emerge-pct">'+p+'%</div><div class="emerge-txt">'+phrase+'</div></div>';
+          });
+        } else {
+          doc+='<div style="font-size:10px;color:#888;font-style:italic">Nessuna area critica diffusa.</div>';
+        }
+        doc+='</div>';
+        doc+='</div>';
+        
+        // Scuola che chiedono
+        if(topS.length){
+          doc+='<div class="emerge-scuola">';
+          doc+='<h4>Cosa chiedono alla scuola</h4>';
+          const maxS = topS[0][1];
+          topS.forEach(([phrase,count])=>{
+            const p = Math.round((count/N)*100);
+            const fill = Math.round((count/maxS)*100);
+            doc+='<div class="emerge-bar-row"><div style="text-align:right">'+phrase+'</div><div class="emerge-bar-trk"><div class="emerge-bar-fil" style="width:'+fill+'%"></div></div><div style="font-weight:700;font-family:Menlo,monospace;color:#2E7CAF">'+p+'%</div></div>';
+          });
+          doc+='</div>';
+        }
       }
     }
 
