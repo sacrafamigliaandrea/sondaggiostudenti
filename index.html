@@ -15,7 +15,7 @@
 .tb{background:rgba(27,109,63,.1);border-left:4px solid var(--g);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin:10px 0;font-family:var(--fb);font-size:13px;line-height:1.6;color:var(--gd)}
 .fd-row{display:flex;gap:16px}.fd{flex:1;margin:10px 0}.fd label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
 .fd input{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:var(--r);font-family:var(--f);font-size:16px;background:rgba(255,255,255,.9)}.fd input:focus{outline:none;border-color:var(--g)}
-.cls-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.cls-o{padding:10px;border:2px solid var(--bd);border-radius:var(--r);text-align:center;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
+.cls-opts{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}.cls-o{padding:6px 2px;border:1.5px solid var(--bd);border-radius:6px;text-align:center;font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.9)}.cls-o:hover{border-color:var(--g)}.cls-o.on{border-color:var(--g);background:var(--gl);color:var(--g)}
 .btn-s{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:17px;font-weight:600;cursor:pointer;margin-top:10px}.btn-s:hover{background:var(--gd)}.btn-s:disabled{background:var(--bd);color:var(--mu);cursor:default}
 .copy{text-align:center;font-size:9px;color:var(--mu);margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)}
 #main{display:none;height:100%;flex-direction:column}.layout{display:flex;flex:1;min-height:0}
@@ -677,7 +677,6 @@ function saveToDrive(){
     img.onload=img.onerror=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';};
     img.src=SCRIPT+'?'+p.toString();
   }catch(e){btn.textContent='Errore';btn.style.background='var(--co)';}
-}
 }
 
 // SUBMIT
