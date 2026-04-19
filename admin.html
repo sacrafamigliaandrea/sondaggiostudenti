@@ -82,7 +82,7 @@ canvas{max-height:300px!important}
 <div id="dash" style="display:none">
 <div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
 <div style="display:flex;gap:8px;align-items:center">
-<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span><div id="complBox" style="padding:5px 12px;background:#fff;border:2px solid var(--g);border-radius:8px;display:flex;flex-direction:column;align-items:center;line-height:1.1"><span style="font-size:8px;font-weight:700;color:var(--g);letter-spacing:1px;text-transform:uppercase;margin-bottom:1px">Compilazioni</span><span id="complValue" style="font-size:15px;font-weight:700;color:#2C2C2C;font-family:Menlo,Monaco,monospace">—/207</span><span id="complGender" style="font-size:9px;color:var(--mu);margin-top:2px;font-family:Menlo,Monaco,monospace">—</span></div><div id="sessionCodeBox" style="display:none;padding:7px 14px;background:#fff;border:2px solid var(--am);border-radius:8px;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(194,139,10,.25)"><div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1"><span style="font-size:9px;font-weight:700;color:var(--am);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Codice sessione</span><span id="sessionCodeValue" style="font-size:22px;font-weight:700;color:#2C2C2C;letter-spacing:5px;font-family:Menlo,Monaco,monospace">—</span></div><button onclick="copySessionCode()" id="btnCopyCode" style="padding:5px 12px;border-radius:6px;border:none;background:var(--am);color:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--f);letter-spacing:.5px">Copia</button></div>
+<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span><div id="complBox" style="padding:5px 12px;background:#fff;border:2px solid var(--g);border-radius:8px;display:flex;flex-direction:column;align-items:center;line-height:1.1"><span style="font-size:8px;font-weight:700;color:var(--g);letter-spacing:1px;text-transform:uppercase;margin-bottom:1px">Compilazioni</span><span id="complValue" style="font-size:15px;font-weight:700;color:#2C2C2C;font-family:Menlo,Monaco,monospace">—/207</span><span id="complGender" style="font-size:9px;color:var(--mu);margin-top:2px;font-family:Menlo,Monaco,monospace">—</span></div><button onclick="refreshAll()" id="btnRefresh" title="Ricarica i dati dal foglio" style="padding:6px 14px;border-radius:8px;border:1px solid var(--g);background:#fff;color:var(--g);cursor:pointer;font-family:var(--f);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px"><span id="refreshIcon" style="display:inline-block;transition:transform .3s">↻</span> Aggiorna</button><div id="sessionCodeBox" style="display:none;padding:7px 14px;background:#fff;border:2px solid var(--am);border-radius:8px;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(194,139,10,.25)"><div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1"><span style="font-size:9px;font-weight:700;color:var(--am);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Codice sessione</span><span id="sessionCodeValue" style="font-size:22px;font-weight:700;color:#2C2C2C;letter-spacing:5px;font-family:Menlo,Monaco,monospace">—</span></div><button onclick="copySessionCode()" id="btnCopyCode" style="padding:5px 12px;border-radius:6px;border:none;background:var(--am);color:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--f);letter-spacing:.5px">Copia</button></div>
 <select id="filtro"><option value="all">Tutte le classi</option><optgroup label="Per anno"><option value="y1">Tutte le prime</option><option value="y2">Tutte le seconde</option><option value="y3">Tutte le terze</option></optgroup><optgroup label="Per sezione"><option value="1A">1A</option><option value="1B">1B</option><option value="1C">1C</option><option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="3A">3A</option><option value="3B">3B</option><option value="3C">3C</option></optgroup></select>
 <button onclick="toggleSurvey()" id="btnToggle" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--am);cursor:pointer">Chiudi sondaggio</button>
 <button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button>
@@ -178,6 +178,20 @@ function copySessionCode(){
     setTimeout(()=>{btn.textContent=old;},1200);
   }).catch(()=>{alert('Codice: '+sessionCode);});
 }
+function refreshAll(){
+  const btn=document.getElementById('btnRefresh');
+  const icon=document.getElementById('refreshIcon');
+  if(btn){btn.disabled=true;btn.style.opacity='.6';}
+  if(icon){icon.style.transform='rotate(360deg)';}
+  checkStatus();
+  loadData();
+  // Feedback visivo: il bottone torna attivo dopo ~800ms
+  setTimeout(()=>{
+    if(btn){btn.disabled=false;btn.style.opacity='1';}
+    if(icon){icon.style.transition='none';icon.style.transform='rotate(0deg)';setTimeout(()=>{icon.style.transition='transform .3s';},50);}
+  },800);
+}
+
 function toggleSurvey(){
   const action=surveyOpen?'chiudere':'aprire';
   if(!confirm('Vuoi '+action+' il sondaggio?'))return;
