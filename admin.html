@@ -72,15 +72,15 @@ canvas{max-height:300px!important}
 <div style="background:#fff;padding:40px;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center;max-width:360px;width:100%">
 <h1 style="font-size:24px;color:var(--g);margin-bottom:4px">TI ASCOLTO!</h1>
 <p style="font-size:12px;color:var(--mu);margin-bottom:20px">Area riservata — Dashboard docenti</p>
-<input type="password" id="pwd" placeholder="Password" style="width:100%;padding:12px;border:2px solid var(--bd);border-radius:10px;font-family:var(--f);font-size:16px;text-align:center;margin-bottom:10px" onkeydown="if(event.key==='Enter')tryPwd()">
-<button onclick="tryPwd()" style="width:100%;padding:12px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer">Accedi</button>
+<input type="password" id="pwd" onkeydown="if(event.key==='Enter')tryPwd()" placeholder="Password" style="width:100%;padding:12px;border:2px solid var(--bd);border-radius:10px;font-family:var(--f);font-size:16px;text-align:center;margin-bottom:10px">
+<button id="btnLogin" onclick="tryPwd()" style="width:100%;padding:12px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:var(--f);font-size:15px;font-weight:600;cursor:pointer">Accedi</button>
 <p id="pwdErr" style="font-size:11px;color:var(--co);margin-top:8px;display:none">Password errata</p>
 </div></div>
 
 <div id="dash" style="display:none">
 <div class="top"><h1>TI ASCOLTO! — Dashboard docenti</h1>
 <div style="display:flex;gap:8px;align-items:center">
-<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span>
+<span id="statusBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600"></span><div id="sessionCodeBox" style="display:none;padding:6px 14px;background:var(--pul);border:2px solid var(--pu);border-radius:8px;align-items:center;gap:10px"><div style="display:flex;flex-direction:column;align-items:flex-start"><span style="font-size:9px;font-weight:700;color:var(--pu);letter-spacing:1px;text-transform:uppercase">Codice sessione</span><span id="sessionCodeValue" style="font-size:20px;font-weight:700;color:var(--pu);letter-spacing:4px;font-family:Menlo,Monaco,monospace;line-height:1">—</span></div><button onclick="copySessionCode()" id="btnCopyCode" style="padding:4px 10px;border-radius:6px;border:1px solid var(--pu);background:#fff;color:var(--pu);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--f)">Copia</button></div>
 <select id="filtro"><option value="all">Tutte le classi</option><optgroup label="Per anno"><option value="y1">Tutte le prime</option><option value="y2">Tutte le seconde</option><option value="y3">Tutte le terze</option></optgroup><optgroup label="Per sezione"><option value="1A">1A</option><option value="1B">1B</option><option value="1C">1C</option><option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="3A">3A</option><option value="3B">3B</option><option value="3C">3C</option></optgroup></select>
 <button onclick="toggleSurvey()" id="btnToggle" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--am);cursor:pointer">Chiudi sondaggio</button>
 <button onclick="genDossier()" style="padding:6px 14px;border-radius:8px;border:none;font-family:var(--f);font-size:12px;font-weight:600;background:#fff;color:var(--g);cursor:pointer">Genera Dossier</button>
@@ -91,40 +91,119 @@ canvas{max-height:300px!important}
 </div>
 
 <script>
-const PWD='comesei26';
+// Password NON più hardcoded. Viene validata server-side e memorizzata solo in sessione.
+let __pwd = '';
+let __attempts = 0;
+const MAX_ATTEMPTS = 5;
+let __lockUntil = 0;
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzPyEMTOH8_1_LvlCrOq1Ecwyn4A4-T_BPgcXN7KgCM8IQS7avIbpj2imStBzF_21t5NQ/exec';
 let surveyOpen=true;
 
-function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';checkStatus();loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
+async function tryPwd(){
+  const err=document.getElementById('pwdErr');
+  const now=Date.now();
+  if(now<__lockUntil){
+    const secs=Math.ceil((__lockUntil-now)/1000);
+    err.textContent='Troppi tentativi. Riprova fra '+secs+' secondi.';
+    err.style.display='block';
+    return;
+  }
+  const pwd=document.getElementById('pwd').value;
+  if(!pwd){err.textContent='Inserisci la password';err.style.display='block';return;}
+  const btn=document.getElementById('btnLogin');
+  const origText=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Verifica...';}
+  try{
+    const r=await fetch(SCRIPT_URL+'?action=verify&pwd='+encodeURIComponent(pwd));
+    const d=await r.json();
+    if(d.ok){
+      __pwd=pwd;__attempts=0;
+      document.getElementById('gate').style.display='none';
+      document.getElementById('dash').style.display='block';
+      checkStatus();loadData();
+    }else{
+      __attempts++;
+      if(__attempts>=MAX_ATTEMPTS){
+        __lockUntil=Date.now()+60000;
+        err.textContent='Troppi tentativi. Bloccato per 60 secondi.';
+      }else{
+        err.textContent='Password errata ('+__attempts+'/'+MAX_ATTEMPTS+')';
+      }
+      err.style.display='block';
+      document.getElementById('pwd').value='';
+    }
+  }catch(e){
+    err.textContent='Errore di rete. Riprova.';
+    err.style.display='block';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=origText;}
+  }
+}
 
 function checkStatus(){
   fetch(SCRIPT_URL+'?action=status').then(r=>r.json()).then(d=>{
-    surveyOpen=d.status!=='closed';updateStatusUI();
+    surveyOpen=d.status!=='closed';
+    sessionCode=d.code||'';
+    updateStatusUI();
   }).catch(()=>{});
 }
+let sessionCode = '';
 function updateStatusUI(){
-  const badge=document.getElementById('statusBadge');const btn=document.getElementById('btnToggle');
-  if(surveyOpen){badge.textContent='APERTO';badge.style.background='var(--gl)';badge.style.color='var(--g)';btn.textContent='Chiudi sondaggio';btn.style.color='var(--am)';}
-  else{badge.textContent='CHIUSO';badge.style.background='var(--col)';badge.style.color='var(--co)';btn.textContent='Apri sondaggio';btn.style.color='var(--g)';}
+  const badge=document.getElementById('statusBadge');
+  const btn=document.getElementById('btnToggle');
+  const box=document.getElementById('sessionCodeBox');
+  const val=document.getElementById('sessionCodeValue');
+  if(surveyOpen){
+    badge.textContent='APERTO';badge.style.background='var(--gl)';badge.style.color='var(--g)';
+    btn.textContent='Chiudi sondaggio';btn.style.color='var(--am)';
+    if(sessionCode){
+      box.style.display='flex';
+      val.textContent=sessionCode;
+    } else {
+      box.style.display='none';
+    }
+  } else {
+    badge.textContent='CHIUSO';badge.style.background='var(--col)';badge.style.color='var(--co)';
+    btn.textContent='Apri sondaggio';btn.style.color='var(--g)';
+    box.style.display='none';
+  }
+}
+function copySessionCode(){
+  if(!sessionCode)return;
+  navigator.clipboard.writeText(sessionCode).then(()=>{
+    const btn=document.getElementById('btnCopyCode');
+    const old=btn.textContent;btn.textContent='Copiato!';
+    setTimeout(()=>{btn.textContent=old;},1200);
+  }).catch(()=>{alert('Codice: '+sessionCode);});
 }
 function toggleSurvey(){
   const action=surveyOpen?'chiudere':'aprire';
   if(!confirm('Vuoi '+action+' il sondaggio?'))return;
-  fetch(SCRIPT_URL+'?action=toggle&pwd='+PWD).then(r=>r.json()).then(d=>{
-    if(d.status){surveyOpen=d.status!=='closed';updateStatusUI();alert('Sondaggio '+(surveyOpen?'aperto':'chiuso')+'.');}
+  fetch(SCRIPT_URL+'?action=toggle&pwd='+encodeURIComponent(__pwd)).then(r=>r.json()).then(d=>{
+    if(d.status){
+      surveyOpen=d.status!=='closed';
+      sessionCode=d.code||'';
+      updateStatusUI();
+      if(surveyOpen && sessionCode){
+        // Apertura: mostro un dialogo prominente col codice
+        alert('SONDAGGIO APERTO\n\nCodice sessione: '+sessionCode+'\n\nScrivi questo codice alla lavagna. Gli studenti dovranno inserirlo nel login.\nQuando chiudi il sondaggio il codice scade automaticamente.');
+      } else {
+        alert('Sondaggio chiuso. Il codice sessione è stato invalidato.');
+      }
+    }
     else alert('Errore: '+JSON.stringify(d));
   }).catch(e=>alert('Errore di rete.'));
 }
 function clearData(){
   if(!confirm('ATTENZIONE: stai per cancellare TUTTI i dati delle risposte. Questa operazione è irreversibile.\n\nSei sicuro?'))return;
   if(!confirm('Conferma definitiva: cancellare tutti i dati?'))return;
-  fetch(SCRIPT_URL+'?action=clear&pwd='+PWD).then(r=>r.json()).then(d=>{
+  fetch(SCRIPT_URL+'?action=clear&pwd='+encodeURIComponent(__pwd)).then(r=>r.json()).then(d=>{
     if(d.cleared){alert('Cancellati '+d.deletedRows+' record. Ricarico la pagina.');location.reload();}
     else alert('Errore: '+JSON.stringify(d));
   }).catch(e=>alert('Errore di rete.'));
 }
 
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRHAWAYvrlNKiI6tewGhXTR2UbdENC-fwDi7-LJrjiU14v2xdjrNsP1Vn7LmOg9bLEZ3rc3SY5x5cvo/pub?gid=632189738&single=true&output=csv';
+// CSV pubblico rimosso per motivi di sicurezza. I dati vengono caricati via Apps Script con password validata server-side.
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.','Informatica'];
 const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP','INFO'];
 const MDIM=['Interesse','Chiarezza','Attivazione'];
@@ -187,14 +266,22 @@ function idxOf(code){ return SUB_C.indexOf(code); }
 
 let ALL=[];
 function loadData(){
-  fetch(CSV_URL).then(r=>r.text()).then(csv=>{
-    const rows=Papa.parse(csv,{skipEmptyLines:true}).data;
-    if(rows.length<3){document.getElementById('content').innerHTML='<div class="load">Nessun dato.</div>';return;}
-    const hdr=rows[1];
-    for(let i=2;i<rows.length;i++){const o={};hdr.forEach((h,j)=>{if(h&&h.trim())o[h.trim()]=rows[i][j]||'';});if(o.timestamp||o.nome)ALL.push(o);}
-    document.getElementById('filtro').onchange=()=>render();
-    render();
-  }).catch(()=>{document.getElementById('content').innerHTML='<div class="load">Errore CSV.</div>';});
+  fetch(SCRIPT_URL+'?action=fetchData&pwd='+encodeURIComponent(__pwd))
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.error){
+        document.getElementById('content').innerHTML='<div class="load">Errore: '+d.error+'. Ricarica la pagina e rifai il login.</div>';
+        return;
+      }
+      const rows=d.rows||[];
+      if(rows.length===0){document.getElementById('content').innerHTML='<div class="load">Nessun dato.</div>';return;}
+      ALL=rows;
+      document.getElementById('filtro').onchange=()=>render();
+      render();
+    })
+    .catch(()=>{
+      document.getElementById('content').innerHTML='<div class="load">Errore di rete.</div>';
+    });
 }
 
 function D(){const f=document.getElementById('filtro').value;if(f==='all')return ALL;if(f==='y1')return ALL.filter(r=>r.classe&&r.classe.startsWith('1'));if(f==='y2')return ALL.filter(r=>r.classe&&r.classe.startsWith('2'));if(f==='y3')return ALL.filter(r=>r.classe&&r.classe.startsWith('3'));return ALL.filter(r=>r.classe===f);}
