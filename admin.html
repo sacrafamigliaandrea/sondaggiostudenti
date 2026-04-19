@@ -59,11 +59,13 @@ canvas{max-height:300px!important}
 .lol-val{width:30px;font-size:10px;font-weight:600}
 
 /* LABELED DISTRIBUTION */
-.ld{margin-bottom:14px;padding:10px 12px;background:var(--bg);border-radius:8px}
+.ld{margin-bottom:16px;padding:12px 14px;background:var(--bg);border-radius:8px}
 .ld-q{font-size:11px;font-weight:600;margin-bottom:6px;color:var(--tx)}
-.ld-row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
-.ld-bar{height:16px;border-radius:3px;min-width:2px;transition:width .3s}
-.ld-txt{font-size:10px;flex:1;min-width:0}.ld-pct{font-size:10px;font-weight:600;width:32px;text-align:right;flex-shrink:0}
+.ld-row{display:grid;grid-template-columns:220px 1fr 54px;align-items:center;gap:12px;margin-bottom:7px}
+.ld-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative}
+.ld-fill{height:100%;border-radius:6px;transition:width .4s ease-out;min-width:2px}
+.ld-label{font-size:11px;line-height:1.35;text-align:right;font-weight:500}
+.ld-pct{font-size:12px;font-weight:700;text-align:left;font-variant-numeric:tabular-nums}
 
 .load{text-align:center;padding:60px;font-size:14px;color:var(--mu)}
 </style></head><body>
@@ -292,7 +294,11 @@ function ldist(R,key,question,opts,colors){
   const d=dist(R,key);colors=colors||['var(--g)','var(--am)','var(--co)'];
   let h='<div class="ld"><div class="ld-q">'+question+'</div>';
   opts.forEach((o,i)=>{
-    h+='<div class="ld-row"><div class="ld-bar" style="width:'+Math.max(d[i],2)+'%;background:'+colors[i]+'"></div><div class="ld-txt" style="color:'+colors[i]+'">'+o+'</div><div class="ld-pct" style="color:'+colors[i]+'">'+d[i]+'%</div></div>';
+    h+='<div class="ld-row">'
+      +'<div class="ld-label" style="color:'+colors[i]+'">'+o+'</div>'
+      +'<div class="ld-track"><div class="ld-fill" style="width:'+d[i]+'%;background:'+colors[i]+'"></div></div>'
+      +'<div class="ld-pct" style="color:'+colors[i]+'">'+d[i]+'%</div>'
+      +'</div>';
   });
   h+='</div>';return h;
 }
