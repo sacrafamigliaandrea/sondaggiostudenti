@@ -57,6 +57,17 @@
 .done{text-align:center;padding:40px}.done h2{font-size:20px;color:var(--g);margin:12px 0 4px}.done p{color:var(--mu);font-size:12px;line-height:1.6}
 .preview .tri-b,.preview .mx-b,.preview .eb,.preview .ri,.preview .fb textarea{pointer-events:none;opacity:.6}
 .preview .tri-b:hover,.preview .mx-b:hover{transform:none;border-color:var(--bd);background:var(--cd)}
+.qn{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.qn .qn-num{background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:4px;font-size:10px}
+.qn .qn-sub{color:var(--mu);font-size:10px}
+.mx-ext{margin-bottom:10px;padding:10px 12px;background:var(--cd);border-radius:var(--r);border:1px solid var(--bd);transition:border-color .2s}
+.mx-ext.ok{border-color:var(--g50)}
+.mx-ext .mx-qn{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:.6px;margin-bottom:4px}
+.mx-ext .mx-name{font-size:13px;font-weight:600;color:var(--g);margin-bottom:2px;line-height:1.3}
+.mx-ext .mx-desc{font-size:10px;color:var(--mu);font-style:italic;margin-bottom:8px;line-height:1.4}
+.mx-ext .tri{gap:4px}
+.mx-ext .tri-b{min-height:44px;font-size:11px;padding:8px 6px}
+.sub-header{font-size:11px;font-weight:700;color:var(--pu);margin:6px 0 4px;padding:4px 10px;background:var(--pul);border-radius:6px;display:inline-block}
 .divider{margin:12px 0 8px;padding:8px 10px;border-radius:var(--r);font-size:11px;font-weight:500}
 </style></head><body>
 <div id="login"><div class="lc">
@@ -74,13 +85,77 @@
 <div class="pn" id="pnR"></div>
 </div></div>
 <script>
-const SCRIPT='https://script.google.com/macros/s/AKfycby9M7yRgDiwXYzYScr6NhHxe8e2Napk2KTcdNR_4bnt9mqz_Q102-I7IA3NEngjfFLATQ/exec';
+const SCRIPT='https://script.google.com/macros/s/AKfycbx8BQ8yvmXWXuulJ2tuBnJ-LnNyRD2mystBTFUbqSESe3Ys_3ldyn3Qm870eZCheKMNWA/exec';
 let SURVEY_OPEN=true;
 // Check status on load
 fetch(SCRIPT+'?action=status').then(r=>r.json()).then(d=>{
   if(d.status==='closed'){SURVEY_OPEN=false;showClosed();}
 }).catch(()=>{});
 const SUBS=[["ITAL","Italiano"],["INGL","Inglese"],["STOR","Storia"],["GEOG","Geografia"],["MATE","Matematica"],["SCIE","Scienze"],["TECN","Tecnologia"],["ARTE","Arte e Imm."],["MUSI","Musica"],["SPAN","Spagnolo"],["EDFI","Ed. Fisica"],["RELI","Religione"],["EDCI","Ed. Civica"],["COMP","Comportam."],["INFO","Informatica"]];
+
+// ============================================================
+// SUBJ_CONFIG — componenti disciplinari per materie speciali
+// ITAL, MATE, COMP sostituiscono le 6 dimensioni generiche
+// ============================================================
+const SUBJ_CONFIG={
+ITAL:{
+dims:[
+{code:'ANT',name:'Antologia / Lettura',o:['Leggo poco, i testi non mi coinvolgono','Leggo, ma dipende molto dal tipo di testo','Amo leggere, mi immergo nelle storie']},
+{code:'EPL',name:'Epica e Letteratura',o:['Sono parti lontane da me, faccio fatica a starci dietro','Qualcosa mi colpisce, altro mi scivola addosso','Mi affascina scoprire da dove vengono i testi']},
+{code:'GRA',name:'Grammatica',o:['Mi confonde, non ricordo le regole quando servono','La capisco se studio, ma mi stanca','Mi piace smontare la lingua e capire come funziona']},
+{code:'SCR',name:'Scrittura',o:['Mi blocco davanti al foglio, non so cosa scrivere','Scrivo se ho una traccia chiara, altrimenti fatico','Mi piace scrivere, trovo le mie parole']}
+],
+contenuti:{
+1:{ANT:'in 1ª: favola, fiaba, mito, testo descrittivo, avventura e fantasy, primi approcci al testo poetico',EPL:'in 1ª: epica classica — origini del mito, poemi omerici (Iliade, Odissea), cenni di Eneide',GRA:'in 1ª: morfologia, fonologia, ortografia, le 9 parti del discorso',SCR:'in 1ª: riassunto, testo descrittivo e narrativo, riscrittura creativa'},
+2:{ANT:'in 2ª: giallo, horror, fantascienza, testo umoristico, diario, lettera, poesia (figure retoriche)',EPL:'in 2ª: epica cavalleresca (ciclo bretone, carolingio); origini dell\'italiano: Stilnovo, Dante, Petrarca, Boccaccio',GRA:'in 2ª: sintassi della frase semplice — soggetto, predicato, attributo, apposizione, complementi',SCR:'in 2ª: diario e lettera, articolo di cronaca, testo informativo-espositivo, cenni all\'argomentativo'},
+3:{ANT:'in 3ª: tematiche sociali e storiche, testi legati all\'attualità, la memoria',EPL:'in 3ª: letteratura italiana dal Rinascimento al Novecento e all\'età contemporanea',GRA:'in 3ª: sintassi del periodo — proposizione principale, coordinate, subordinate',SCR:'in 3ª: testo argomentativo strutturato, relazione, commento, preparazione Esame di Stato'}
+}
+},
+MATE:{
+dims:[
+{code:'ARI',name:'Aritmetica e Algebra',o:['I numeri mi confondono, sbaglio anche i calcoli semplici','Ci arrivo con metodo, ma mi serve tanto esercizio','Con i numeri mi muovo con sicurezza']},
+{code:'GEO',name:'Geometria',o:['Non "vedo" le figure, mi perdo tra formule e disegni','Capisco se visualizzo, ma le dimostrazioni mi costano','Ragiono bene nello spazio, le figure mi piacciono']},
+{code:'REL',name:'Relazioni e funzioni',o:['Tabelle e grafici mi sembrano astratti','Li leggo, ma fatico a usarli per risolvere problemi','Mi aiutano a vedere come le cose si collegano']},
+{code:'DAT',name:'Dati e previsioni',o:['Statistica e probabilità mi entrano poco','Li uso se servono, ma non mi interessano molto','Mi incuriosisce capire cosa dicono i numeri del mondo']}
+],
+contenuti:{
+1:{ARI:'in 1ª: numeri naturali e decimali, 4 operazioni, potenze, divisibilità (MCD, mcm), frazioni',GEO:'in 1ª: enti geometrici fondamentali, segmenti, angoli, rette, poligoni, triangoli, quadrilateri',REL:'in 1ª: insiemi elementari, costruzione e lettura di tabelle',DAT:'in 1ª: rappresentazione dei dati — istogrammi, ideogrammi, areogrammi'},
+2:{ARI:'in 2ª: frazioni (consolidamento), numeri razionali, radici quadrate, rapporti e proporzioni',GEO:'in 2ª: equivalenza, calcolo delle aree, Teorema di Pitagora, similitudine',REL:'in 2ª: piano cartesiano, funzioni di proporzionalità diretta e inversa',DAT:'in 2ª: statistica descrittiva — frequenza, media, moda, mediana'},
+3:{ARI:'in 3ª: numeri relativi, calcolo letterale (monomi, polinomi), equazioni di primo grado',GEO:'in 3ª: circonferenza e cerchio, geometria solida — prismi, piramidi, cilindro, cono, sfera',REL:'in 3ª: la retta nel piano cartesiano, risoluzione grafica e algebrica di problemi',DAT:'in 3ª: calcolo della probabilità — eventi certi, impossibili, probabili'}
+}
+},
+COMP:{
+dims:[
+{code:'REG',name:'Rispetto delle regole',o:['Le ignoro o le trasgredisco di frequente','Le rispetto, ma a volte sgarro o mi richiamano','Le rispetto sempre e ne capisco il senso']},
+{code:'LIN',name:'Uso del linguaggio',o:['Uso lo stesso linguaggio con tutti, a volte provoco o offendo','Adatto il tono, ma non sempre in modo appropriato','Scelgo registro e parole in base al contesto e resto rispettoso']},
+{code:'SAN',name:'Sanzioni ricevute',o:['Ho ricevuto note o sospensioni','Ho avuto qualche richiamo verbale o scritto','Non ho mai ricevuto sanzioni']},
+{code:'RES',name:'Responsabilità e assunzione del compito',o:['Evito o rifiuto i compiti che mi vengono assegnati','Mi assumo le responsabilità solo se guidato','Prendo decisioni responsabili in autonomia']},
+{code:'PAR',name:'Partecipazione e lavoro di squadra',o:['Partecipo poco e nei gruppi ostacolo il lavoro','Partecipo, ma nei gruppi ho scarsa iniziativa','Partecipo attivamente e nei gruppi collaboro davvero']},
+{code:'AUT',name:'Autocontrollo',o:['Fatico a gestire le emozioni, reagisco d\'impulso','Controllo le reazioni, con qualche difficoltà','Gestisco emozioni e reazioni con maturità']},
+{code:'FRE',name:'Frequenza',o:['Ho frequenza irregolare, assenze o ritardi frequenti','Qualche ritardo o assenza, ma in generale sono regolare','Sono sempre puntuale, non salto le lezioni']}
+]
+}
+};
+// Ritorna l'array delle dimensioni effettive per una materia (considera la classe per i contenuti)
+function getSubjDims(code,classe){
+  if(SUBJ_CONFIG[code]){
+    const cfg=SUBJ_CONFIG[code];
+    const anno=classe?parseInt(classe[0]):null;
+    return cfg.dims.map(d=>({
+      code:d.code,name:d.name,o:d.o,
+      desc:(cfg.contenuti&&anno)?cfg.contenuti[anno]?.[d.code]:null
+    }));
+  }
+  // Fallback: 6 dimensioni generiche — formattate come le speciali
+  return MDIMS.map(m=>({code:m[0],name:m[1],o:m[2],desc:null}));
+}
+// Conta totale sotto-domande matrice (varia per classe? NO — ITAL/MATE/COMP hanno sempre stesso numero di componenti)
+function countMatrixSubs(){
+  let n=0;
+  SUBS.forEach(([code])=>{ n+=getSubjDims(code,null).length; });
+  return n;
+}
+
 const MDIMS=[
 ["ARG","Gli argomenti ti interessano?",["No","Abbastanza","Molto"]],
 ["REA","Sono collegati alla realtà?",["No","Un po'","Sì"]],
@@ -182,6 +257,36 @@ const S9Q=[
 {q:"Quando faccio un errore, mi sento...",tp:"emo",opts:["Umiliato/a","Scoraggiato/a","Indifferente","Stimolato/a","Motivato/a"]},
 {q:"Quando ho una verifica, mi sento...",tp:"emo",opts:["Ansioso/a","Sotto pressione","Indifferente","Preparato/a","Sicuro/a"]}
 ];
+
+// ============================================================
+// QNUMS — numerazione progressiva di tutte le domande
+// ============================================================
+const QNUMS=(function(){
+  const o={};let n=1;
+  o.S1=n;n+=Q.S1.q.length;
+  o.S2=n;n+=Q.S2.q.length;
+  o.S3=n;n+=Q.S3.q.length;
+  o.S4=n;n+=Q.S4.q.length;
+  o.S5=n;n+=Q.S5.q.length;
+  o.S6=n;n+=Q.S6.q.length;
+  o.MATRIX=n;n+=1; // La matrice è 1 "domanda" (43), ma ha sub-items 43.1..43.N
+  o.ICCA=n;n+=Q.ICCA.q.length;
+  o.ICCB=n;n+=Q.ICCB.q.length;
+  o.S9=n;n+=S9Q.length;
+  o.S10=n;n+=Q.S10.q.length;
+  o.RANK=n;n+=1;
+  o.NEW=n;n+=1;
+  o.VOICE=n;n+=1;
+  o.TOT=n-1;
+  return o;
+})();
+// Dato un codice materia e un indice di componente, ritorna il numero 43.X globale
+function getMatSubNum(subjIdx,dimIdx){
+  let n=1;
+  for(let i=0;i<subjIdx;i++){ n+=getSubjDims(SUBS[i][0],null).length; }
+  return n+dimIdx;
+}
+
 const RKS=["Andare bene a scuola","Amicizie","Sport","Famiglia","Passione/hobby","Stare bene con me stesso/a","Costruire il mio futuro","Social e chat","Videogiochi e streaming","Essere accettato/a dagli altri"];
 const SECS=['S1','S2','S3','S4','S5','S6'];
 const STEPS=['s1','s2','s3','s4','s5','s6','matrix','icc','rules','digital','ranking','newsubject','voice','done'];
@@ -243,7 +348,7 @@ function sa(k,v){ST.a[k]=v;go();}
 function canGo(){
   const s=STEPS[ST.step];
   if(s.startsWith('s')&&Q[s.toUpperCase()]){const sec=Q[s.toUpperCase()];for(let i=0;i<sec.q.length;i++){if(!ST.a[s.toUpperCase()+'_'+i])return false;}return true;}
-  if(s==='matrix'){for(let i=0;i<SUBS.length;i++)for(let j=0;j<MDIMS.length;j++){if(!ST.a['M_'+i+'_'+j])return false;}return true;}
+  if(s==='matrix'){for(let i=0;i<SUBS.length;i++){const dims=getSubjDims(SUBS[i][0],ST.cls);for(let j=0;j<dims.length;j++){if(!ST.a['M_'+i+'_'+j])return false;}}return true;}
   if(s==='icc'){for(let i=0;i<4;i++){if(!ST.a['IA_'+i]||!ST.a['IB_'+i])return false;}return true;}
   if(s==='rules'){for(let i=0;i<S9Q.length;i++){if(!ST.a['S9_'+i])return false;}return true;}
   if(s==='digital'){for(let i=0;i<Q.S10.q.length;i++){if(!ST.a['S10_'+i])return false;}return true;}
@@ -387,6 +492,8 @@ function rPR(){
   // Matrix: active, passive, understands, doesn't understand
   let active=[],passive=[],capisce=[],noCapisce=[];
   SUBS.forEach(([sc,sn],si)=>{
+    // Salto le materie speciali: ITAL/MATE/COMP non hanno dimensione ATV o SPG
+    if(SUBJ_CONFIG[sc])return;
     if(ST.a['M_'+si+'_4']===3) active.push(sn);
     if(ST.a['M_'+si+'_4']===1) passive.push(sn);
     if(ST.a['M_'+si+'_3']===3) capisce.push(sn);
@@ -422,72 +529,110 @@ function rPR(){
   $('pnR').innerHTML=h;
 }
 
-// RENDER: TRI-OPTION SECTIONS
+// RENDER: TRI-OPTION SECTIONS (con numerazione progressiva)
 function rTri(sec){
   const S=Q[sec],done=S.q.filter((_,i)=>ST.a[sec+'_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--'+S.c[0]+');color:var(--'+S.c[1]+')">'+sec+'</span><h2>'+S.t+'</h2><p>'+S.s+'</p></div>';
+  const base=QNUMS[sec]||1; // numero di partenza globale
+  let h='<div class="sh"><span class="sht" style="background:var(--'+S.c[0]+');color:var(--'+S.c[1]+')">'+sec+'</span><h2>'+S.t+'</h2><p>'+S.s+' · Domande '+base+' → '+(base+S.q.length-1)+'</p></div>';
   h+='<div class="cnt">'+done+'/'+S.q.length+'</div>';
   S.q.forEach((item,i)=>{const ok=ST.a[sec+'_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
+    h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\''+sec+'_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   return h;
 }
 
-// MATRIX
+// MATRIX — rendering condizionale (standard 6 dim / speciale per ITAL, MATE, COMP)
 function rMat(){
-  const tot=SUBS.length*MDIMS.length;let done=0;
-  SUBS.forEach((_,i)=>MDIMS.forEach((_,j)=>{if(ST.a['M_'+i+'_'+j])done++;}));
-  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Le tue materie</h2><p>Per ogni materia, rispondi alle 6 domande.</p></div>';
+  const tot=countMatrixSubs();let done=0;
+  SUBS.forEach(([code],i)=>{
+    getSubjDims(code,ST.cls).forEach((_,j)=>{if(ST.a['M_'+i+'_'+j])done++;});
+  });
+  let h='<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">MAT</span><h2>Domanda '+QNUMS.MATRIX+' · Le tue materie</h2><p>'+tot+' sotto-domande ('+QNUMS.MATRIX+'.1 → '+QNUMS.MATRIX+'.'+tot+'). Per ogni materia rispondi sulle sue aree specifiche.</p></div>';
   h+='<div class="cnt">'+done+'/'+tot+'</div>';
   SUBS.forEach(([sc,sn],si)=>{
-    let subDone=0;MDIMS.forEach((_,j)=>{if(ST.a['M_'+si+'_'+j])subDone++;});
-    h+='<div class="qc'+(subDone===6?' ok':'')+'" style="padding:10px 12px">';
-    h+='<div style="font-size:14px;font-weight:700;color:var(--pu);margin-bottom:6px;display:flex;justify-content:space-between"><span>'+sn+'</span><span style="font-size:10px;color:var(--mu);font-weight:400">'+subDone+'/6</span></div>';
-    MDIMS.forEach(([dc,dt,labels],di)=>{
-      h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--bd)">';
-      h+='<div style="width:180px;font-size:10px;color:var(--mu);flex-shrink:0">'+dt+'</div>';
-      h+='<div style="display:flex;gap:3px;flex:1">';
-      labels.forEach((l,v)=>{
-        h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';
+    const dims=getSubjDims(sc,ST.cls);
+    let subDone=0;dims.forEach((_,j)=>{if(ST.a['M_'+si+'_'+j])subDone++;});
+    const isSpecial=!!SUBJ_CONFIG[sc];
+    
+    if(isSpecial){
+      // Layout esteso — una card per ogni componente, opzioni testuali a larghezza piena
+      h+='<div class="sub-header">'+sn+' · '+dims.length+' componenti</div>';
+      dims.forEach((d,di)=>{
+        const ok=ST.a['M_'+si+'_'+di];
+        const subNum=getMatSubNum(si,di);
+        h+='<div class="mx-ext'+(ok?' ok':'')+'">';
+        h+='<div class="mx-qn">Domanda '+QNUMS.MATRIX+'.'+subNum+' · '+sn+'</div>';
+        h+='<div class="mx-name">'+d.name+'</div>';
+        if(d.desc)h+='<div class="mx-desc">'+d.desc+'</div>';
+        h+='<div class="tri">';
+        d.o.forEach((opt,v)=>{
+          h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+opt+'</div>';
+        });
+        h+='</div></div>';
       });
-      h+='</div></div>';
-    });
-    h+='</div>';
+    } else {
+      // Layout compatto — griglia materia × 6 dimensioni generiche
+      h+='<div class="qc'+(subDone===dims.length?' ok':'')+'" style="padding:10px 12px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--pu);margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline"><span>'+sn+'</span><span style="font-size:10px;color:var(--mu);font-weight:400">Domande '+QNUMS.MATRIX+'.'+getMatSubNum(si,0)+' → '+QNUMS.MATRIX+'.'+getMatSubNum(si,dims.length-1)+' · '+subDone+'/'+dims.length+'</span></div>';
+      dims.forEach((d,di)=>{
+        const subNum=getMatSubNum(si,di);
+        h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--bd)">';
+        h+='<div style="width:200px;font-size:10px;color:var(--mu);flex-shrink:0"><span style="color:var(--pu);font-weight:700;margin-right:4px">'+QNUMS.MATRIX+'.'+subNum+'</span>'+d.name+'</div>';
+        h+='<div style="display:flex;gap:3px;flex:1">';
+        d.o.forEach((l,v)=>{
+          h+='<div class="mx-b'+(ST.a['M_'+si+'_'+di]===(v+1)?' on':'')+'" onclick="sa(\'M_'+si+'_'+di+"',"+(v+1)+')">'+l+'</div>';
+        });
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
   });
   return h;
 }
 
-// ICC
+// ICC (con numerazione progressiva)
 function rICC(){
   const A=Q.ICCA,B=Q.ICCB;
   let dA=A.q.filter((_,i)=>ST.a['IA_'+i]).length,dB=B.q.filter((_,i)=>ST.a['IB_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--aml);color:var(--am)">ICC</span><h2>'+A.t+'</h2><p>'+A.s+'</p></div>';
+  const baseA=QNUMS.ICCA,baseB=QNUMS.ICCB;
+  let h='<div class="sh"><span class="sht" style="background:var(--aml);color:var(--am)">ICC</span><h2>'+A.t+'</h2><p>'+A.s+' · Domande '+baseA+' → '+(baseB+B.q.length-1)+'</p></div>';
   h+='<div class="cnt">'+(dA+dB)+'/8</div>';
   A.q.forEach((item,i)=>{const ok=ST.a['IA_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qn"><span class="qn-num">Domanda '+(baseA+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
+    h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IA_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   h+='<div class="divider" style="background:var(--aml);color:var(--am)">'+B.s+'</div>';
   B.q.forEach((item,i)=>{const ok=ST.a['IB_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qn"><span class="qn-num">Domanda '+(baseB+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
+    h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IB_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   return h;
 }
 
-// RULES
+// RULES (con numerazione progressiva)
 function rRules(){
   const done=S9Q.filter((_,i)=>ST.a['S9_'+i]).length;
-  let h='<div class="sh"><span class="sht" style="background:var(--col);color:var(--co)">REG</span><h2>Regole, note e conseguenze</h2><p>Rispondi con sincerità.</p></div>';
+  const base=QNUMS.S9;
+  let h='<div class="sh"><span class="sht" style="background:var(--col);color:var(--co)">REG</span><h2>Regole, note e conseguenze</h2><p>Rispondi con sincerità · Domande '+base+' → '+(base+S9Q.length-1)+'</p></div>';
   h+='<div class="cnt">'+done+'/'+S9Q.length+'</div>';
   S9Q.forEach((item,i)=>{const ok=ST.a['S9_'+i];
     if(item.tp==='emo'){
-      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="emo">';
+      h+='<div class="qc'+(ok?' ok':'')+'">';
+      h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
+      h+='<div class="qt">'+item.q+'</div><div class="emo">';
       item.opts.forEach((l,v)=>{h+='<div class="eb'+(ok===(v+1)?' on':'')+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+l+'</div>';});
       h+='</div></div>';
     }else{
-      h+='<div class="qc'+(ok?' ok':'')+'"><div class="qt">'+item.q+'</div><div class="tri">';
+      h+='<div class="qc'+(ok?' ok':'')+'">';
+      h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
+      h+='<div class="qt">'+item.q+'</div><div class="tri">';
       item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+opt+'</div>';});
       h+='</div></div>';}});
   return h;
@@ -495,7 +640,7 @@ function rRules(){
 
 // RANKING
 function rRank(){
-  let h='<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">PRI</span><h2>Cosa conta per te</h2><p>Tocca in ordine di importanza.</p></div>';
+  let h='<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">PRI</span><h2>Domanda '+QNUMS.RANK+' · Cosa conta per te</h2><p>Tocca in ordine di importanza.</p></div>';
   h+='<div class="cnt">'+ST.rk.length+'/'+RKS.length+'</div>';
   if(ST.rk.length)h+='<div style="text-align:right;margin-bottom:4px"><span style="font-size:10px;color:var(--co);cursor:pointer;font-weight:600" onclick="ST.rk=[];go();">Ricomincia</span></div>';
   RKS.forEach((item,i)=>{const p=ST.rk.indexOf(i);h+='<div class="ri'+(p!==-1?' rk':'')+'" onclick="tR('+i+')"><div class="rn">'+(p!==-1?p+1:'')+'</div><div>'+item+'</div></div>';});
@@ -504,12 +649,12 @@ function rRank(){
 function tR(i){const p=ST.rk.indexOf(i);if(p!==-1)ST.rk=ST.rk.filter(x=>x!==i);else ST.rk.push(i);go();}
 
 function rNewSubject(){
-  return '<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">NEW</span><h2>La materia che manca</h2><p>Se potessi aggiungere una materia nuova a quelle che studi, quale sceglieresti?</p></div>'+
+  return '<div class="sh"><span class="sht" style="background:var(--pul);color:var(--pu)">NEW</span><h2>Domanda '+QNUMS.NEW+' · La materia che manca</h2><p>Se potessi aggiungere una materia nuova a quelle che studi, quale sceglieresti?</p></div>'+
   '<div class="tb">Non esiste una risposta giusta o sbagliata. Scrivi quello che vorresti davvero imparare a scuola e che oggi non c\'\u00e8.</div>'+
   '<div class="fb"><textarea placeholder="Quale materia aggiungeresti?" oninput="ST.a.newsubject=this.value" maxlength="500">'+(ST.a.newsubject||'')+'</textarea></div>';
 }
 function rVoice(){
-  return '<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">TXT</span><h2>Spazio libero</h2><p>Scrivi quello che vuoi sulla tua esperienza a scuola.</p></div>'+
+  return '<div class="sh"><span class="sht" style="background:var(--gl);color:var(--g)">TXT</span><h2>Domanda '+QNUMS.VOICE+' · Spazio libero</h2><p>Scrivi quello che vuoi sulla tua esperienza a scuola.</p></div>'+
   '<div class="tb">Completamente anonimo nei risultati. Anche una sola frase conta.</div>'+
   '<div class="fb"><textarea placeholder="Scrivi qui..." oninput="ST.a.voice=this.value" maxlength="1000">'+(ST.a.voice||'')+'</textarea></div>';
 }
@@ -559,6 +704,8 @@ function buildNarrative(){
 
   // Materie
   SUBS.forEach(([sc,sn],si)=>{
+    // Le materie speciali (ITAL/MATE/COMP) non hanno ATV/SPG — le salto per il daimon
+    if(SUBJ_CONFIG[sc])return;
     if(ST.a['M_'+si+'_4']===3) P.matAtt.push(sn);
     if(ST.a['M_'+si+'_4']===1) P.matPass.push(sn);
     if(ST.a['M_'+si+'_3']===3) P.matCap.push(sn);
@@ -663,12 +810,18 @@ function exportDaimonPDF(){
 }
 
 function saveToDrive(){
-  const {data:P}=buildNarrative();
   const btn=$('btnDrive');btn.textContent='Salvataggio...';btn.disabled=true;
-  const s={nome:ST.nome,classe:ST.cls,
-    forza:P.forza.slice(0,6),crescita:P.crescita.slice(0,6),
-    studio:P.studio.slice(0,4),scuola:P.scuola.slice(0,4),
-    matAtt:P.matAtt,matPass:P.matPass,matCap:P.matCap,matNoCap:P.matNoCap};
+  // Extract the rendered narrative text from the page
+  const content=$('daimonContent');
+  if(!content){btn.textContent='Errore';return;}
+  // Get all paragraphs with their styling context
+  const paras=[];
+  content.querySelectorAll('p,strong').forEach(el=>{
+    const t=el.innerText.trim();if(t&&t.length>3)paras.push(t);
+  });
+  // Also grab text directly
+  const fullText=content.innerText;
+  const s={nome:ST.nome,classe:ST.cls,letter:fullText.substring(0,6000)};
   const url=SCRIPT+'?action=saveProfile&profile='+encodeURIComponent(JSON.stringify(s));
   const img=new Image();
   img.onload=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';};
@@ -682,7 +835,10 @@ function send(){
   const p=new URLSearchParams();
   p.append('ts',new Date().toISOString());p.append('nome',ST.nome);p.append('classe',ST.cls);
   SECS.forEach(sec=>{p.append(sec,Q[sec].q.map((_,i)=>ST.a[sec+'_'+i]||'').join(','));});
-  SUBS.forEach(([code],si)=>{p.append('M_'+code,MDIMS.map((_,di)=>ST.a['M_'+si+'_'+di]||'').join(','));});
+  SUBS.forEach(([code],si)=>{
+    const dims=getSubjDims(code,ST.cls);
+    p.append('M_'+code,dims.map((_,di)=>ST.a['M_'+si+'_'+di]||'').join(','));
+  });
   p.append('ICCA',Q.ICCA.q.map((_,i)=>ST.a['IA_'+i]||'').join(','));
   p.append('ICCB',Q.ICCB.q.map((_,i)=>ST.a['IB_'+i]||'').join(','));
   p.append('S9',S9Q.map((_,i)=>ST.a['S9_'+i]||'').join(','));

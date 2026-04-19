@@ -92,7 +92,7 @@ canvas{max-height:300px!important}
 
 <script>
 const PWD='comesei26';
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycby9M7yRgDiwXYzYScr6NhHxe8e2Napk2KTcdNR_4bnt9mqz_Q102-I7IA3NEngjfFLATQ/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbx8BQ8yvmXWXuulJ2tuBnJ-LnNyRD2mystBTFUbqSESe3Ys_3ldyn3Qm870eZCheKMNWA/exec';
 let surveyOpen=true;
 
 function tryPwd(){if(document.getElementById('pwd').value===PWD){document.getElementById('gate').style.display='none';document.getElementById('dash').style.display='block';checkStatus();loadData();}else{document.getElementById('pwdErr').style.display='block';document.getElementById('pwd').value='';}}
@@ -124,13 +124,66 @@ function clearData(){
   }).catch(e=>alert('Errore di rete.'));
 }
 
-const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQWETdZqhw1rVJPeoYTGTUpHGbUQGN5SmStO_Uq7klBb7fMEKYZ7oPQGmrmyI1RuSWQ3TQsGmRrnEEy/pub?gid=1534327246&single=true&output=csv';
+const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vRHAWAYvrlNKiI6tewGhXTR2UbdENC-fwDi7-LJrjiU14v2xdjrNsP1Vn7LmOg9bLEZ3rc3SY5x5cvo/pub?gid=202387932&single=true&output=csv';
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.','Informatica'];
 const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP','INFO'];
 const MDIM=['Interesse','Realtà','Difficoltà','Chiarezza','Attivazione','Consegna'];
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 const SNUMS=[5,5,7,12,5,8];
+
+// ============================================================
+// SUBJ_DIMS_MAP — codici dimensione per materia
+// Materie generiche: 6 dimensioni standard (ARG,REA,DIF,SPG,ATV,CON)
+// Italiano/Matematica/Comportamento: componenti specifiche
+// ============================================================
+const SUBJ_DIMS_MAP={
+  _default:['ARG','REA','DIF','SPG','ATV','CON'],
+  ITAL:['ANT','EPL','GRA','SCR'],
+  MATE:['ARI','GEO','REL','DAT'],
+  COMP:['REG','LIN','SAN','RES','PAR','AUT','FRE']
+};
+const SUBJ_SPECIAL={ITAL:true,MATE:true,COMP:true};
+// Nomi estesi componenti (per display)
+const COMP_NAMES={
+  ITAL:{ANT:'Antologia / Lettura',EPL:'Epica e Letteratura',GRA:'Grammatica',SCR:'Scrittura'},
+  MATE:{ARI:'Aritmetica e Algebra',GEO:'Geometria',REL:'Relazioni e funzioni',DAT:'Dati e previsioni'},
+  COMP:{REG:'Rispetto delle regole',LIN:'Uso del linguaggio',SAN:'Sanzioni ricevute',RES:'Responsabilità e assunzione del compito',PAR:'Partecipazione e lavoro di squadra',AUT:'Autocontrollo',FRE:'Frequenza'}
+};
+// Etichette opzioni testuali (per ldist) — 3 opzioni ciascuna
+const COMP_OPTS={
+  ITAL:{
+    ANT:['Legge poco','Dipende dal testo','Ama leggere'],
+    EPL:['Parti lontane da me','Qualcosa colpisce','Mi affascina'],
+    GRA:['Mi confonde','La capisco se studio','Mi piace smontare la lingua'],
+    SCR:['Mi blocco','Se ho traccia chiara','Trovo le mie parole']
+  },
+  MATE:{
+    ARI:['I numeri mi confondono','Ci arrivo con metodo','Mi muovo con sicurezza'],
+    GEO:['Non vedo le figure','Capisco se visualizzo','Ragiono bene nello spazio'],
+    REL:['Mi sembrano astratti','Li leggo, ma fatico','Vedo come si collegano'],
+    DAT:['Mi entrano poco','Li uso se servono','Mi incuriosiscono']
+  },
+  COMP:{
+    REG:['Le trasgredisco','Sgarro a volte','Le rispetto sempre'],
+    LIN:['Linguaggio uguale con tutti','Adatto, non sempre','Scelgo con cura'],
+    SAN:['Note o sospensioni','Qualche richiamo','Mai sanzionato'],
+    RES:['Evito i compiti','Solo se guidato','Autonomo e responsabile'],
+    PAR:['Poca partecipazione','Partecipo, poca iniziativa','Attivo e collaborativo'],
+    AUT:['Reagisco d\'impulso','Controllo, con fatica','Gestisco con maturità'],
+    FRE:['Assenze o ritardi frequenti','Qualche ritardo','Sempre puntuale']
+  }
+};
+// Helper: lista codici dimensione per una materia (per indice in SUB_C)
+function dimsOf(subjIdx){
+  const code=SUB_C[subjIdx];
+  return SUBJ_DIMS_MAP[code]||SUBJ_DIMS_MAP._default;
+}
+// Helper: è una materia speciale?
+function isSpecial(subjIdx){ return !!SUBJ_SPECIAL[SUB_C[subjIdx]]; }
+// Helper: indice di una materia speciale
+function idxOf(code){ return SUB_C.indexOf(code); }
+
 
 let ALL=[];
 function loadData(){
@@ -157,6 +210,23 @@ function ldist(R,key,question,opts,colors){
   h+='</div>';return h;
 }
 
+
+// Rende una card per una materia speciale (ITAL/MATE/COMP): distribuzione % per componente
+function renderSpecialSubj(R,subjCode,title,subtitle){
+  const dims=SUBJ_DIMS_MAP[subjCode]||[];
+  const names=COMP_NAMES[subjCode]||{};
+  const opts=COMP_OPTS[subjCode]||{};
+  let h='<div class="card"><h2>'+title+'</h2><div class="sub">'+subtitle+'</div>';
+  dims.forEach(dc=>{
+    const key='M_'+subjCode+'_'+dc;
+    const name=names[dc]||dc;
+    const o=opts[dc]||['opz 1','opz 2','opz 3'];
+    h+=ldist(R,key,name,o);
+  });
+  h+='</div>';
+  return h;
+}
+
 function render(){
   const R=D(),N=R.length;if(!N){document.getElementById('content').innerHTML='<div class="load">Nessun dato.</div>';document.getElementById('heroArea').innerHTML='';return;}
 
@@ -168,13 +238,13 @@ function render(){
 
   // 2. Si sentono attivi o passivi? (% passivi media su TUTTE le materie)
   let totPass=0,totPassN=0;
-  SUB_C.forEach(sc=>{const p=pct(R,'M_'+sc+'_ATV',1);if(p!==undefined){totPass+=p;totPassN++;}});
+  SUB_C.forEach((sc,si)=>{if(isSpecial(si))return;const p=pct(R,'M_'+sc+'_ATV',1);if(p!==undefined){totPass+=p;totPassN++;}});
   const avgPass=totPassN?Math.round(totPass/totPassN):0;
   const passCol=avgPass>40?'var(--co)':avgPass>20?'var(--am)':'var(--g)';
 
   // 3. Capiscono le spiegazioni? (% che capisce = opzione 3, media su tutte le materie)
   let totCap=0,totCapN=0;
-  SUB_C.forEach(sc=>{const p=pct(R,'M_'+sc+'_SPG',3);if(p!==undefined){totCap+=p;totCapN++;}});
+  SUB_C.forEach((sc,si)=>{if(isSpecial(si))return;const p=pct(R,'M_'+sc+'_SPG',3);if(p!==undefined){totCap+=p;totCapN++;}});
   const avgCap=totCapN?Math.round(totCap/totCapN):0;
   const capCol=avgCap>60?'var(--g)':avgCap>40?'var(--am)':'var(--co)';
 
@@ -197,9 +267,10 @@ function render(){
 
   // === 2. HEATMAP: MATERIE × DIMENSIONI ===
   const HM_WORDS=[['No','Un po\'','Molto'],['No','Un po\'','S\u00ec'],['Facile','Cos\u00ec','Difficile'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo'],['No','A volte','Sempre']];
-  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Colore e parola: la sintesi di ogni materia su ogni dimensione</div>';
+  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Colore e parola: la sintesi delle 12 materie sulle 6 dimensioni generiche. Italiano, Matematica e Comportamento hanno sezioni dedicate sotto.</div>';
   h+='<div class="hm-header">';MDIM.forEach(d=>{h+='<div class="hm-htxt">'+d+'</div>';});h+='</div>';
   SUBS.forEach((sn,si)=>{
+    if(isSpecial(si))return; // Salto ITAL/MATE/COMP
     h+='<div class="hm-row"><div class="hm-label">'+sn+'</div>';
     MDIM.forEach((dn,di)=>{
       const k='M_'+SUB_C[si]+'_'+['ARG','REA','DIF','SPG','ATV','CON'][di];
@@ -210,10 +281,16 @@ function render(){
     h+='</div>';
   });
   h+='</div>';
+  
+  // === 2bis. SEZIONI DEDICATE per le materie speciali (ITAL, MATE, COMP) ===
+  h+=renderSpecialSubj(R,'ITAL','Italiano — le 4 componenti','Antologia, Epica/Letteratura, Grammatica, Scrittura. I contenuti specifici cambiano in base alla classe.');
+  h+=renderSpecialSubj(R,'MATE','Matematica — le 4 componenti','Aritmetica e Algebra, Geometria, Relazioni e funzioni, Dati e previsioni.');
+  h+=renderSpecialSubj(R,'COMP','Comportamento — le 7 componenti','Autovalutazione sugli atteggiamenti. Scala 1 (negativo) → 3 (positivo).');
 
-  // === 3. DIVERGENT: ATTIVI vs PASSIVI per materia ===
-  h+='<div class="card"><h2>Attivi vs Passivi per materia</h2><div class="sub">Rosso = passivi (opz. 1) | Verde = attivi (opz. 3)</div>';
+  // === 3. DIVERGENT: ATTIVI vs PASSIVI per materia (solo generiche: ITAL/MATE/COMP non hanno ATV) ===
+  h+='<div class="card"><h2>Attivi vs Passivi per materia</h2><div class="sub">Rosso = passivi (opz. 1) | Verde = attivi (opz. 3). Solo per le 12 materie generiche.</div>';
   SUBS.forEach((sn,si)=>{
+    if(isSpecial(si))return;
     const k='M_'+SUB_C[si]+'_ATV';const p1=pct(R,k,1),p3=pct(R,k,3);
     h+='<div class="div-row"><div class="div-label">'+sn+'</div><div class="div-bar">';
     h+='<div class="div-left" style="width:'+p1/2+'%;right:50%;background:var(--co)"></div>';
@@ -221,7 +298,7 @@ function render(){
     h+='<div class="div-center"></div></div>';
     h+='<div class="div-val" style="color:var(--co)">'+p1+'</div><div class="div-val" style="color:var(--g)">'+p3+'</div></div>';
   });
-  let worstPassive=SUB_C.map((sc,i)=>({n:SUBS[i],p:pct(R,'M_'+sc+'_ATV',1)})).sort((a,b)=>b.p-a.p)[0];
+  let worstPassive=SUB_C.map((sc,i)=>({n:SUBS[i],p:pct(R,'M_'+sc+'_ATV',1),idx:i})).filter(x=>!isSpecial(x.idx)).sort((a,b)=>b.p-a.p)[0];
   if(worstPassive.p>30)h+='<div class="ev ev-alert"><strong>Evidenza:</strong> in '+worstPassive.n+' il '+worstPassive.p+'% degli studenti si sente passivo. Non \u00e8 il contenuto: \u00e8 il metodo.</div>';
   h+='</div>';
 
@@ -473,11 +550,12 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
     doc+=pl('ICC_B2','Spiegazione a voce',['Capisce leggendo','Aiuta un po\'','Senza voce non capisce']);
     doc+=pl('ICC_B3','Capire vs fare',['Fa quello che chiedono','Ogni tanto sbaglia','Fa spesso cosa diversa']);
 
-    // Heatmap
+    // Heatmap — solo 12 materie generiche
     const HMW=[['No','Un po\'','Molto'],['No','Un po\'','S\u00ec'],['Facile','Cos\u00ec','Difficile'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo'],['No','A volte','Sempre']];
-    doc+='<h3>Materie: mappa termica</h3><table class="hm"><tr><th></th>';
+    doc+='<h3>Materie generiche: mappa termica</h3><table class="hm"><tr><th></th>';
     MDIM.forEach(d=>{doc+='<th>'+d+'</th>';});doc+='</tr>';
     SUBS.forEach((sn,si)=>{
+      if(isSpecial(si))return;
       doc+='<tr><td style="text-align:left;font-weight:500">'+sn+'</td>';
       MDIM.forEach((dn,di)=>{
         const k='M_'+SUB_C[si]+'_'+['ARG','REA','DIF','SPG','ATV','CON'][di];
@@ -487,9 +565,28 @@ seguita dal dettaglio per ciascuna classe.</div></div>`;
       });doc+='</tr>';
     });doc+='</table>';
 
-    // Attivi/Passivi
-    doc+='<h3>Attivi vs Passivi per materia</h3>';
-    SUBS.forEach((sn,si)=>{const k='M_'+SUB_C[si]+'_ATV';doc+='<div class="ap"><div class="ap-n">'+sn+'</div><div class="ap-r">'+pct(R,k,1)+'% passivi</div><span style="color:#7A7A72"> | </span><div class="ap-g">'+pct(R,k,3)+'% attivi</div></div>';});
+    // === SEZIONI SPECIALI: ITALIANO / MATEMATICA / COMPORTAMENTO ===
+    ['ITAL','MATE','COMP'].forEach(subjCode=>{
+      const dims=SUBJ_DIMS_MAP[subjCode];
+      const names=COMP_NAMES[subjCode];
+      const opts=COMP_OPTS[subjCode];
+      const titolo=({ITAL:'Italiano — 4 componenti',MATE:'Matematica — 4 componenti',COMP:'Comportamento — 7 componenti'})[subjCode];
+      doc+='<h3>'+titolo+'</h3>';
+      dims.forEach(dc=>{
+        const k='M_'+subjCode+'_'+dc;
+        const d=dist(R,k);
+        doc+='<div class="ap"><div class="ap-n">'+names[dc]+'</div>';
+        doc+='<div class="ap-r">'+d[0]+'% '+opts[dc][0]+'</div>';
+        doc+='<span style="color:#7A7A72"> | </span>';
+        doc+='<div style="color:#C28B0A">'+d[1]+'% '+opts[dc][1]+'</div>';
+        doc+='<span style="color:#7A7A72"> | </span>';
+        doc+='<div class="ap-g">'+d[2]+'% '+opts[dc][2]+'</div></div>';
+      });
+    });
+
+    // Attivi/Passivi — solo materie generiche
+    doc+='<h3>Attivi vs Passivi per materia (solo materie generiche)</h3>';
+    SUBS.forEach((sn,si)=>{if(isSpecial(si))return;const k='M_'+SUB_C[si]+'_ATV';doc+='<div class="ap"><div class="ap-n">'+sn+'</div><div class="ap-r">'+pct(R,k,1)+'% passivi</div><span style="color:#7A7A72"> | </span><div class="ap-g">'+pct(R,k,3)+'% attivi</div></div>';});
 
     // Regole
     doc+='<h3>Come vivono le regole</h3>';
