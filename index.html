@@ -3,6 +3,7 @@
 <meta name="author" content="Progetto Ferraboschi/Cerioli"><meta name="copyright" content="2026 Progetto Ferraboschi/Cerioli - Scuola Sacra Famiglia. Tutti i diritti riservati.">
 <title>TI ASCOLTO!</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{--g:#1B6D3F;--gl:#E8F5EE;--gd:#145230;--g50:#C8E0D2;--tl:#1A7F6D;--tll:#E0F5F1;--am:#C28B0A;--aml:#FFF8EC;--co:#B8432E;--col:#FDECE8;--pu:#6B4FA0;--pul:#F0ECF8;--sk:#2E7CAF;--skl:#E8F2FA;--bg:#FAFAF7;--cd:#FFF;--tx:#2C2C2C;--mu:#7A7A72;--bd:#E8E8E2;--f:'DM Sans',system-ui,sans-serif;--fb:'Source Sans 3',system-ui,sans-serif;--r:10px}
 *{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}body{font-family:var(--f);background:var(--bg);color:var(--tx);-webkit-user-select:none;user-select:none}
@@ -637,12 +638,14 @@ function buildNarrative(){
 }
 
 function showDaimon(){
+  // Hide side panels
+  $('pnL').style.display='none';$('pnR').style.display='none';
   const {text}=buildNarrative();
-  const el=$('cc');
-  let h='<div style="max-width:540px;margin:0 auto;padding:20px 0">';
+  const el=$('cc');el.style.maxWidth='600px';
+  let h='<div id="daimonContent" style="max-width:560px;margin:0 auto;padding:20px 0">';
   h+=text;
   h+='<div style="text-align:center;margin-top:24px;display:flex;gap:10px;justify-content:center">';
-  h+='<button onclick="exportDaimonPDF()" style="padding:12px 24px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva come PDF</button>';
+  h+='<button onclick="exportDaimonPDF()" style="padding:12px 24px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva PDF</button>';
   h+='<button onclick="saveToDrive()" id="btnDrive" style="padding:12px 24px;background:var(--sk);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer">Salva su Drive</button>';
   h+='</div>';
   h+='<div style="text-align:center;margin-top:12px;font-size:10px;color:var(--mu)">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi</div>';
@@ -651,19 +654,12 @@ function showDaimon(){
 }
 
 function exportDaimonPDF(){
-  const {text}=buildNarrative();
-  const w=window.open('','_blank');
-  let d='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+ST.nome+' \u2014 La tua voce interiore</title><style>';
-  d+='@page{size:A4;margin:24mm 20mm}*{margin:0;padding:0;box-sizing:border-box}';
-  d+='body{font-family:"DM Sans",Georgia,serif;color:#2C2C2C;line-height:1.8;max-width:520px;margin:0 auto;padding:20px}';
-  d+='p{margin-bottom:14px;font-size:13px}strong{font-weight:700}';
-  d+='.foot{text-align:center;font-size:8px;color:#7A7A72;margin-top:30px;padding-top:8px;border-top:1px solid #E8E8E2}';
-  d+='</style></head><body>';
-  d+=text;
-  d+='<div class="foot">\u00a9 2026 Progetto Ferraboschi/Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi \u2014 Tutti i diritti riservati</div>';
-  d+='</body></html>';
-  w.document.write(d);w.document.close();
-  setTimeout(()=>w.print(),500);
+  const content=$('daimonContent');
+  if(!content)return;
+  // Hide buttons during export
+  const btns=content.querySelectorAll('button');btns.forEach(b=>b.style.display='none');
+  const opt={margin:[15,12],filename:ST.nome+' - Voce Interiore.pdf',image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}};
+  html2pdf().set(opt).from(content).save().then(()=>{btns.forEach(b=>b.style.display='');});
 }
 
 function saveToDrive(){
@@ -675,12 +671,13 @@ function saveToDrive(){
   const p=new URLSearchParams();
   p.append('action','saveProfile');
   p.append('profile',JSON.stringify(summary));
+  // Image pixel method — same as data submit, follows redirects
   try{
-    fetch(SCRIPT+'?'+p.toString()).then(r=>r.json()).then(d=>{
-      if(d.saved){btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';}
-      else{btn.textContent='Errore';btn.style.background='var(--co)';setTimeout(()=>{btn.textContent='Salva su Drive';btn.style.background='var(--sk)';btn.disabled=false;},2000);}
-    }).catch(()=>{btn.textContent='Errore rete';setTimeout(()=>{btn.textContent='Salva su Drive';btn.style.background='var(--sk)';btn.disabled=false;},2000);});
-  }catch(e){btn.textContent='Errore';}
+    const img=new Image();
+    img.onload=img.onerror=()=>{btn.textContent='\u2713 Salvato su Drive';btn.style.background='var(--g)';};
+    img.src=SCRIPT+'?'+p.toString();
+  }catch(e){btn.textContent='Errore';btn.style.background='var(--co)';}
+}
 }
 
 // SUBMIT
