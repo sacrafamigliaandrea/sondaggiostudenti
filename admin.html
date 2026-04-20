@@ -609,17 +609,37 @@ function render(){
   // === 11. LA MATERIA CHE MANCA ===
   const materie=R.map(r=>(r.MATERIA_NUOVA||'').trim()).filter(t=>t.length>1);
   if(materie.length){
-    // Count frequencies
-    const freq={};materie.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
-    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
-    h+='<div class="card"><h2>La materia che manca</h2><div class="sub">'+materie.length+' studenti su '+N+' hanno proposto una materia nuova</div>';
-    sorted.forEach(([nome,count])=>{
-      const pctM=Math.round(count/materie.length*100);
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:12px;font-weight:600;width:140px;text-align:right;text-transform:capitalize">'+nome+'</div>';
-      h+='<div style="flex:1;height:18px;background:var(--bd);border-radius:4px;overflow:hidden"><div style="width:'+pctM+'%;height:100%;background:var(--pu);border-radius:4px"></div></div>';
-      h+='<div style="font-size:11px;font-weight:600;color:var(--pu);width:50px">'+count+'x ('+pctM+'%)</div></div>';
+    // Raggruppo SOLO per testo identico (case-insensitive, whitespace normalizzato)
+    // Ma conservo la grafia originale dello studente.
+    const groups=new Map();
+    materie.forEach(m=>{
+      const key=m.toLowerCase().replace(/\s+/g,' ').trim();
+      if(!groups.has(key)) groups.set(key,{text:m,count:0});
+      groups.get(key).count++;
     });
-    if(sorted.length&&sorted[0][1]>=3)h+='<div class="ev ev-info"><strong>Richiesta ricorrente:</strong> \u201c'+sorted[0][0]+'\u201d \u00e8 la materia pi\u00f9 richiesta con '+sorted[0][1]+' proposte. Un segnale da non ignorare.</div>';
+    // Ordino: prima le più ricorrenti, poi le uniche in ordine di lunghezza crescente
+    const bubbles=[...groups.values()].sort((a,b)=>{
+      if(b.count!==a.count) return b.count-a.count;
+      return a.text.length-b.text.length;
+    });
+    h+='<div class="card full"><h2>La materia che manca</h2><div class="sub">'+materie.length+' studenti su '+N+' hanno proposto una materia nuova</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">';
+    bubbles.forEach(({text,count})=>{
+      const isRec=count>=2;
+      const bg=isRec?'var(--pul)':'var(--bg)';
+      const bd=isRec?'var(--pu)':'var(--bd)';
+      const esc=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      h+='<div style="padding:7px 12px;background:'+bg+';border:1px solid '+bd+';border-radius:16px;font-size:12px;line-height:1.4;color:var(--tx);max-width:100%;display:inline-flex;align-items:center;gap:6px">';
+      h+='<span>\u201c'+esc+'\u201d</span>';
+      if(count>1) h+='<span style="font-weight:700;color:var(--pu);font-size:10px;background:#fff;padding:1px 6px;border-radius:8px">\u00d7'+count+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+    // Evidenza solo se c'è una richiesta davvero ricorrente
+    const top=bubbles[0];
+    if(top && top.count>=3){
+      h+='<div class="ev ev-info" style="margin-top:12px"><strong>Richiesta ricorrente:</strong> \u201c'+top.text+'\u201d \u00e8 stata proposta '+top.count+' volte. Un segnale da non ignorare.</div>';
+    }
     h+='</div>';
   }
 
