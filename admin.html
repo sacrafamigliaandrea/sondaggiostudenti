@@ -948,29 +948,29 @@ function genDossier(){
   const videoRank = ranking.findIndex(x => x.label === 'Videogiochi e streaming') + 1;
   
   // — Sezione 3 (Materie)
-  // Attivi per materia (Ed.Fisica idx 8, Musica idx 6, Arte idx 5, Tecnologia idx 4)
-  // Uso i codici SUB_C per identificarle
+  // Attivi per materia. I codici SUB_C sono: ITAL,INGL,STOR,GEOG,MATE,SCIE,TECN,ARTE,MUSI,SPAN,EDFI,RELI,EDCI,COMP,INFO
+  // Le dimensioni sono: ARG (interesse/argomento), SPG (chiarezza/spiegazione), ATV (attivazione)
   function actPct(subjCode) {
     const idx = SUB_C.indexOf(subjCode);
     if (idx < 0) return {att:0,pass:0};
-    // Attivi = scelta 3 sulla dimensione ATT (attivazione)
+    // Attivi = scelta 3 sulla dimensione ATV (attivazione)
     return {
-      att: pct(R, 'M_' + subjCode + '_ATT', 3),
-      pass: pct(R, 'M_' + subjCode + '_ATT', 1)
+      att: pct(R, 'M_' + subjCode + '_ATV', 3),
+      pass: pct(R, 'M_' + subjCode + '_ATV', 1)
     };
   }
-  const edFis = actPct('EDF');
-  const arte = actPct('ART');
-  const musica = actPct('MUS');
-  const tecno = actPct('TEC');
-  const geo = actPct('GEO');
-  const edCiv = actPct('EDC');
+  const edFis = actPct('EDFI');
+  const arte = actPct('ARTE');
+  const musica = actPct('MUSI');
+  const tecno = actPct('TECN');
+  const geo = actPct('GEOG');
+  const edCiv = actPct('EDCI');
   
   // Componenti Italiano
   const pctScritturaDiff = pct(R,'M_ITAL_SCR',1);
   const pctScritturaAmo = pct(R,'M_ITAL_SCR',3);
   const pctGramConf = pct(R,'M_ITAL_GRA',1);
-  const pctEpicaFasc = pct(R,'M_ITAL_EPI',3);
+  const pctEpicaFasc = pct(R,'M_ITAL_EPL',3);
   
   // Componenti Matematica
   const pctRelAstratto = pct(R,'M_MATE_REL',1);
