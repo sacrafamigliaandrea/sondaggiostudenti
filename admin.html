@@ -838,452 +838,535 @@ function hmColRev(v){// For difficulty: high=hard=red
 
 function genDossier(){
   if(!ALL.length){alert('Nessun dato caricato.');return;}
-  const groups=[{label:'Tutte le classi',data:ALL},{label:'Tutte le prime',data:ALL.filter(r=>r.classe&&r.classe.startsWith('1'))},{label:'Tutte le seconde',data:ALL.filter(r=>r.classe&&r.classe.startsWith('2'))},{label:'Tutte le terze',data:ALL.filter(r=>r.classe&&r.classe.startsWith('3'))},{label:'1A',data:ALL.filter(r=>r.classe==='1A')},{label:'1B',data:ALL.filter(r=>r.classe==='1B')},{label:'1C',data:ALL.filter(r=>r.classe==='1C')},{label:'2A',data:ALL.filter(r=>r.classe==='2A')},{label:'2B',data:ALL.filter(r=>r.classe==='2B')},{label:'2C',data:ALL.filter(r=>r.classe==='2C')},{label:'3A',data:ALL.filter(r=>r.classe==='3A')},{label:'3B',data:ALL.filter(r=>r.classe==='3B')},{label:'3C',data:ALL.filter(r=>r.classe==='3C')}];
-  const w=window.open('','_blank');
-  let doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dossier TI ASCOLTO!</title>
-<style>
-@page{size:A4;margin:18mm 15mm}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',Helvetica,sans-serif;font-size:11px;color:#2C2C2C;line-height:1.5}
-.cover{page-break-after:always;display:flex;flex-direction:column;align-items:center;justify-content:center;height:90vh;text-align:center}
-.cover h1{font-size:32px;color:#1B6D3F;margin-bottom:6px}.cover .sub{font-size:14px;color:#7A7A72;margin-bottom:30px}
-.cover .info{font-size:11px;color:#7A7A72}
-.section{page-break-before:always}
-h2{font-size:16px;color:#1B6D3F;border-bottom:2px solid #1B6D3F;padding-bottom:4px;margin:18px 0 10px}
-h3{font-size:13px;color:#2E7CAF;margin:14px 0 6px}
-.q{font-weight:600;margin:8px 0 3px;font-size:11px}
-.opts{margin-left:8px;margin-bottom:4px}
-.opt{display:flex;align-items:center;gap:6px;margin:2px 0}
-.bar{height:10px;border-radius:3px;min-width:2px;display:inline-block}
-.pct{font-weight:600;width:32px;text-align:right;font-size:10px}
-.ev{padding:6px 10px;border-radius:4px;margin:6px 0;font-size:10px;line-height:1.5}
-.ev-w{background:#FEF3D6;border-left:3px solid #C28B0A}.ev-a{background:#FDECE8;border-left:3px solid #B8432E}
-.ev-g{background:#E8F5EE;border-left:3px solid #1B6D3F}.ev-i{background:#E8F2FA;border-left:3px solid #2E7CAF}
-.rank-row{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid #E8E8E2}
-.rank-n{width:20px;height:20px;border-radius:50%;background:#7A7A72;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
-.rank-n.hl{background:#1B6D3F}
-.quote{padding:6px 10px;margin:3px 0;background:#F5F5F0;border-left:3px solid #1A7F6D;font-style:italic;font-size:10px}
-table.hm{border-collapse:collapse;width:100%;margin:6px 0}table.hm td,table.hm th{padding:3px 4px;text-align:center;font-size:8px;border:1px solid #E8E8E2}table.hm th{background:#F5F5F0;font-weight:600}
-.footer{text-align:center;font-size:8px;color:#7A7A72;margin-top:20px;padding-top:6px;border-top:1px solid #E8E8E2}
-.ap{display:flex;gap:4px;margin:2px 0;font-size:10px}.ap-n{width:90px;text-align:right}.ap-r{color:#B8432E;width:30px;text-align:right}.ap-g{color:#1B6D3F;width:30px}
-.prof-row{display:grid;grid-template-columns:130px 1fr 50px 85px;gap:8px;align-items:center;padding:6px 8px;margin-bottom:4px;border-radius:4px;background:#FAFAF6;page-break-inside:avoid}
-.prof-row.s-cri{background:#FDECE8;border-left:3px solid #B8432E}
-.prof-row.s-att{background:#FEF3D6;border-left:3px solid #C28B0A}
-.prof-row.s-buo{background:#E8F5EE;border-left:3px solid #5C9E4A}
-.prof-row.s-con{background:#D6EADA;border-left:3px solid #1B6D3F}
-.prof-lab{font-size:11px;font-weight:600;text-align:right}
-.prof-trk{height:9px;background:#fff;border-radius:5px;overflow:hidden;border:1px solid #E8E8E2}
-.prof-fil{height:100%;border-radius:5px}
-.prof-val{font-size:11px;font-weight:700;text-align:left;font-family:Menlo,monospace}
-.prof-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;text-align:right}
-.prof-ev{grid-column:1 / -1;font-size:9.5px;color:#555;padding:3px 0 0 14px;line-height:1.4;font-style:italic}
-.open-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}
-.open-col{min-width:0;break-inside:avoid}
-.open-col h3{margin-top:0}
-.emerge-intro{font-size:10px;color:#555;margin-bottom:10px;padding:8px 10px;background:#F5F5F0;border-left:3px solid #1B6D3F;font-style:italic;line-height:1.5}
-.emerge-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
-.emerge-block{min-width:0}
-.emerge-block h4{font-size:10px;font-weight:700;color:#1B6D3F;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #E8E8E2}
-.emerge-block.growth h4{color:#C28B0A;border-bottom-color:#F0D9A6}
-.emerge-item{display:grid;grid-template-columns:38px 1fr;gap:6px;align-items:baseline;padding:3px 0;font-size:10px;line-height:1.45}
-.emerge-pct{font-weight:700;font-family:Menlo,monospace;color:#1B6D3F;text-align:right}
-.emerge-block.growth .emerge-pct{color:#C28B0A}
-.emerge-txt{color:#2C2C2C}
-.emerge-scuola{margin-top:6px}
-.emerge-scuola h4{font-size:10px;font-weight:700;color:#2E7CAF;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #D6E6F0}
-.emerge-bar-row{display:grid;grid-template-columns:220px 1fr 38px;gap:8px;align-items:center;margin-bottom:4px;font-size:10px}
-.emerge-bar-trk{height:8px;background:#F5F5F0;border-radius:4px;overflow:hidden}
-.emerge-bar-fil{height:100%;background:#2E7CAF;border-radius:4px}
-/* Toggle M/F per sezione */
-.cmp-toggle{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:#fff;cursor:pointer;font-size:10px;font-weight:700;color:var(--mu);letter-spacing:.5px;transition:all .15s;margin-left:12px;vertical-align:middle;user-select:none;font-family:var(--f)}
-.cmp-toggle:hover{border-color:var(--g)}
-.cmp-toggle.on{background:var(--g);color:#fff;border-color:var(--g)}
-.cmp-toggle .cmp-dot{width:7px;height:7px;border-radius:50%;background:#ccc;transition:all .15s}
-.cmp-toggle.on .cmp-dot{background:#fff}
-.cmp-warn{font-size:10px;color:#8a6a0a;padding:7px 10px;background:#FEF3D6;border-left:3px solid var(--am);border-radius:4px;margin:8px 0}
-/* Layout ldist comparato (2 sub-barre M e F per opzione) */
-.ld-row.ld-cmp{grid-template-columns:220px 1fr}
-.ld-cmp-stack{display:flex;flex-direction:column;gap:4px}
-.ld-cmp-sub{display:grid;grid-template-columns:22px 1fr 48px;gap:8px;align-items:center}
-.ld-cmp-tag{font-weight:700;text-align:center;letter-spacing:.5px;font-size:10px;font-family:Menlo,monospace}
-.ld-cmp-pct{font-weight:700;text-align:left;font-variant-numeric:tabular-nums;font-size:11px}
-</style></head><body>`;
-
-  doc+=`<div class="cover"><h1>TI ASCOLTO!</h1><div class="sub">Profilo studente 2026 \u2014 Dossier analitico</div>
-<div class="info">Scuola Sacra Famiglia \u2014 Orzinuovi<br>Progetto Andrea Cerioli<br><br>
-${ALL.length} studenti | Generato il ${new Date().toLocaleDateString('it-IT')}<br><br>
-Questo dossier contiene i risultati del questionario di profilazione<br>
-somministrato agli studenti della scuola secondaria di I grado.<br><br>
-I dati sono organizzati in sezione sommativa (tutte le classi)<br>
-seguita dal dettaglio per ciascuna classe.</div></div>`;
-
-  // Helper: breakdown genere per un gruppo
-  function gBreakdown(R){
-    let m=0,f=0,nd=0;
-    R.forEach(r=>{const g=(r.genere||'').toUpperCase();if(g==='M')m++;else if(g==='F')f++;else nd++;});
-    return {m:m,f:f,nd:nd};
-  }
-  function gLabel(b){
-    const parts=[];
-    if(b.m) parts.push(b.m+'M');
-    if(b.f) parts.push(b.f+'F');
-    if(b.nd) parts.push(b.nd+'ND');
-    return parts.join(' · ');
+  const R = ALL;
+  const N = R.length;
+  
+  // ======================================================
+  // HELPERS DI ANALISI — riusano dist/avg/pct già definiti
+  // ======================================================
+  
+  // Formatta una percentuale: arrotonda e trasforma in stringa senza decimali
+  const pp = (v) => Math.round(v) + '%';
+  
+  // Classifica delle priorità (dal ranking R_1..R_10)
+  const priLabels = ['Famiglia','Amicizie','Andare bene a scuola','Stare bene con me',
+    'Sport','Costruire il futuro','Passione/hobby','Essere accettato/a',
+    'Social e chat','Videogiochi e streaming'];
+  // Nota: l'ordine dipende dalla definizione originale. Uso l'ordine dello schema esistente.
+  // In realtà nel dossier attuale R_1..R_10 corrispondono all'ordine presentato.
+  // Calcolo ranking medio per ciascuno.
+  function computePriorityRanking(R) {
+    const out = [];
+    for (let i = 0; i < priLabels.length; i++) {
+      const key = 'R_' + (i+1);
+      let s = 0, c = 0;
+      R.forEach(r => { const v = +r[key]; if (v >= 1 && v <= 10) { s += v; c++; } });
+      out.push({ label: priLabels[i], rank: c ? s/c : 99, n: c });
+    }
+    out.sort((a, b) => a.rank - b.rank);
+    return out;
   }
   
-  groups.forEach((grp,gi)=>{
-    const R=grp.data,N=R.length;
-    if(!N)return;
-    const gb=gBreakdown(R);
-    const gbLab=gLabel(gb);
-    doc+=`<div class="section"><h2>${grp.label} \u2014 ${N} studenti${gbLab?' <span style="font-size:12px;color:#7A7A72;font-weight:500">('+gbLab+')</span>':''}</h2>`;
-
-    // === COMPOSIZIONE DI GENERE PER CLASSE (solo sommativo) ===
-    if(gi===0){
-      const classList=['1A','1B','1C','2A','2B','2C','3A','3B','3C'];
-      const classData=classList.map(cl=>{
-        const rows=R.filter(r=>r.classe===cl);
-        const b=gBreakdown(rows);
-        return {cl:cl,n:rows.length,m:b.m,f:b.f,nd:b.nd};
-      });
-      const hasData=classData.some(c=>c.n>0);
-      if(hasData){
-        doc+='<h3>Composizione di genere per classe</h3>';
-        doc+='<div style="font-size:10px;color:#555;margin-bottom:8px;font-style:italic;line-height:1.5">Utile per valutare gli equilibri nelle attuali classi e orientare la formazione dei gruppi futuri. Uno sbilanciamento è segnalato quando M e F differiscono di più del 20% dei compilatori della classe.</div>';
-        doc+='<table class="hm" style="font-size:9px"><tr><th style="width:50px">Classe</th><th>Tot</th><th style="background:#E8F2FA">M</th><th style="background:#FDECE8">F</th><th style="color:#888">ND</th><th style="width:180px">Equilibrio</th></tr>';
-        classData.forEach(c=>{
-          if(c.n===0){
-            doc+='<tr><td style="font-weight:700;text-align:left">'+c.cl+'</td><td colspan="5" style="color:#aaa;text-align:left;font-style:italic">nessuna compilazione</td></tr>';
-            return;
-          }
-          // Soglia sbilanciamento: differenza M-F > 20% del totale
-          const diff=Math.abs(c.m-c.f);
-          const thresh=c.n*0.2;
-          let eqLab,eqCol,eqBg;
-          if(diff<=thresh){eqLab='equilibrata';eqCol='#1B6D3F';eqBg='#E8F5EE';}
-          else if(c.m>c.f){eqLab='prevalenza M';eqCol='#2E7CAF';eqBg='#E8F2FA';}
-          else{eqLab='prevalenza F';eqCol='#B8432E';eqBg='#FDECE8';}
-          doc+='<tr>';
-          doc+='<td style="font-weight:700;text-align:left">'+c.cl+'</td>';
-          doc+='<td>'+c.n+'</td>';
-          doc+='<td style="background:#E8F2FA;font-weight:600">'+c.m+'</td>';
-          doc+='<td style="background:#FDECE8;font-weight:600">'+c.f+'</td>';
-          doc+='<td style="color:#888">'+c.nd+'</td>';
-          doc+='<td style="background:'+eqBg+';color:'+eqCol+';font-weight:600">'+eqLab+'</td>';
-          doc+='</tr>';
-        });
-        doc+='</table>';
-      }
-    }
-    
-    // === PROFILO SULLE 6 MACRODIMENSIONI (equivalente PDF del radar) ===
-    (function(){
-      const profD=[];
-      SDIM.forEach((l,si)=>{
-        const sec='S'+(si+1),n=SNUMS[si];
-        let s=0,c=0;
-        for(let i=1;i<=n;i++){const a=avg(R,sec+'_'+i);if(a){s+=a;c++;}}
-        profD.push(c?+(s/c).toFixed(2):0);
-      });
-      function pStatus(v){
-        if(v>=2.5) return {tag:'consolidata',cls:'s-con',col:'#1B6D3F'};
-        if(v>=2.0) return {tag:'buona',cls:'s-buo',col:'#5C9E4A'};
-        if(v>=1.8) return {tag:'attenzione',cls:'s-att',col:'#C28B0A'};
-        return {tag:'critica',cls:'s-cri',col:'#B8432E'};
-      }
-      // Stessa mappa evidenze del radar a schermo
-      const evidenceMap = {
-        0:{q:'S1_3',v:3,text:'preferisce costruire a studiare teoria'},
-        1:{q:'S2_0',v:3,text:'si distrae dopo pochi minuti di spiegazione'},
-        2:{q:'S3_6',v:3,text:'il disturbo in classe \u00e8 un problema serio'},
-        3:{q:'S4_6',v:3,text:'studia ancora ripetendo a memoria'},
-        4:{q:'S5_0',v:3,text:'lavora meglio in gruppo'},
-        5:{q:'S6_3',v:3,text:'vuole che ci\u00f2 che impara sia collegato alla realt\u00e0'}
-      };
-      doc+='<h3>Profilo sulle 6 macrodimensioni</h3>';
-      SDIM.forEach((dim,i)=>{
-        const v=profD[i];
-        const st=pStatus(v);
-        const fillPct=(v/3)*100;
-        const ev=evidenceMap[i];
-        const evPct=ev?pct(R,ev.q,ev.v):0;
-        doc+='<div class="prof-row '+st.cls+'">';
-        doc+='<div class="prof-lab" style="color:'+st.col+'">'+dim+'</div>';
-        doc+='<div class="prof-trk"><div class="prof-fil" style="width:'+fillPct+'%;background:'+st.col+'"></div></div>';
-        doc+='<div class="prof-val" style="color:'+st.col+'">'+(v?v.toFixed(2):'\u2014')+'</div>';
-        doc+='<div class="prof-tag" style="color:'+st.col+'">'+st.tag+'</div>';
-        if(ev && evPct>=20){
-          doc+='<div class="prof-ev"><strong>'+evPct+'%</strong> '+ev.text+'</div>';
+  // Estrae risposte aperte non vuote
+  function getOpenTexts(R, key) {
+    return R.map(r => (r[key] || '').trim())
+            .filter(t => t.length > 2);
+  }
+  
+  // Tematizza le risposte aperte raggruppandole per parole chiave
+  function classifyOpenResponses(texts, themes) {
+    const result = {};
+    for (const themeName in themes) result[themeName] = [];
+    const unclassified = [];
+    texts.forEach(text => {
+      const low = text.toLowerCase();
+      let matched = false;
+      for (const themeName in themes) {
+        if (themes[themeName].some(kw => low.includes(kw))) {
+          result[themeName].push(text);
+          matched = true;
+          break;
         }
-        doc+='</div>';
-      });
-    })();
-
-    function pl(key,question,opts){
-      const d=dist(R,key);const cols=['#1B6D3F','#C28B0A','#B8432E'];
-      let s='<div class="q">'+question+'</div><div class="opts">';
-      opts.forEach((o,i)=>{s+='<div class="opt"><div class="bar" style="width:'+Math.max(d[i]*1.5,2)+'px;background:'+cols[i]+'"></div><span style="color:'+cols[i]+'">'+o+'</span><span class="pct">'+d[i]+'%</span></div>';});
-      return s+'</div>';
-    }
-
-    // Ranking
-    const RK_L=['Andare bene a scuola','Amicizie','Sport','Famiglia','Passione/hobby','Stare bene con me','Costruire il futuro','Social e chat','Videogiochi e streaming','Essere accettato/a'];
-    const rkA=RK_L.map((_,i)=>{let s=0,c=0;R.forEach(r=>{const v=+r['R_'+(i+1)];if(v){s+=v;c++;}});return{l:RK_L[i],a:c?s/c:99,i:i};}).sort((a,b)=>a.a-b.a);
-    doc+='<h3>Classifica delle priorit\u00e0</h3>';
-    rkA.forEach((it,p)=>{doc+='<div class="rank-row"><div class="rank-n'+(it.i===0?' hl':'')+'">'+(p+1)+'</div><span'+(it.i===0?' style="font-weight:700;color:#1B6D3F"':'')+'>'+it.l+'</span><span style="margin-left:auto;font-size:9px;color:#7A7A72">'+it.a.toFixed(1)+'\u00ba</span></div>';});
-    const sPos=rkA.findIndex(x=>x.i===0)+1;
-    if(sPos>=4)doc+='<div class="ev ev-w"><strong>La scuola \u00e8 al '+sPos+'\u00ba posto</strong> su 10 priorit\u00e0.</div>';
-    const socialPos=rkA.findIndex(x=>x.i===7)+1;const gamePos=rkA.findIndex(x=>x.i===8)+1;
-    if(socialPos<sPos||gamePos<sPos)doc+='<div class="ev ev-a">Social e/o videogiochi si posizionano davanti alla scuola nella classifica delle priorit\u00e0.</div>';
-
-    // Aspettative
-    doc+='<h3>Cosa si aspettano dalla scuola</h3>';
-    doc+=pl('S6_1','Il ritmo delle lezioni',['Le lezioni uguali non lo disturbano','Vorrebbe pi\u00f9 variet\u00e0','Se non cambia ritmo, si spegne']);
-    doc+=pl('S6_2','Il coinvolgimento emotivo',['Impara bene anche senza','Aiuta ma non \u00e8 tutto','Se non coinvolge, non arriva nulla']);
-    doc+=pl('S6_3','Spazio per la creativit\u00e0',['Il programma va bene','Vorrebbe pi\u00f9 creativit\u00e0','Ha bisogno di creare']);
-    doc+=pl('S6_4','Collegamento col mondo reale',['Non gli serve','A volte vorrebbe capire','Se non collegato, non ha senso']);
-    doc+=pl('S6_5','L\'insegnante severo ma giusto',['Preferisce meno esigenza','Dipende','Chi pretende tira fuori il meglio']);
-    doc+=pl('S6_7','I compiti ripetitivi',['Lo aiutano','Alcuni s\u00ec altri no','Sono una perdita di tempo']);
-    doc+=pl('S6_8','Scegliere come lavorare',['Preferisce istruzioni','Guida + scelta','Decide lui il suo approccio']);
-
-    // Studio
-    doc+='<h3>Come studiano e cosa resta</h3>';
-    doc+=pl('S4_1','Video o testo scritto',['Preferisce testo','Dipende','Video molto di pi\u00f9']);
-    doc+=pl('S4_2','Schema o spiegazione orale',['Preferisce orale','Entrambi','Senza schema non arriva']);
-    doc+=pl('S4_7','Preparazione verifica',['Capire, non a memoria','Un po\' e un po\'','Ripete finch\u00e9 entra']);
-    doc+=pl('S4_9','Cosa resta dopo giorni',['Resta a lungo','Qualcosa s\u00ec','Dimenticato quasi tutto']);
-    doc+=pl('S4_10','Ricordare e passione',['Ricorda tutto','Meglio le cose che piacciono','Solo se appassiona']);
-    doc+=pl('S4_11','Perch\u00e9 studia',['Per capire davvero','Un po\' e un po\'','Solo per la verifica']);
-    doc+=pl('S4_12','Quando non capisce',['Cerca altro modo','A volte rilegge a volte alternative','Rilegge sperando']);
-    const mP=pct(R,'S4_9',3),vP=pct(R,'S4_11',3);
-    if(mP>30||vP>30)doc+='<div class="ev ev-a"><strong>'+mP+'%</strong> dimentica tutto, <strong>'+vP+'%</strong> studia solo per il voto.</div>';
-
-    // ICC
-    doc+='<h3>La consegna</h3>';
-    doc+=pl('ICC_A1','Rileggere la consegna',['Rilegge con attenzione','Legge veloce','Non rilegge']);
-    doc+=pl('ICC_A2','Prima di iniziare',['Tempo per capire','Occhiata rapida','Parte subito']);
-    doc+=pl('ICC_B1','Esempio nella consegna',['La scritta basta','A volte aiuta','Senza esempio non parte']);
-    doc+=pl('ICC_B2','Spiegazione a voce',['Capisce leggendo','Aiuta un po\'','Senza voce non capisce']);
-    doc+=pl('ICC_B3','Capire vs fare',['Fa quello che chiedono','Ogni tanto sbaglia','Fa spesso cosa diversa']);
-
-    // Heatmap — solo 12 materie generiche
-    const HMW=[['No','Un po\'','Molto'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo']];
-    doc+='<h3>Materie generiche: mappa termica</h3><table class="hm"><tr><th></th>';
-    MDIM.forEach(d=>{doc+='<th>'+d+'</th>';});doc+='</tr>';
-    SUBS.forEach((sn,si)=>{
-      if(isSpecial(si))return;
-      doc+='<tr><td style="text-align:left;font-weight:500">'+sn+'</td>';
-      MDIM.forEach((dn,di)=>{
-        const k='M_'+SUB_C[si]+'_'+['ARG','SPG','ATV'][di];
-        const a=avg(R,k);const c=hmCol(a);
-        const wi=a<1.5?0:a<2.5?1:2;
-        doc+='<td style="background:'+c+';color:#fff">'+HMW[di][wi]+'</td>';
-      });doc+='</tr>';
-    });doc+='</table>';
-
-    // === SEZIONI SPECIALI: ITALIANO / MATEMATICA / COMPORTAMENTO ===
-    ['ITAL','MATE','COMP'].forEach(subjCode=>{
-      const dims=SUBJ_DIMS_MAP[subjCode];
-      const names=COMP_NAMES[subjCode];
-      const opts=COMP_OPTS[subjCode];
-      const titolo=({ITAL:'Italiano — 4 componenti',MATE:'Matematica — 4 componenti',COMP:'Comportamento — 7 componenti'})[subjCode];
-      doc+='<h3>'+titolo+'</h3>';
-      dims.forEach(dc=>{
-        const k='M_'+subjCode+'_'+dc;
-        const d=dist(R,k);
-        doc+='<div class="ap"><div class="ap-n">'+names[dc]+'</div>';
-        doc+='<div class="ap-r">'+d[0]+'% '+opts[dc][0]+'</div>';
-        doc+='<span style="color:#7A7A72"> | </span>';
-        doc+='<div style="color:#C28B0A">'+d[1]+'% '+opts[dc][1]+'</div>';
-        doc+='<span style="color:#7A7A72"> | </span>';
-        doc+='<div class="ap-g">'+d[2]+'% '+opts[dc][2]+'</div></div>';
-      });
+      }
+      if (!matched) unclassified.push(text);
     });
-
-    // Attivi/Passivi — solo materie generiche
-    doc+='<h3>Attivi vs Passivi per materia (solo materie generiche)</h3>';
-    SUBS.forEach((sn,si)=>{if(isSpecial(si))return;const k='M_'+SUB_C[si]+'_ATV';doc+='<div class="ap"><div class="ap-n">'+sn+'</div><div class="ap-r">'+pct(R,k,1)+'% passivi</div><span style="color:#7A7A72"> | </span><div class="ap-g">'+pct(R,k,3)+'% attivi</div></div>';});
-
-    // Regole
-    doc+='<h3>Come vivono le regole</h3>';
-    doc+=pl('S9_1','Le regole della scuola',['Non hanno senso','Alcune s\u00ec','Giuste e servono']);
-    doc+=pl('S9_3','Quando riceve una nota',['Non cambia nulla','Dipende','Capisce cosa migliorare']);
-    doc+=pl('S9_7','Rispetto e comportamento',['Non dipende','Il rispetto aiuta','Se rispettato, do il massimo']);
-    doc+=pl('S9_9','Dialogo o punizione',['Punizioni servono','Dipende','Parlarne \u00e8 meglio']);
-    if(pct(R,'S9_7',3)>50)doc+='<div class="ev ev-i"><strong>'+pct(R,'S9_7',3)+'%</strong> dice: se trattato con rispetto, do il massimo.</div>';
-
-    // Cittadinanza digitale
-    doc+='<h3>Cittadinanza digitale</h3>';
-    doc+=pl('S10_1','Riconoscere i rischi',['Non insegnato','Qualcosa','So riconoscerli']);
-    doc+=pl('S10_4','Cambiato comportamento',['Come prima','Qualcosa','Molto cambiato']);
-    doc+=pl('S10_5','Simulazioni vs spiegazioni',['Tradizionali','Entrambi','Simulazioni molto di pi\u00f9']);
-    doc+=pl('S10_9','Coinvolgimento',['Non particolarmente','Abbastanza','Tra le pi\u00f9 coinvolgenti']);
-    if(pct(R,'S10_5',3)>40)doc+='<div class="ev ev-g"><strong>'+pct(R,'S10_5',3)+'%</strong> dice che le simulazioni insegnano pi\u00f9 delle spiegazioni tradizionali.</div>';
-
-    // Concentrazione
-    doc+='<h3>Concentrazione e disturbo</h3>';
-    doc+=pl('S3_1','Seguire senza distrarsi',['Concentrato','Si distrae ma recupera','Si distrae continuamente']);
-    doc+=pl('S3_2','Quando i compagni disturbano',['Si concentra lo stesso','Fastidio ma regge','Non capisce pi\u00f9 nulla']);
-    doc+=pl('S3_7','Il disturbo in classe',['Abbastanza ordine','A volte problema','Problema serio']);
-    if(pct(R,'S3_7',3)>40)doc+='<div class="ev ev-a"><strong>'+pct(R,'S3_7',3)+'%</strong> considera il disturbo un problema serio.</div>';
-
-    // Domande aperte — 2 colonne (materia che manca | testi liberi)
-    const matN=R.map(r=>(r.MATERIA_NUOVA||'').trim()).filter(t=>t.length>1);
-    const testi=R.map(r=>(r.TESTO||'').trim()).filter(t=>t.length>3);
-    if(matN.length || testi.length){
-      doc+='<div class="open-cols">';
-      // Colonna sinistra: materia che manca
-      doc+='<div class="open-col">';
-      if(matN.length){
-        const freq={};matN.forEach(m=>{const k=m.toLowerCase().replace(/[^a-z\u00e0-\u00ff ]/g,'').trim();if(k)freq[k]=(freq[k]||0)+1;});
-        const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
-        doc+='<h3>La materia che manca ('+matN.length+' proposte)</h3>';
-        sorted.forEach(([nome,count])=>{doc+='<div style="margin:3px 0;font-size:10px;line-height:1.4"><strong style="text-transform:capitalize">'+nome+'</strong> \u2014 '+count+'x</div>';});
-      } else {
-        doc+='<h3>La materia che manca</h3><div style="font-size:10px;color:#888;font-style:italic">Nessuna proposta in questo gruppo.</div>';
-      }
-      doc+='</div>';
-      // Colonna destra: testi liberi
-      doc+='<div class="open-col">';
-      if(testi.length){
-        doc+='<h3>Le loro parole ('+testi.length+' testi)</h3>';
-        testi.forEach(t=>{doc+='<div class="quote">\u201c'+t+'\u201d</div>';});
-      } else {
-        doc+='<h3>Le loro parole</h3><div style="font-size:10px;color:#888;font-style:italic">Nessun testo libero in questo gruppo.</div>';
-      }
-      doc+='</div>';
-      doc+='</div>';
-    }
-
-    // === LETTURA EMERGENTE — aggregazione dei profili daimon ===
-    // Solo nel gruppo sommativo, dove la statistica ha senso
-    if(gi===0 && N>=5){
-      // Replica della mappa presente in index.html buildNarrative()
-      const daimonMap = [
-        ['S1',0,1,'sai ascoltare e trarre il meglio da una spiegazione','forza'],
-        ['S1',0,3,'hai bisogno di toccare, fare, costruire per capire davvero','forza'],
-        ['S1',2,1,'riesci a muoverti anche nel pensiero astratto','forza'],
-        ['S1',2,3,'gli esempi concreti sono la tua porta d\'ingresso verso i concetti','crescita'],
-        ['S1',3,3,'creare qualcosa \u00e8 il tuo modo naturale di imparare','forza'],
-        ['S1',4,3,'la pratica trasforma le parole in ricordi','forza'],
-        ['S2',0,1,'hai il dono raro della concentrazione prolungata','forza'],
-        ['S2',0,3,'la tua attenzione \u00e8 intensa ma breve, hai bisogno che il ritmo cambi','crescita'],
-        ['S2',3,1,'di fronte alla difficolt\u00e0 non molli, cerchi un\'altra strada','forza'],
-        ['S2',3,3,'quando qualcosa non \u00e8 chiaro subito, rischi di fermarti','crescita'],
-        ['S2',2,3,'i compiti lunghi ti tolgono energia prima ancora di cominciare','crescita'],
-        ['S3',0,1,'sai isolarti dal rumore e restare dentro ci\u00f2 che conta','forza'],
-        ['S3',0,3,'il silenzio \u00e8 il tuo alleato: ne hai bisogno per pensare','crescita'],
-        ['S3',5,3,'sei permeabile al disimpegno degli altri','crescita'],
-        ['S4',6,1,'studi per capire il perch\u00e9, non per ripetere','forza'],
-        ['S4',6,3,'studi ancora ripetendo a memoria','crescita'],
-        ['S4',8,1,'ci\u00f2 che impari ti resta: la tua mente trattiene','forza'],
-        ['S4',8,3,'dimentichi in fretta','crescita'],
-        ['S4',9,3,'la passione \u00e8 il tuo vero motore','forza'],
-        ['S4',10,1,'studi perch\u00e9 vuoi sapere, non per un numero sul registro','forza'],
-        ['S4',10,3,'studi solo quando c\'\u00e8 la verifica','crescita'],
-        ['S4',11,1,'quando non capisci, cambi strategia. Flessibilit\u00e0 rara','forza'],
-        ['S4',11,3,'quando non capisci, rileggi sperando che entri','crescita'],
-        ['S5',0,3,'il gruppo \u00e8 il tuo ambiente naturale','forza'],
-        ['S5',0,1,'nella solitudine trovi la concentrazione','forza'],
-        ['S5',4,3,'quando la collaborazione \u00e8 vera, impari il doppio','forza'],
-        ['S6',4,3,'apprezzi chi ti sfida e pretende il massimo','forza'],
-        ['S6',2,3,'hai bisogno di creare, di esprimerti','forza'],
-        ['ICC_A',1,1,'leggi le consegne con attenzione prima di partire','forza'],
-        ['ICC_A',1,3,'non ti fermi a leggere le consegne','crescita'],
-        ['ICC_A',2,3,'parti troppo in fretta','crescita']
-      ];
-      // Nota: i codici ICC_A vs IA divergono fra index e foglio. Nell\'admin i campi
-      // sono ICC_A1..A4 e ICC_B1..B4, mentre index usava IA. Uso ICC_A come approx.
-      
-      // Conteggi
-      const countForza = {};
-      const countCresc = {};
-      const countScuola = {};
-      
-      daimonMap.forEach(([sec,qi,val,phrase,type])=>{
-        // Per ICC_A la colonna nel foglio è ICC_A1 / ICC_A2 (senza underscore tra A e numero)
-        // Per tutte le altre sezioni il formato è SEC_N (S1_0, S2_3, ecc.)
-        const key = sec.startsWith('ICC_') ? sec + qi : sec + '_' + qi;
-        let hits = 0;
-        R.forEach(r=>{ if (+r[key] === val) hits++; });
-        if (hits > 0) {
-          const bag = type === 'forza' ? countForza : countCresc;
-          bag[phrase] = (bag[phrase]||0) + hits;
-        }
-      });
-      
-      // Scuola che serve (stessa logica di P.scuola)
-      const scuolaMap = [
-        ['S6_0','variare il ritmo'],
-        ['S6_1','coinvolgervi emotivamente'],
-        ['S6_3','collegare ci\u00f2 che imparano al mondo reale'],
-        ['S6_5','pretendere il massimo con rispetto'],
-        ['S6_7','lasciarli scegliere come affrontare le cose'],
-        ['S6_6','non dare compiti ripetitivi']
-      ];
-      scuolaMap.forEach(([k,phrase])=>{
-        let hits = 0;
-        R.forEach(r=>{ if (+r[k] === 3) hits++; });
-        if (hits > 0) countScuola[phrase] = hits;
-      });
-      
-      // Ordino e prendo top 10 per forza/crescita, tutte per scuola
-      const topF = Object.entries(countForza).sort((a,b)=>b[1]-a[1]).slice(0,10);
-      const topC = Object.entries(countCresc).sort((a,b)=>b[1]-a[1]).slice(0,10);
-      const topS = Object.entries(countScuola).sort((a,b)=>b[1]-a[1]);
-      
-      if (topF.length || topC.length || topS.length) {
-        doc+='<h3>Lettura emergente \u2014 cosa raccontano i profili individuali</h3>';
-        doc+='<div class="emerge-intro">Questa sezione aggrega ci\u00f2 che il sistema ha identificato come tratto saliente in ogni profilo individuale. Non sono semplici risposte: sono caratteristiche emerse dal sistema di lettura dimensionale che genera la voce interiore di ogni studente. Base: '+N+' profili.</div>';
-        
-        doc+='<div class="emerge-cols">';
-        // Forze
-        doc+='<div class="emerge-block">';
-        doc+='<h4>Le forze pi\u00f9 ricorrenti</h4>';
-        if(topF.length){
-          topF.forEach(([phrase,count])=>{
-            const p = Math.round((count/N)*100);
-            doc+='<div class="emerge-item"><div class="emerge-pct">'+p+'%</div><div class="emerge-txt">'+phrase+'</div></div>';
-          });
-        } else {
-          doc+='<div style="font-size:10px;color:#888;font-style:italic">Nessuna forza dominante rilevata.</div>';
-        }
-        doc+='</div>';
-        
-        // Aree di crescita
-        doc+='<div class="emerge-block growth">';
-        doc+='<h4>Le aree di crescita pi\u00f9 ricorrenti</h4>';
-        if(topC.length){
-          topC.forEach(([phrase,count])=>{
-            const p = Math.round((count/N)*100);
-            doc+='<div class="emerge-item"><div class="emerge-pct">'+p+'%</div><div class="emerge-txt">'+phrase+'</div></div>';
-          });
-        } else {
-          doc+='<div style="font-size:10px;color:#888;font-style:italic">Nessuna area critica diffusa.</div>';
-        }
-        doc+='</div>';
-        doc+='</div>';
-        
-        // Scuola che chiedono
-        if(topS.length){
-          doc+='<div class="emerge-scuola">';
-          doc+='<h4>Cosa chiedono alla scuola</h4>';
-          const maxS = topS[0][1];
-          topS.forEach(([phrase,count])=>{
-            const p = Math.round((count/N)*100);
-            const fill = Math.round((count/maxS)*100);
-            doc+='<div class="emerge-bar-row"><div style="text-align:right">'+phrase+'</div><div class="emerge-bar-trk"><div class="emerge-bar-fil" style="width:'+fill+'%"></div></div><div style="font-weight:700;font-family:Menlo,monospace;color:#2E7CAF">'+p+'%</div></div>';
-          });
-          doc+='</div>';
-        }
-      }
-    }
-
-    doc+='<div class="footer">\u00a9 2026 Progetto Andrea Cerioli \u2014 Scuola Sacra Famiglia Orzinuovi \u2014 Tutti i diritti riservati</div></div>';
+    result._unclassified = unclassified;
+    return result;
+  }
+  
+  // Seleziona N citazioni più ricche da un array (evita testi troppo corti o "ciao")
+  function pickQuotes(arr, n) {
+    return arr
+      .filter(t => t.length > 15 && t.length < 280)
+      .sort((a, b) => b.length - a.length)  // prime le più ricche, poi tronchiamo
+      .slice(0, Math.max(n * 2, 6))  // prendi il doppio per aver scelta
+      .sort(() => Math.random() - 0.5)  // mescola
+      .slice(0, n);
+  }
+  
+  // Escape HTML
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  
+  // ======================================================
+  // AGGREGAZIONE DATI PER LE SEZIONI
+  // ======================================================
+  
+  // — Apertura: 4 numeri chiave (robusti)
+  const pctVariety = pct(R,'S6_1',2) + pct(R,'S6_1',3);  // vorrebbe varietà + si spegne
+  const pctRespect = pct(R,'S9_7',3);                     // se rispettato do il massimo
+  const pctRealHigh = pct(R,'S6_4',3);                    // senza collegamento non ha senso
+  const pctCapireVero = pct(R,'S4_11',1);                 // per capire davvero (opz 1)
+  
+  // — Sezione 1
+  const pctRitmoSpegne = pct(R,'S6_1',3);
+  const pctRitmoVar = pct(R,'S6_1',2);
+  const pctRispettaRegole = pct(R,'S9_1',3);
+  const pctRispettoMax = pct(R,'S9_7',3);
+  const pctAutoritaSev = pct(R,'S6_5',3);
+  const pctDipende = pct(R,'S6_5',2);
+  const pctRealHighAll = pct(R,'S6_4',3);
+  const pctRealMid = pct(R,'S6_4',2);
+  const pctCostruire = pct(R,'S1_3',3);
+  const pctCreare = pct(R,'S6_3',3);
+  
+  // — Sezione 2
+  const pctVideo = pct(R,'S4_4',3);
+  const pctSchema = pct(R,'S4_5',2);
+  const pctDistrae = pct(R,'S3_1',2);
+  const pctLeggeVel = pct(R,'ICC_A1',2);
+  const pctSbaglia = pct(R,'ICC_B3',2);
+  const pctEsempio = pct(R,'ICC_B1',2);
+  const pctScrittaBasta = pct(R,'ICC_B1',1);
+  
+  // Ranking priorità
+  const ranking = computePriorityRanking(R);
+  const scuolaRank = ranking.findIndex(x => x.label === 'Andare bene a scuola') + 1;
+  const socialRank = ranking.findIndex(x => x.label === 'Social e chat') + 1;
+  const videoRank = ranking.findIndex(x => x.label === 'Videogiochi e streaming') + 1;
+  
+  // — Sezione 3 (Materie)
+  // Attivi per materia (Ed.Fisica idx 8, Musica idx 6, Arte idx 5, Tecnologia idx 4)
+  // Uso i codici SUB_C per identificarle
+  function actPct(subjCode) {
+    const idx = SUB_C.indexOf(subjCode);
+    if (idx < 0) return {att:0,pass:0};
+    // Attivi = scelta 3 sulla dimensione ATT (attivazione)
+    return {
+      att: pct(R, 'M_' + subjCode + '_ATT', 3),
+      pass: pct(R, 'M_' + subjCode + '_ATT', 1)
+    };
+  }
+  const edFis = actPct('EDF');
+  const arte = actPct('ART');
+  const musica = actPct('MUS');
+  const tecno = actPct('TEC');
+  const geo = actPct('GEO');
+  const edCiv = actPct('EDC');
+  
+  // Componenti Italiano
+  const pctScritturaDiff = pct(R,'M_ITAL_SCR',1);
+  const pctScritturaAmo = pct(R,'M_ITAL_SCR',3);
+  const pctGramConf = pct(R,'M_ITAL_GRA',1);
+  const pctEpicaFasc = pct(R,'M_ITAL_EPI',3);
+  
+  // Componenti Matematica
+  const pctRelAstratto = pct(R,'M_MATE_REL',1);
+  const pctGeoSpazio = pct(R,'M_MATE_GEO',3);
+  const pctCalcTrappole = pct(R,'M_MATE_ARI',1);
+  const pctCalcRiesce = pct(R,'M_MATE_ARI',3);
+  
+  // — Sezione 4 — Le loro parole (tematizzazione)
+  const materieOpen = getOpenTexts(R, 'OPEN_MAT');
+  const paroleOpen  = getOpenTexts(R, 'OPEN_FREE');
+  
+  const themesMat = {
+    'Futuro concreto (economia, tasse, lavoro)': ['economia','tasse','bollett','mutuo','soldi','lavoro','denaro','pagar'],
+    'Laboratorialità (cucina, meccanica, chimica)': ['cucina','meccanic','chimic','laborator','agraria','nuovo','costru'],
+    'Espressione di sé (emozioni, psicologia)': ['emozion','psicolog','esprim','parlare di s','se stess'],
+    'Sport e corpo': ['sport','calcio','tennis','paddle','nuoto','pallacanestro','volley','corpo'],
+    'Lingue': ['inglese','spagnol','frances','tedesc','latin','cinese','giappones','corean','lingue','lingua'],
+    'Mondo reale e attualità': ['mondo','realt','attualit','news','futuro','vita quotidian'],
+  };
+  const themesFree = {
+    'Ambiente, benessere, mensa': ['mensa','bagn','cib','ricreazion','ipad','port','agnes','pizza','acqua'],
+    'Apprezzamento della scuola': ['bella scuola','mi piace','mi trovo bene','trovato bene','sono felice','piace questa','stupenda','bellissima'],
+    'Critica al sondaggio / alla scuola': ['mettere in difficolt','obbligarla','impedisce','ci impedisc','meno restriz','meno regole','meno ore'],
+    'Valore riflessivo dell\'attività': ['questa attivit','mi ha aiutato','capire cosa','ragionare','riflettere','esprimersi','chiedono il nostro','mi piace come'],
+    'Futuro e progetti personali': ['futuro','progett','sogn','carriera','universit'],
+    'Amicizia e relazioni': ['amicizi','amici','compagn','nuove amicizi'],
+  };
+  
+  const classMat = classifyOpenResponses(materieOpen, themesMat);
+  const classFree = classifyOpenResponses(paroleOpen, themesFree);
+  
+  // ======================================================
+  // RENDERING HTML — CSS A PROVA DI STAMPA
+  // ======================================================
+  
+  const w = window.open('','_blank');
+  const today = new Date().toLocaleDateString('it-IT',
+    {day:'numeric', month:'long', year:'numeric'});
+  
+  let doc = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">';
+  doc += '<title>Dossier TI ASCOLTO! — ' + today + '</title>';
+  doc += `<style>
+  @page { size: A4; margin: 22mm 18mm 20mm 18mm; }
+  @media print { .no-print { display: none !important; } }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a1a;
+               font-size: 11pt; line-height: 1.55; background: #fff; }
+  
+  /* Copertina */
+  .cover { height: 247mm; display: flex; flex-direction: column;
+           justify-content: center; align-items: center; text-align: center;
+           page-break-after: always; }
+  .cover-eyebrow { font-family: Helvetica, Arial, sans-serif; font-size: 9pt;
+                   font-weight: 700; color: #C28B0A; letter-spacing: 2px; 
+                   margin-bottom: 24pt; }
+  .cover h1 { font-size: 42pt; color: #1B6D3F; line-height: 1.05;
+              margin-bottom: 8pt; font-weight: 700; }
+  .cover .sub { font-family: Helvetica, Arial, sans-serif; font-size: 14pt; 
+                color: #7A7A72; margin-bottom: 36pt; line-height: 1.4; }
+  .cover hr { border: none; border-top: 1.2pt solid #1B6D3F; width: 85%;
+              margin: 18pt auto; }
+  .cover-meta { font-family: Helvetica, Arial, sans-serif; font-size: 10pt;
+                color: #1a1a1a; line-height: 1.7; }
+  .cover-author { font-weight: 700; color: #1B6D3F; font-size: 12pt;
+                  margin: 18pt 0 4pt; }
+  
+  /* Struttura sezione */
+  .section { page-break-before: always; }
+  .section-eyebrow { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; 
+                     font-weight: 700; color: #C28B0A; letter-spacing: 1.5px; 
+                     margin-bottom: 4pt; }
+  h1.section-title { font-family: Helvetica, Arial, sans-serif; font-size: 22pt;
+                     color: #1B6D3F; font-weight: 700; line-height: 1.15;
+                     margin-bottom: 6pt; page-break-after: avoid; }
+  .section hr { border: none; border-top: 0.8pt solid #1B6D3F; 
+                margin: 0 0 16pt 0; }
+  h2 { font-family: Helvetica, Arial, sans-serif; font-size: 15pt; color: #145230;
+       font-weight: 700; margin: 20pt 0 10pt; line-height: 1.3;
+       page-break-after: avoid; }
+  h3 { font-family: Helvetica, Arial, sans-serif; font-size: 12pt; color: #2E7CAF;
+       font-weight: 700; margin: 14pt 0 6pt; page-break-after: avoid; }
+  
+  p { margin-bottom: 10pt; text-align: justify; hyphens: auto;
+      orphans: 3; widows: 3; }
+  p.lead { font-size: 11.5pt; color: #145230; line-height: 1.65;
+           margin-bottom: 12pt; }
+  
+  strong { color: #1a1a1a; font-weight: 700; }
+  em { color: #145230; }
+  
+  /* Citazioni */
+  blockquote { font-family: 'Georgia', serif; font-style: italic;
+               color: #145230; border-left: 3pt solid #1A7F6D;
+               padding: 6pt 14pt; margin: 8pt 0 8pt 12pt;
+               font-size: 10.5pt; line-height: 1.5;
+               page-break-inside: avoid; }
+  blockquote.source { font-style: normal; }
+  blockquote .attrib { display: block; font-size: 9pt; color: #7A7A72;
+                       margin-top: 3pt; font-style: normal; }
+  
+  /* Box numeri chiave - griglia 2x2 a prova di stampa */
+  .key-grid { width: 100%; border-collapse: collapse; margin: 14pt 0; }
+  .key-grid td { width: 50%; padding: 16pt 12pt; text-align: center;
+                 vertical-align: middle; border: 1pt solid #E8E8E2;
+                 background: #FAFAF6; page-break-inside: avoid; }
+  .key-num { font-family: Helvetica, Arial, sans-serif; font-size: 40pt;
+             font-weight: 700; line-height: 1; margin-bottom: 6pt; }
+  .key-lbl { font-family: Helvetica, Arial, sans-serif; font-size: 9.5pt;
+             line-height: 1.4; color: #1a1a1a; }
+  .key-lbl small { display: block; color: #7A7A72; margin-top: 3pt;
+                   font-size: 8.5pt; }
+  .c-green { color: #1B6D3F; } .c-blue { color: #2E7CAF; }
+  .c-amber { color: #C28B0A; } .c-red { color: #B8432E; }
+  
+  /* Callout box */
+  .callout { border-left: 3pt solid #C28B0A; background: #FEF3D6;
+             padding: 10pt 14pt; margin: 14pt 0; page-break-inside: avoid; }
+  .callout.info { border-left-color: #2E7CAF; background: #E8F2FA; }
+  .callout.good { border-left-color: #1B6D3F; background: #E8F5EE; }
+  .callout-title { font-family: Helvetica, Arial, sans-serif; font-size: 10pt;
+                   font-weight: 700; color: #8a6a0a; margin-bottom: 4pt; }
+  .callout.info .callout-title { color: #1d5a85; }
+  .callout.good .callout-title { color: #145230; }
+  .callout p { font-family: Helvetica, Arial, sans-serif; font-size: 10pt;
+               margin-bottom: 0; color: #1a1a1a; line-height: 1.5; }
+  
+  /* Tabella priorità — a prova di collasso */
+  table.prio { width: 100%; border-collapse: collapse; margin: 10pt 0;
+               font-family: Helvetica, Arial, sans-serif; font-size: 10pt;
+               page-break-inside: avoid; }
+  table.prio td { padding: 4pt 8pt; border-bottom: 0.5pt solid #E8E8E2; }
+  table.prio td.rank { width: 20mm; font-weight: 700; color: #1B6D3F; }
+  table.prio td.label { text-align: left; }
+  table.prio td.val { width: 25mm; text-align: right; color: #7A7A72; }
+  table.prio tr.highlight td { background: #E8F5EE; color: #1B6D3F;
+                               font-weight: 700; }
+  
+  /* Footer piè di pagina */
+  .page-footer { text-align: center; font-family: Helvetica, Arial, sans-serif;
+                 font-size: 7.5pt; color: #7A7A72; margin-top: 20pt;
+                 padding-top: 6pt; border-top: 0.3pt solid #E8E8E2; }
+  
+  /* Blocchi anti-orfani */
+  .keep { page-break-inside: avoid; }
+  </style></head><body>`;
+  
+  // ==========================================================
+  // COPERTINA
+  // ==========================================================
+  doc += '<div class="cover">';
+  doc += '<div class="cover-eyebrow">DOSSIER 2026</div>';
+  doc += '<h1>TI&nbsp;ASCOLTO!</h1>';
+  doc += '<div class="sub">Dossier narrativo<br/>Cosa ci dicono gli studenti</div>';
+  doc += '<hr/>';
+  doc += '<div class="cover-meta">';
+  doc += '<strong>Sommativo d\'istituto</strong><br/>';
+  doc += N + ' studenti della scuola secondaria di primo grado';
+  doc += '</div>';
+  doc += '<div class="cover-author">Andrea Cerioli</div>';
+  doc += '<div class="cover-meta">Animatore Digitale<br/>Scuola Sacra Famiglia &middot; Orzinuovi (BS)<br/><br/>' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE APERTURA — 4 NUMERI CHIAVE
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">APERTURA</div>';
+  doc += '<h1 class="section-title">Quattro numeri per cominciare</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Se questo dossier avesse solo una pagina per raccontare cosa gli studenti ci hanno detto, sarebbero questi quattro numeri. Ciascuno di loro è una richiesta, non una misura.</p>';
+  
+  doc += '<table class="key-grid"><tr>';
+  doc += '<td><div class="key-num c-green">' + pp(pctVariety) + '</div>';
+  doc += '<div class="key-lbl">chiede lezioni più varie.<small>Il ritmo uguale disturba o spegne.</small></div></td>';
+  doc += '<td><div class="key-num c-blue">' + pp(pctRespect) + '</div>';
+  doc += '<div class="key-lbl">darebbe il massimo se trattato con rispetto.<small>Nessuno chiede meno regole: chiedono regole con senso.</small></div></td>';
+  doc += '</tr><tr>';
+  doc += '<td><div class="key-num c-amber">' + pp(pctRealHigh) + '</div>';
+  doc += '<div class="key-lbl">ha bisogno che ciò che impara sia collegato al mondo reale.<small>Altrimenti non vede perché.</small></div></td>';
+  doc += '<td><div class="key-num c-red">' + pp(pctCapireVero) + '</div>';
+  doc += '<div class="key-lbl">studia per capire davvero.<small>Gli altri studiano per il voto o per la verifica.</small></div></td>';
+  doc += '</tr></table>';
+  
+  doc += '<p>Ognuno di questi numeri nasce dalle risposte di ' + N + ' studenti e trova, nelle pagine seguenti, le proprie ramificazioni, i propri intrecci con ciò che gli studenti hanno scritto a voce libera, e le domande che apre per il nostro collegio docenti.</p>';
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Dossier Scuola Sacra Famiglia &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE 1 — COSA CI CHIEDONO
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">SEZIONE 1</div>';
+  doc += '<h1 class="section-title">Cosa ci chiedono di fare diversamente</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Il dato più sorprendente che emerge dalle ' + N + ' compilazioni è che gli studenti non chiedono meno scuola. Chiedono, con insistenza, <strong>una scuola diversa</strong>. Quattro istanze aggregate emergono con chiarezza, ciascuna sostenuta sia dai dati strutturati che dalle risposte libere finali.</p>';
+  
+  // 1.1 VARIETÀ
+  doc += '<h2>1. Chiedono varietà — non meno lezioni, lezioni diverse</h2>';
+  doc += '<p>Il ' + pp(pctRitmoVar) + ' degli studenti vorrebbe più varietà nelle lezioni; un ulteriore ' + pp(pctRitmoSpegne) + ' dichiara esplicitamente che "se il ritmo non cambia, si spegne". Messi insieme, sono più di ' + pp(pctRitmoVar + pctRitmoSpegne) + ' di studenti che ci dicono di non reggere più le lezioni monotone.</p>';
+  doc += '<p>Il dato quantitativo trova corrispondenza nelle parole libere. Tra le richieste più ricorrenti:</p>';
+  
+  // Inserisco citazioni sulla varietà dalle risposte aperte
+  const quotesVariety = pickQuotes(
+    (classMat['Laboratorialità (cucina, meccanica, chimica)']||[]).concat(
+    (classMat['Mondo reale e attualità']||[])),
+    2
+  );
+  quotesVariety.forEach(q => {
+    doc += '<blockquote>' + esc(q) + '</blockquote>';
   });
-
-  doc+='</body></html>';
-  w.document.write(doc);w.document.close();
-  setTimeout(()=>w.print(),600);
+  doc += '<p>Lo studente vuole sapere dove sta andando, ma non vuole arrivarci sempre per la stessa strada.</p>';
+  
+  // 1.2 RISPETTO
+  doc += '<h2>2. Chiedono rispetto — non permissività, reciprocità</h2>';
+  doc += '<p>Tra tutti i dati del dossier, questo è forse il più potente: il <strong>' + pp(pctRispettoMax) + ' degli studenti</strong> dichiara che "se trattati con rispetto, danno il massimo". Nessuno chiede meno regole: il dato di chi ritiene che le regole "non hanno senso" si ferma al ' + pp(pct(R,'S9_1',1)) + '.</p>';
+  doc += '<p>L\'istanza è netta e va maneggiata con attenzione: non è una richiesta di allentare la disciplina. È una richiesta di <em>coerenza relazionale</em>. Lo studente distingue tra punizione come conseguenza logica (che accetta) e punizione come umiliazione (che rifiuta). Il ' + pp(pctAutoritaSev) + ' afferma che "chi pretende tira fuori il meglio": non c\'è rigetto dell\'esigenza. La parola chiave è <strong>senso</strong>: se la severità ha senso, è accolta; se è arbitraria, genera resistenza.</p>';
+  
+  // 1.3 SENSO CONCRETO
+  doc += '<h2>3. Chiedono senso concreto — il collegamento col mondo reale</h2>';
+  doc += '<p>Il ' + pp(pctRealHighAll) + ' degli studenti dichiara che "se quel che impara non è collegato alla realtà, non ha senso". Un ulteriore ' + pp(pctRealMid) + ' "a volte vorrebbe capire a cosa serve". Sommati, rappresentano quasi la totalità della popolazione studentesca.</p>';
+  
+  const quotesFuturo = classMat['Futuro concreto (economia, tasse, lavoro)'] || [];
+  if (quotesFuturo.length >= 2) {
+    doc += '<p>Le risposte libere rivelano una maturità precoce del desiderio: gli studenti non chiedono genericamente "scuola utile", ma nominano ambiti specifici che percepiscono come assenti nel curricolo.</p>';
+    pickQuotes(quotesFuturo, 3).forEach(q => {
+      doc += '<blockquote>' + esc(q) + '</blockquote>';
+    });
+    doc += '<p>Il tema ricorre in <strong>' + quotesFuturo.length + ' risposte libere su ' + materieOpen.length + '</strong>: un segnale statisticamente forte. Non è un capriccio individuale, è una richiesta collettiva.</p>';
+  }
+  
+  // 1.4 LABORATORIO
+  doc += '<h2>4. Chiedono laboratorio — il fare che non c\'è abbastanza</h2>';
+  doc += '<p>Il ' + pp(pctCostruire) + ' degli studenti "preferisce costruire a studiare teoria". Il ' + pp(pctCreare) + ' chiede "più creatività" nel programma.</p>';
+  
+  const quotesLab = classMat['Laboratorialità (cucina, meccanica, chimica)'] || [];
+  if (quotesLab.length >= 2) {
+    doc += '<p>Nelle risposte libere, la richiesta di laboratorialità è tra i temi quantitativamente più ricorrenti:</p>';
+    pickQuotes(quotesLab, 3).forEach(q => {
+      doc += '<blockquote>' + esc(q) + '</blockquote>';
+    });
+  }
+  
+  doc += '<p>Il dato quantitativo sulla mappa termica conferma: Educazione Fisica è l\'unica materia su cui l\'attivazione media è "Attivo" (con il ' + pp(edFis.att) + ' di studenti attivi); Arte e Immagine è seconda (' + pp(arte.att) + '). Le materie con maggior carico teorico scendono rapidamente.</p>';
+  
+  doc += '<div class="callout"><div class="callout-title">SPUNTO PER IL COLLEGIO</div>';
+  doc += '<p>Il ' + pp(pctRealHighAll + pctRealMid) + ' degli studenti chiede senso concreto. Quante ore di didattica laboratoriale ha oggi la scuola, al di fuori di Ed. Fisica e Arte? E quanti dipartimenti potrebbero sperimentare formati hands-on su contenuti tradizionalmente teorici?</p></div>';
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 1 &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE 2 — COSA DICONO DI SÉ
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">SEZIONE 2</div>';
+  doc += '<h1 class="section-title">Cosa dicono di sé</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Il questionario ha chiesto agli studenti di descrivere sei dimensioni del loro modo di stare a scuola: come imparano, a che ritmo, con quale capacità di concentrazione, come gestiscono la comprensione, la socialità, e cosa si aspettano dall\'istituzione.</p>';
+  
+  doc += '<h3>Come imparano</h3>';
+  doc += '<p>Il ' + pp(pctVideo) + ' degli studenti privilegia il video rispetto al testo scritto; il ' + pp(pctSchema) + ' funziona meglio con spiegazioni orali accompagnate da schemi visivi; il ' + pp(pctDistrae) + ' si distrae spesso ma recupera in autonomia — non è disattenzione grave, è <em>fragilità attentiva sostenibile</em>.</p>';
+  
+  doc += '<h3>Come leggono le consegne</h3>';
+  doc += '<p>La sezione sulla lettura delle consegne produce dati di grande rilevanza operativa. Il ' + pp(pctLeggeVel) + ' legge le consegne velocemente; il ' + pp(pctSbaglia) + ' "ogni tanto sbaglia il senso di ciò che gli viene chiesto"; il ' + pp(pctEsempio) + ' ammette che "un esempio a volte aiuta" a capire cosa fare. Solo il ' + pp(pctScrittaBasta) + ' afferma che "la consegna scritta basta".</p>';
+  doc += '<p>La lettura congiunta dei due blocchi (cosa fa lo studente, cosa gli serve) suggerisce che il problema è doppio: <strong>c\'è una fragilità dello studente</strong> (legge veloce, non rilegge) <strong>e c\'è un\'opacità nella consegna</strong>. Una revisione del modo in cui formuliamo compiti e verifiche, con esempi sistematici in testa alla traccia, potrebbe produrre effetti immediati.</p>';
+  
+  doc += '<h3>Le loro priorità</h3>';
+  doc += '<p>Abbiamo chiesto agli studenti di mettere in ordine dieci aspetti della loro vita. Il ranking medio su ' + N + ' risposte ci racconta un\'adolescenza più tradizionale di quanto il discorso pubblico sui ragazzi lasci credere.</p>';
+  
+  doc += '<table class="prio">';
+  ranking.slice(0,10).forEach((row, i) => {
+    const hl = (row.label === 'Andare bene a scuola') ? ' class="highlight"' : '';
+    doc += '<tr' + hl + '>';
+    doc += '<td class="rank">' + (i+1) + '°</td>';
+    doc += '<td class="label">' + esc(row.label) + '</td>';
+    doc += '<td class="val">posiz. media ' + row.rank.toFixed(1) + '</td>';
+    doc += '</tr>';
+  });
+  doc += '</table>';
+  
+  doc += '<p>La <strong>Famiglia</strong> è al primo posto. Le <strong>amicizie</strong> vengono subito dopo. <strong>Andare bene a scuola</strong> si colloca al ' + scuolaRank + '° posto — davanti allo sport e al benessere personale. I <strong>social</strong> e i <strong>videogiochi</strong> chiudono la classifica al ' + socialRank + '° e ' + videoRank + '°. Nessuna sorpresa è attesa dal lettore smaliziato, ma il dato è importante: <strong>la scuola non è percepita come un corpo estraneo</strong>. È dentro le priorità, contesa tra famiglia e amicizie. Una posizione di privilegio, da non sprecare.</p>';
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 2 &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE 3 — LE MATERIE
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">SEZIONE 3</div>';
+  doc += '<h1 class="section-title">Le materie che funzionano, quelle che faticano</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Abbiamo misurato ogni materia su tre dimensioni: quanto la trovano interessante, quanto la capiscono con chiarezza, quanto li attiva in aula. La lettura congiunta produce mappe diverse da quelle che potremmo aspettarci.</p>';
+  
+  doc += '<h3>Le materie che funzionano</h3>';
+  doc += '<p><strong>Educazione Fisica</strong> è la materia più attivante di tutta la scuola: il ' + pp(edFis.att) + ' degli studenti si dichiara attivo, contro il ' + pp(edFis.pass) + ' di passivi. La lezione che ne deriva non è che dovremmo fare tutti educazione fisica, ma che <strong>il formato "corpo in movimento, obiettivo concreto, feedback immediato" è quello che mobilita di più gli studenti</strong>. Quali altre materie potrebbero adottare occasionalmente questo schema?</p>';
+  doc += '<p><strong>Arte e Immagine</strong> segue con il ' + pp(arte.att) + ' di attivi. <strong>Educazione Civica</strong>, pur con meno tradizione didattica alle spalle, raccoglie il ' + pp(edCiv.att) + ' di attivi — un risultato positivo per una materia relativamente giovane nel curricolo.</p>';
+  
+  doc += '<h3>Le materie che faticano</h3>';
+  
+  if (musica.pass > musica.att) {
+    doc += '<p><strong>Musica</strong> segna il dato più critico dell\'aggregato scuola: il ' + pp(musica.pass) + ' degli studenti si dichiara passivo, contro il ' + pp(musica.att) + ' attivo. Vale la pena esaminare il rapporto tra cosa si studia in Musica e cosa gli studenti hanno come esperienza musicale viva fuori dalla scuola.</p>';
+  }
+  if (tecno.pass >= 25) {
+    doc += '<p><strong>Tecnologia</strong> mostra numeri fragili: il ' + pp(tecno.pass) + ' di passivi, il ' + pp(tecno.att) + ' di attivi. In una scuola con identità dichiaratamente digitale, il dato chiede riflessione: quanto di Tecnologia è costruire, quanto è rispondere a domande di un manuale?</p>';
+  }
+  if (geo.pass >= 20 && geo.pass > geo.att) {
+    doc += '<p><strong>Geografia</strong> raccoglie il ' + pp(geo.pass) + ' di passivi contro il ' + pp(geo.att) + ' di attivi: è tra le materie con maggior gap tra stare svegli e stare coinvolti.</p>';
+  }
+  
+  doc += '<h3>Italiano e Matematica: i due grandi blocchi</h3>';
+  doc += '<p>Italiano e Matematica, essendo discipline centrali, sono state indagate con quattro componenti ciascuna.</p>';
+  
+  doc += '<p>Su <strong>Italiano</strong>, la Scrittura è la componente più problematica: il ' + pp(pctScritturaDiff) + ' trova le tracce "difficili o noiose"; solo il ' + pp(pctScritturaAmo) + ' afferma che "gli piace scrivere". La Grammatica genera confusione nel ' + pp(pctGramConf) + '. Ma l\'Epica mostra un dato interessante: il ' + pp(pctEpicaFasc) + ' degli studenti "si affascina alle origini". I classici, con la mediazione giusta, funzionano.</p>';
+  
+  doc += '<p>Su <strong>Matematica</strong>, lo scoglio principale sono le Relazioni e Funzioni (il ' + pp(pctRelAstratto) + ' le trova "astratte, scollegate"). Ma la Geometria mostra un dato ricco: il ' + pp(pctGeoSpazio) + ' "ragiona nello spazio" con naturalezza. Il dato Aritmetica/Algebra è più severo: il ' + pp(pctCalcTrappole) + ' trova i calcoli "pieni di trappole", solo il ' + pp(pctCalcRiesce) + ' si sente "a proprio agio". Matematica è la materia dove lo scarto cognitivo tra gli studenti è più marcato.</p>';
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 3 &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE 4 — LE LORO PAROLE
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">SEZIONE 4</div>';
+  doc += '<h1 class="section-title">Le loro parole</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Alla fine del questionario gli studenti hanno avuto due spazi di scrittura libera: quale materia aggiungerebbero e un\'ultima parola a tutto campo. Abbiamo ricevuto <strong>' + paroleOpen.length + ' risposte libere</strong> e <strong>' + materieOpen.length + ' proposte di materia nuova</strong>. Qui le abbiamo tematizzate: non più una lista alfabetica, ma nuclei tematici che emergono con ricorrenza.</p>';
+  
+  // Temi materie
+  doc += '<h2>Le materie che vorrebbero</h2>';
+  const matThemesOrder = Object.keys(themesMat).filter(t => (classMat[t]||[]).length >= 2);
+  matThemesOrder.forEach(theme => {
+    const quotes = classMat[theme];
+    doc += '<h3>' + esc(theme) + ' <span style="font-family:Helvetica;font-weight:400;font-size:9pt;color:#7A7A72">(' + quotes.length + ' risposte)</span></h3>';
+    pickQuotes(quotes, 3).forEach(q => {
+      doc += '<blockquote>' + esc(q) + '</blockquote>';
+    });
+  });
+  
+  // Temi testi liberi
+  doc += '<h2>Le loro parole finali</h2>';
+  const freeThemesOrder = Object.keys(themesFree).filter(t => (classFree[t]||[]).length >= 2);
+  freeThemesOrder.forEach(theme => {
+    const quotes = classFree[theme];
+    doc += '<h3>' + esc(theme) + ' <span style="font-family:Helvetica;font-weight:400;font-size:9pt;color:#7A7A72">(' + quotes.length + ' risposte)</span></h3>';
+    pickQuotes(quotes, 3).forEach(q => {
+      doc += '<blockquote>' + esc(q) + '</blockquote>';
+    });
+  });
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 4 &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // CHIUSURA — QUATTRO DOMANDE PER IL COLLEGIO
+  // ==========================================================
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">CHIUSURA</div>';
+  doc += '<h1 class="section-title">Quattro domande per il collegio</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Questo dossier non contiene ricette. Contiene quattro domande che il collegio docenti potrebbe portare al tavolo nella prossima riunione. Ciascuna nasce da un dato robusto del dossier, ed è formulata come interrogativo aperto.</p>';
+  
+  doc += '<h3>1. Sulla varietà dei formati didattici</h3>';
+  doc += '<p>Il ' + pp(pctRitmoVar + pctRitmoSpegne) + ' degli studenti chiede lezioni più varie. Quante tipologie di lezione pratichiamo oggi con sistematicità? Per ogni docente: quanti formati sono nel proprio repertorio attivo? Come si potrebbe, senza stravolgere i programmi, introdurre <strong>un\'ora al mese</strong> di formato alternativo, materia per materia?</p>';
+  
+  doc += '<h3>2. Sulla qualità delle consegne</h3>';
+  doc += '<p>Il ' + pp(pctEsempio) + ' ha bisogno di esempi per attivarsi. Il ' + pp(pctSbaglia) + ' "ogni tanto sbaglia il senso di ciò che gli viene chiesto". Possiamo introdurre il principio di <strong>"consegna + esempio"</strong> come standard d\'istituto per verifiche e compiti? Quanto ci costerebbe, come dipartimenti, standardizzare questa pratica?</p>';
+  
+  doc += '<h3>3. Sul collegamento con la realtà</h3>';
+  const nFuturo = (classMat['Futuro concreto (economia, tasse, lavoro)']||[]).length;
+  doc += '<p>' + nFuturo + ' studenti chiedono esplicitamente di imparare come funziona il mondo reale: tasse, mutui, lavoro, denaro. Educazione Civica è oggi lo spazio istituzionalmente deputato. È effettivamente quello lo spazio in cui stiamo affrontando queste domande, o un laboratorio trasversale — in collaborazione con genitori professionisti — potrebbe essere una via?</p>';
+  
+  doc += '<h3>4. Sullo spazio per parlare di sé</h3>';
+  const nEspress = (classMat['Espressione di sé (emozioni, psicologia)']||[]).length;
+  if (nEspress > 0) {
+    doc += '<p>' + nEspress + ' studenti chiedono spontaneamente "emozioni", "psicologia", momenti per parlare di sé. È una richiesta che non può essere scaricata sul singolo insegnante bravo di turno. Quale spazio istituzionale possiamo offrire?</p>';
+  } else {
+    doc += '<p>Alcuni studenti chiedono spontaneamente spazi per parlare di sé, emozioni, pensieri. È una richiesta che non può essere scaricata sul singolo insegnante. Quale spazio istituzionale possiamo offrire?</p>';
+  }
+  
+  doc += '<p style="margin-top:28pt">Il valore di questo dossier non sta in ciò che dice. Sta in ciò che permette di fare dopo: <strong>decisioni informate</strong>, in un collegio in cui non è più possibile dire "gli studenti vogliono X" senza che qualcuno possa rispondere "no, guarda qui: questo è ciò che hanno detto".</p>';
+  
+  doc += '<p style="text-align:center;margin-top:28pt;font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.6">';
+  doc += '<strong style="color:#1B6D3F">Andrea Cerioli</strong> &middot; Animatore Digitale<br/>';
+  doc += 'Scuola Sacra Famiglia &middot; Orzinuovi (BS)<br/>';
+  doc += '<span style="color:#7A7A72">' + esc(today) + '</span>';
+  doc += '</p>';
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Chiusura &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  doc += '</body></html>';
+  
+  w.document.write(doc);
+  w.document.close();
+  setTimeout(() => w.print(), 600);
 }
 </script></body></html>
