@@ -646,11 +646,37 @@ function render(){
   // === 12. SPAZIO LIBERO — LE LORO PAROLE ===
   const testi=R.map(r=>(r.TESTO||'').trim()).filter(t=>t.length>3);
   if(testi.length){
-    h+='<div class="card full"><h2>Le loro parole</h2><div class="sub">'+testi.length+' studenti su '+N+' hanno scritto qualcosa nello spazio libero</div>';
+    // Raggruppo per testo identico (come "materia che manca")
+    const tgroups=new Map();
     testi.forEach(t=>{
-      h+='<div style="padding:10px 14px;margin-bottom:6px;background:var(--bg);border-radius:8px;border-left:3px solid var(--tl);font-size:12px;line-height:1.6;font-style:italic;color:var(--tx)">\u201c'+t+'\u201d</div>';
+      const key=t.toLowerCase().replace(/\s+/g,' ').trim();
+      if(!tgroups.has(key)) tgroups.set(key,{text:t,count:0});
+      tgroups.get(key).count++;
     });
-    h+='</div>';
+    const tiles=[...tgroups.values()].sort((a,b)=>{
+      if(b.count!==a.count) return b.count-a.count;
+      return a.text.length-b.text.length;
+    });
+    h+='<div class="card full"><h2>Le loro parole</h2><div class="sub">'+testi.length+' studenti su '+N+' hanno scritto qualcosa nello spazio libero</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:flex-start">';
+    tiles.forEach(({text,count})=>{
+      const isRec=count>=2;
+      const bg=isRec?'var(--tll)':'var(--bg)';
+      const bd=isRec?'var(--tl)':'var(--bd)';
+      const esc=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      // Larghezza della bolla dipende dalla lunghezza del testo
+      const len=text.length;
+      let maxW;
+      if(len<30) maxW='auto';
+      else if(len<80) maxW='380px';
+      else if(len<160) maxW='520px';
+      else maxW='100%';
+      h+='<div style="padding:10px 14px;background:'+bg+';border:1px solid '+bd+';border-left:3px solid '+bd+';border-radius:8px;font-size:13px;line-height:1.55;font-style:italic;color:var(--tx);max-width:'+maxW+';flex:0 1 auto;position:relative">';
+      h+='\u201c'+esc+'\u201d';
+      if(count>1) h+='<span style="display:inline-block;margin-left:6px;font-style:normal;font-weight:700;color:var(--tl);font-size:10px;background:#fff;padding:2px 7px;border-radius:8px;vertical-align:middle">\u00d7'+count+'</span>';
+      h+='</div>';
+    });
+    h+='</div></div>';
   }
 
   document.getElementById('content').innerHTML=h;
