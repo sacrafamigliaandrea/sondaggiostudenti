@@ -33,7 +33,7 @@
 .sh{margin-bottom:12px}.sht{display:inline-block;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:12px;margin-bottom:3px}.sh h2{font-size:17px;font-weight:700}.sh p{font-size:11px;color:var(--mu);margin-top:2px;font-family:var(--fb);line-height:1.5}
 .cnt{font-size:9px;color:var(--mu);text-align:right;margin-bottom:3px}
 /* Question card */
-.qc{background:var(--cd);border-radius:var(--r);padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid var(--bd);transition:border-color .2s}.qc.ok{border-color:var(--g50)}
+.qc{background:var(--cd);border-radius:var(--r);padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid var(--bd);transition:border-color .2s,opacity .3s,box-shadow .3s;position:relative}.qc.ok{border-color:var(--g50)}
 .qt{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px;color:var(--g)}
 /* TRI BUTTONS — 3 specific text options */
 .tri{display:flex;gap:5px}
@@ -55,10 +55,26 @@
 .done{text-align:center;padding:40px}.done h2{font-size:20px;color:var(--g);margin:12px 0 4px}.done p{color:var(--mu);font-size:12px;line-height:1.6}
 .preview .tri-b,.preview .mx-b,.preview .eb,.preview .ri,.preview .fb textarea{pointer-events:none;opacity:.6}
 .preview .tri-b:hover,.preview .mx-b:hover{transform:none;border-color:var(--bd);background:var(--cd)}
+/* ━━ AUDIO FOCUS & PULSE ━━ */
+.qc.audio-focus,.mx-ext.audio-focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(27,109,63,.18),0 3px 12px rgba(27,109,63,.1);position:relative}
+.qc.audio-dim,.mx-ext.audio-dim{opacity:.45;transition:opacity .3s}
+.qc.audio-focus.audio-pulse,.mx-ext.audio-focus.audio-pulse{animation:audioPulse 1.4s ease-in-out infinite}
+@keyframes audioPulse{0%,100%{box-shadow:0 0 0 2px rgba(27,109,63,.2),0 3px 12px rgba(27,109,63,.1)}50%{box-shadow:0 0 0 6px rgba(27,109,63,.35),0 3px 18px rgba(27,109,63,.25)}}
+.btn-repeat{position:absolute;top:8px;right:8px;background:var(--gl);color:var(--g);border:1px solid var(--g50);border-radius:16px;padding:3px 10px;font-family:var(--f);font-size:10px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:4px;letter-spacing:.3px}
+.qc.audio-focus .btn-repeat,.mx-ext.audio-focus .btn-repeat{display:inline-flex}
+.btn-repeat:hover{background:var(--g);color:#fff}
+.btn-repeat svg{width:11px;height:11px;fill:currentColor}
+/* Toggle voice in login */
+.voice-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--gl);border:1px solid var(--g50);border-radius:var(--r);margin:8px 0;cursor:pointer;user-select:none;font-size:12px;color:var(--gd);font-weight:600}
+.voice-toggle:hover{background:#d9eadf}
+.voice-toggle .vt-sw{width:32px;height:18px;background:var(--mu);border-radius:9px;position:relative;flex-shrink:0;transition:background .2s}
+.voice-toggle .vt-sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:left .2s}
+.voice-toggle.on .vt-sw{background:var(--g)}
+.voice-toggle.on .vt-sw::after{left:16px}
 .qn{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
 .qn .qn-num{background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:4px;font-size:10px}
 .qn .qn-sub{color:var(--mu);font-size:10px}
-.mx-ext{margin-bottom:10px;padding:10px 12px;background:var(--cd);border-radius:var(--r);border:1px solid var(--bd);transition:border-color .2s}
+.mx-ext{margin-bottom:10px;padding:10px 12px;background:var(--cd);border-radius:var(--r);border:1px solid var(--bd);transition:border-color .2s,opacity .3s,box-shadow .3s;position:relative}
 .mx-ext.ok{border-color:var(--g50)}
 .mx-ext .mx-qn{font-size:9px;color:var(--mu);font-weight:700;letter-spacing:.6px;margin-bottom:4px}
 .mx-ext .mx-name{font-size:13px;font-weight:600;color:var(--g);margin-bottom:2px;line-height:1.3}
@@ -75,6 +91,7 @@
 <div class="tb">Vogliamo migliorare la nostra scuola. E la prima cosa che facciamo è <strong>ascoltarti</strong>.<br><br>Questo strumento lo ha costruito il tuo Animatore Digitale — la stessa persona che ti accompagna con l'iPad, che ti ha insegnato a difenderti dai rischi della rete, che ti ha guidato nell'uso etico dell'intelligenza artificiale e che lavora ogni giorno perché la tecnologia a scuola abbia senso. I tuoi dati sono protetti e servono a costruire una scuola migliore.<br><br>Ti chiedo il nome perché alla fine non avrai una statistica, ma una lettera. La scrive il tuo <strong>daimon</strong>: così i greci chiamavano la voce interiore che sa chi sei davvero — non chi dovresti essere. Ha senso solo se è tua.</div>
 <div class="fd-row"><div class="fd"><label>Nome e cognome</label><input type="text" id="inp-nome" placeholder="Nome Cognome" autocomplete="off"><label style="margin-top:10px">Genere</label><div class="gen-opts" id="gen-opts"></div></div>
 <div class="fd"><label>Classe</label><div class="cls-opts" id="cls-opts"></div><label style="margin-top:10px">Codice sessione</label><input type="text" id="inp-code" placeholder="4 cifre" autocomplete="off" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" style="letter-spacing:6px;text-align:center;font-family:Menlo,Monaco,monospace;font-size:20px;font-weight:700"></div></div>
+<div class="voice-toggle" id="voice-toggle" onclick="toggleVoice()"><span class="vt-sw"></span><span id="vt-label">Voce guida: spenta</span><span style="margin-left:auto;font-size:10px;color:var(--mu);font-weight:500">Metti le cuffie</span></div>
 <button class="btn-s" id="btn-s" disabled onclick="startApp()">Iniziamo</button>
 <div class="copy"><a href="admin.html" style="color:var(--g);text-decoration:none;font-size:11px;display:inline-block;margin-bottom:6px;padding:4px 12px;background:var(--gl);border-radius:6px;font-weight:600">&#9881; Area riservata</a><br>© 2026 Progetto Andrea Cerioli — Scuola Sacra Famiglia Orzinuovi — Tutti i diritti riservati</div>
 </div></div>
@@ -929,5 +946,191 @@ document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['u','s','i','j'].includes(e.key.toLowerCase()))e.preventDefault();});
 // Admin access: triple click on logo
 let _ac=0,_at=0;document.getElementById('adm-trigger').onclick=()=>{const n=Date.now();if(n-_at>800)_ac=0;_ac++;_at=n;if(_ac>=3){_ac=0;window.open('admin.html','_blank');}};
+
+// ════════════════════════════════════════════════════════
+// MODULO VOCE GUIDA — TTS browser-native (Web Speech API)
+// ════════════════════════════════════════════════════════
+const VOICE = {
+  enabled: false,
+  voice: null,
+  activeCard: null,     // card attualmente in focus
+  pulseTimer: null,     // timer 12s per pulsazione
+  speaking: false,      // flag: voce sta parlando
+  WAIT_MS: 12000,       // ms prima di pulsare
+  PAUSE_MS: 1200,       // pausa dopo click prima del next
+};
+
+function initVoice() {
+  if (!('speechSynthesis' in window)) { console.warn('Web Speech non disponibile'); return; }
+  const pick = () => {
+    const vs = speechSynthesis.getVoices();
+    VOICE.voice =
+      vs.find(v => v.lang === 'it-IT' && /Alice/i.test(v.name)) ||
+      vs.find(v => v.lang === 'it-IT' && /Luca/i.test(v.name)) ||
+      vs.find(v => v.lang === 'it-IT' && /Google/i.test(v.name)) ||
+      vs.find(v => v.lang === 'it-IT') ||
+      vs.find(v => v.lang && v.lang.startsWith('it')) || null;
+  };
+  pick();
+  speechSynthesis.onvoiceschanged = pick;
+  // Preferenza salvata
+  try { if (localStorage.getItem('ti_voice') === '1') { VOICE.enabled = true; updateVoiceToggleUI(); } } catch(e){}
+}
+initVoice();
+
+function toggleVoice() {
+  VOICE.enabled = !VOICE.enabled;
+  try { localStorage.setItem('ti_voice', VOICE.enabled ? '1' : '0'); } catch(e){}
+  updateVoiceToggleUI();
+  if (!VOICE.enabled) { stopSpeak(); clearFocus(); }
+}
+
+function updateVoiceToggleUI() {
+  const t = document.getElementById('voice-toggle');
+  const l = document.getElementById('vt-label');
+  if (!t) return;
+  if (VOICE.enabled) { t.classList.add('on'); l.textContent = 'Voce guida: attiva'; }
+  else { t.classList.remove('on'); l.textContent = 'Voce guida: spenta'; }
+}
+
+function stopSpeak() {
+  try { speechSynthesis.cancel(); } catch(e){}
+  VOICE.speaking = false;
+  if (VOICE.pulseTimer) { clearTimeout(VOICE.pulseTimer); VOICE.pulseTimer = null; }
+}
+
+function speakAndThen(text, onDone) {
+  if (!VOICE.enabled || !('speechSynthesis' in window)) { if(onDone) onDone(); return; }
+  stopSpeak();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'it-IT';
+  utt.rate = 0.95;
+  utt.pitch = 1.0;
+  if (VOICE.voice) utt.voice = VOICE.voice;
+  VOICE.speaking = true;
+  utt.onend = () => { VOICE.speaking = false; if(onDone) onDone(); };
+  utt.onerror = () => { VOICE.speaking = false; if(onDone) onDone(); };
+  speechSynthesis.speak(utt);
+}
+
+// Ricostruisce il testo leggibile di una card dalla sua struttura HTML
+function extractCardText(card) {
+  if (!card) return '';
+  // Domanda standard: .qt oppure .mx-name + .mx-intro + .mx-desc
+  let question = '';
+  const qt = card.querySelector('.qt');
+  if (qt) question = qt.textContent.trim();
+  else {
+    const name = card.querySelector('.mx-name');
+    const intro = card.querySelector('.mx-intro');
+    const desc = card.querySelector('.mx-desc');
+    question = [name?.textContent, intro?.textContent, desc?.textContent]
+      .filter(Boolean).map(s => s.trim()).join('. ');
+  }
+  // Opzioni
+  const opts = [...card.querySelectorAll('.tri-b')].map(b => b.textContent.trim()).filter(Boolean);
+  const labels = ['Prima risposta', 'Seconda risposta', 'Terza risposta'];
+  const optsPart = opts.map((o, i) => (labels[i] || ('Opzione ' + (i+1))) + ': ' + o + '.').join(' ');
+  return (question + '. ' + optsPart).replace(/\s+/g, ' ').trim();
+}
+
+function clearFocus() {
+  document.querySelectorAll('.audio-focus, .audio-dim, .audio-pulse').forEach(el => {
+    el.classList.remove('audio-focus', 'audio-dim', 'audio-pulse');
+    const btn = el.querySelector('.btn-repeat');
+    if (btn) btn.remove();
+  });
+  if (VOICE.pulseTimer) { clearTimeout(VOICE.pulseTimer); VOICE.pulseTimer = null; }
+  VOICE.activeCard = null;
+}
+
+// Trova la prima card non ancora risposta nel contenitore corrente
+function findNextUnansweredCard() {
+  const cc = document.getElementById('cc');
+  if (!cc) return null;
+  // Considero sia .qc che .mx-ext come card
+  const cards = [...cc.querySelectorAll('.qc, .mx-ext')];
+  return cards.find(c => !c.classList.contains('ok')) || null;
+}
+
+function focusCard(card, opts) {
+  opts = opts || {};
+  if (!card) { clearFocus(); return; }
+  clearFocus();
+  VOICE.activeCard = card;
+  card.classList.add('audio-focus');
+  // Dim delle altre card
+  const cc = document.getElementById('cc');
+  if (cc) {
+    [...cc.querySelectorAll('.qc, .mx-ext')].forEach(c => {
+      if (c !== card) c.classList.add('audio-dim');
+    });
+  }
+  // Bottone "Ripeti" dentro la card focus
+  if (!card.querySelector('.btn-repeat')) {
+    const btn = document.createElement('button');
+    btn.className = 'btn-repeat';
+    btn.type = 'button';
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>Ripeti';
+    btn.onclick = (e) => { e.stopPropagation(); speakCard(card); };
+    card.appendChild(btn);
+  }
+  // Scrolla card in vista
+  try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
+  // Se autoPlay, legge
+  if (!opts.silent) speakCard(card);
+}
+
+function speakCard(card) {
+  if (!VOICE.enabled || !card) return;
+  if (VOICE.pulseTimer) { clearTimeout(VOICE.pulseTimer); VOICE.pulseTimer = null; }
+  card.classList.remove('audio-pulse');
+  const text = extractCardText(card);
+  speakAndThen(text, () => {
+    // A fine lettura, parte il timer dei 12s
+    if (VOICE.activeCard !== card) return; // cambiato focus nel frattempo
+    VOICE.pulseTimer = setTimeout(() => {
+      if (VOICE.activeCard === card) card.classList.add('audio-pulse');
+    }, VOICE.WAIT_MS);
+  });
+}
+
+// Chiamato dal nostro hook post-render per attivare il focus sulla prima non risposta
+function voiceAfterRender() {
+  if (!VOICE.enabled) { clearFocus(); return; }
+  // Attendo fine transizione (in go() c'è un opacity 80ms)
+  setTimeout(() => {
+    const next = findNextUnansweredCard();
+    if (next) focusCard(next);
+    else clearFocus();
+  }, 150);
+}
+
+// Chiamato dopo ogni risposta (sa) per avanzare il focus
+function voiceAfterAnswer(key) {
+  if (!VOICE.enabled) return;
+  stopSpeak();
+  // Pausa 1.2s poi focus sulla prossima non risposta
+  setTimeout(() => {
+    if (!VOICE.enabled) return;
+    const next = findNextUnansweredCard();
+    if (next) focusCard(next);
+    else clearFocus();
+  }, VOICE.PAUSE_MS);
+}
+
+// ── Hook nelle funzioni esistenti ──
+// go() viene chiamato a ogni cambio step: triggera voiceAfterRender dopo il render
+const _orig_go = go;
+go = function() {
+  _orig_go.apply(this, arguments);
+  voiceAfterRender();
+};
+// sa() viene chiamato a ogni click risposta: attiva voiceAfterAnswer
+const _orig_sa = sa;
+sa = function(k, v) {
+  _orig_sa.apply(this, arguments);
+  voiceAfterAnswer(k);
+};
 console.log('%cTI ASCOLTO! — Progetto Andrea Cerioli — Tutti i diritti riservati','color:#1B6D3F;font-size:12px;font-weight:bold');
 </script></body></html>
