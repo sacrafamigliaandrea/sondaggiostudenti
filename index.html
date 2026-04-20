@@ -956,7 +956,7 @@ const VOICE = {
   activeCard: null,     // card attualmente in focus
   pulseTimer: null,     // timer 12s per pulsazione
   speaking: false,      // flag: voce sta parlando
-  WAIT_MS: 12000,       // ms prima di pulsare
+  WAIT_MS: 8000,        // ms prima di pulsare (ridotto: la voce legge solo la domanda, 8s bastano per leggere le 3 opzioni)
   PAUSE_MS: 1200,       // pausa dopo click prima del next
 };
 
@@ -1014,6 +1014,7 @@ function speakAndThen(text, onDone) {
 }
 
 // Ricostruisce il testo leggibile di una card dalla sua struttura HTML
+// Legge SOLO la domanda, non le opzioni (scelta pedagogica: lo studente legge lui le opzioni)
 function extractCardText(card) {
   if (!card) return '';
   // Domanda standard: .qt oppure .mx-name + .mx-intro + .mx-desc
@@ -1027,11 +1028,7 @@ function extractCardText(card) {
     question = [name?.textContent, intro?.textContent, desc?.textContent]
       .filter(Boolean).map(s => s.trim()).join('. ');
   }
-  // Opzioni
-  const opts = [...card.querySelectorAll('.tri-b')].map(b => b.textContent.trim()).filter(Boolean);
-  const labels = ['Prima risposta', 'Seconda risposta', 'Terza risposta'];
-  const optsPart = opts.map((o, i) => (labels[i] || ('Opzione ' + (i+1))) + ': ' + o + '.').join(' ');
-  return (question + '. ' + optsPart).replace(/\s+/g, ' ').trim();
+  return question.replace(/\s+/g, ' ').trim();
 }
 
 function clearFocus() {
