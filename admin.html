@@ -1108,6 +1108,40 @@ function genDossier(){
   table.prio tr.highlight td { background: #E8F5EE; color: #1B6D3F;
                                font-weight: 700; }
   
+  /* Tabella due colonne per risposte aperte — permette split tra pagine ma non dentro alla singola cella */
+  table.opentbl { width: 100%; border-collapse: collapse; margin: 10pt 0;
+                  table-layout: fixed; }
+  table.opentbl thead { display: table-header-group; }
+  table.opentbl th { padding: 8pt 10pt; text-align: left; vertical-align: bottom;
+                     background: #1B6D3F; color: #fff; 
+                     font-family: Helvetica, Arial, sans-serif; font-size: 10pt;
+                     font-weight: 700; border: 0.3pt solid #145230; }
+  table.opentbl th .thcount { display: block; font-weight: 400; font-size: 8.5pt;
+                              color: #C9E8D4; margin-top: 2pt; }
+  table.opentbl td { padding: 6pt 10pt; vertical-align: top; 
+                     border: 0.3pt solid #E8E8E2;
+                     font-family: 'Georgia', serif; font-size: 9.5pt;
+                     line-height: 1.45; color: #1a1a1a;
+                     word-wrap: break-word; overflow-wrap: break-word;
+                     page-break-inside: avoid; }
+  table.opentbl td:empty { background: #FAFAF6; }
+  table.opentbl tbody tr:nth-child(even) td { background: #FAFAF6; }
+  
+  /* Lettura emergente: liste con percentuale allineata */
+  ul.le-list { list-style: none; padding: 0; margin: 10pt 0;
+               font-family: Helvetica, Arial, sans-serif; }
+  ul.le-list li { display: table; width: 100%; padding: 4pt 0;
+                  border-bottom: 0.3pt solid #E8E8E2;
+                  page-break-inside: avoid; }
+  ul.le-list .le-pct { display: table-cell; width: 18mm; font-weight: 700;
+                       font-size: 11pt; color: #1B6D3F; vertical-align: top;
+                       padding-right: 6pt; }
+  ul.le-list .le-txt { display: table-cell; font-size: 10pt; line-height: 1.5;
+                       color: #1a1a1a; vertical-align: top;
+                       font-family: 'Georgia', serif; }
+  ul.le-aree .le-pct { color: #C28B0A; }
+  ul.le-rich .le-pct { color: #2E7CAF; }
+  
   /* Footer piè di pagina */
   .page-footer { text-align: center; font-family: Helvetica, Arial, sans-serif;
                  font-size: 7.5pt; color: #7A7A72; margin-top: 20pt;
@@ -1292,37 +1326,130 @@ function genDossier(){
   doc += '</div>';
   
   // ==========================================================
-  // SEZIONE 4 — LE LORO PAROLE
+  // SEZIONE 4 — LE LORO PAROLE (formato dashboard: due colonne, testi originali)
   // ==========================================================
   doc += '<div class="section">';
   doc += '<div class="section-eyebrow">SEZIONE 4</div>';
   doc += '<h1 class="section-title">Le loro parole</h1>';
   doc += '<hr/>';
-  doc += '<p class="lead">Alla fine del questionario gli studenti hanno avuto due spazi di scrittura libera: quale materia aggiungerebbero e un\'ultima parola a tutto campo. Abbiamo ricevuto <strong>' + paroleOpen.length + ' risposte libere</strong> e <strong>' + materieOpen.length + ' proposte di materia nuova</strong>. Qui le abbiamo tematizzate: non più una lista alfabetica, ma nuclei tematici che emergono con ricorrenza.</p>';
+  doc += '<p class="lead">Alla fine del questionario gli studenti hanno avuto due spazi di scrittura libera. Qui sotto le risposte originali, così come sono state scritte — nessuna selezione, nessuna sintesi. Sono ' + materieOpen.length + ' proposte di materia da aggiungere e ' + paroleOpen.length + ' parole finali. La lettura è affidata a te.</p>';
   
-  // Temi materie
-  doc += '<h2>Le materie che vorrebbero</h2>';
-  const matThemesOrder = Object.keys(themesMat).filter(t => (classMat[t]||[]).length >= 2);
-  matThemesOrder.forEach(theme => {
-    const quotes = classMat[theme];
-    doc += '<h3>' + esc(theme) + ' <span style="font-family:Helvetica;font-weight:400;font-size:9pt;color:#7A7A72">(' + quotes.length + ' risposte)</span></h3>';
-    pickQuotes(quotes, 3).forEach(q => {
-      doc += '<blockquote>' + esc(q) + '</blockquote>';
-    });
-  });
+  // Tabella due colonne: sinistra "la materia che manca", destra "le loro parole"
+  doc += '<table class="opentbl">';
+  doc += '<thead><tr>';
+  doc += '<th>La materia che manca <span class="thcount">(' + materieOpen.length + ' risposte)</span></th>';
+  doc += '<th>Le loro parole <span class="thcount">(' + paroleOpen.length + ' testi)</span></th>';
+  doc += '</tr></thead><tbody>';
   
-  // Temi testi liberi
-  doc += '<h2>Le loro parole finali</h2>';
-  const freeThemesOrder = Object.keys(themesFree).filter(t => (classFree[t]||[]).length >= 2);
-  freeThemesOrder.forEach(theme => {
-    const quotes = classFree[theme];
-    doc += '<h3>' + esc(theme) + ' <span style="font-family:Helvetica;font-weight:400;font-size:9pt;color:#7A7A72">(' + quotes.length + ' risposte)</span></h3>';
-    pickQuotes(quotes, 3).forEach(q => {
-      doc += '<blockquote>' + esc(q) + '</blockquote>';
-    });
-  });
+  // Costruisco righe affiancate fino al max delle due colonne
+  const maxRows = Math.max(materieOpen.length, paroleOpen.length);
+  for (let i = 0; i < maxRows; i++) {
+    doc += '<tr>';
+    doc += '<td>' + (i < materieOpen.length ? '&ldquo;' + esc(materieOpen[i]) + '&rdquo;' : '') + '</td>';
+    doc += '<td>' + (i < paroleOpen.length ? '&ldquo;' + esc(paroleOpen[i]) + '&rdquo;' : '') + '</td>';
+    doc += '</tr>';
+  }
+  doc += '</tbody></table>';
   
   doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 4 &middot; ' + esc(today) + '</div>';
+  doc += '</div>';
+  
+  // ==========================================================
+  // SEZIONE 5 — LETTURA EMERGENTE (ritratto aggregato dai profili)
+  // ==========================================================
+  
+  // Catalogo frasi ricorrenti (riprese dalla logica del daimon individuale)
+  // Ognuna è una lettura che emerge quando il % di studenti sceglie una certa opzione
+  // su una certa domanda. Sono raggruppate in: forze, aree di crescita, richieste.
+  
+  const leFrasiForze = [
+    { key:'S4_12', v:1, txt:"non mollano di fronte alla difficoltà: cercano un'altra strada" },
+    { key:'S1_1',  v:3, txt:"riescono a muoversi anche nel pensiero astratto" },
+    { key:'S5_1',  v:3, txt:"quando la collaborazione è vera, imparano il doppio" },
+    { key:'ICC_A1',v:1, txt:"leggono le consegne con attenzione prima di partire" },
+    { key:'S1_3',  v:3, txt:"creare qualcosa è il loro modo naturale di imparare" },
+    { key:'S4_11', v:1, txt:"studiano per capire il perché, non per ripetere" },
+    { key:'S6_2',  v:3, txt:"la passione è il loro vero motore" },
+    { key:'S6_5',  v:3, txt:"apprezzano chi li sfida e pretende il massimo" },
+    { key:'S6_3',  v:3, txt:"hanno bisogno di creare, di esprimersi" },
+    { key:'S4_9',  v:1, txt:"ciò che imparano resta: la loro mente trattiene" },
+  ];
+  
+  const leFrasiAree = [
+    { key:'S4_9',  v:3, txt:"dimenticano in fretta" },
+    { key:'S4_11', v:3, txt:"studiano solo quando c'è la verifica" },
+    { key:'S4_12', v:3, txt:"quando non capiscono, rileggono sperando che entri" },
+    { key:'S4_7',  v:3, txt:"studiano ancora ripetendo a memoria" },
+    { key:'S3_1',  v:3, txt:"i compiti lunghi tolgono energia prima di iniziare" },
+    { key:'S3_2',  v:3, txt:"sono permeabili al disimpegno degli altri" },
+    { key:'S1_2',  v:3, txt:"quando qualcosa non è chiaro subito, rischiano di fermarsi" },
+    { key:'ICC_A2',v:3, txt:"partono troppo in fretta" },
+    { key:'ICC_B1',v:3, txt:"gli esempi concreti sono la porta d'ingresso verso i concetti" },
+    { key:'ICC_A1',v:3, txt:"non si fermano a leggere le consegne" },
+  ];
+  
+  const leFrasiRichieste = [
+    { key:'S6_7',  v:3, txt:"non dare compiti ripetitivi",           pctLabel:null },
+    { key:'S6_4',  v:3, txt:"collegare ciò che imparano al mondo reale", pctLabel:null },
+    { key:'S6_5',  v:3, txt:"pretendere il massimo con rispetto",    pctLabel:null },
+    { key:'S6_2',  v:3, txt:"coinvolgerli emotivamente",             pctLabel:null },
+    { key:'S6_8',  v:3, txt:"lasciarli scegliere come affrontare le cose", pctLabel:null },
+  ];
+  
+  // Calcolo percentuali e ordino per salienza
+  function buildLE(list) {
+    return list
+      .map(item => ({ ...item, p: pct(R, item.key, item.v) }))
+      .filter(item => item.p >= 5)  // escludo frasi sotto il 5% (non rappresentative)
+      .sort((a, b) => b.p - a.p);
+  }
+  const forzeOrd = buildLE(leFrasiForze);
+  const areeOrd = buildLE(leFrasiAree);
+  const richiesteOrd = buildLE(leFrasiRichieste);
+  
+  doc += '<div class="section">';
+  doc += '<div class="section-eyebrow">SEZIONE 5</div>';
+  doc += '<h1 class="section-title">Ritratto aggregato</h1>';
+  doc += '<hr/>';
+  doc += '<p class="lead">Cosa viene fuori quando mettiamo insieme le risposte di tutti? Un ritratto a tratti rassicurante e a tratti problematico. Queste frasi non sono singole domande: sono <em>letture trasversali</em>, cioè pattern che emergono quando il sistema incrocia più risposte dei profili individuali. Sono quelle che il daimon restituisce allo studente come tratto saliente — e che qui, aggregate, ci raccontano il volto collettivo della scuola.</p>';
+  
+  // FORZE
+  if (forzeOrd.length > 0) {
+    doc += '<h2>Le forze più ricorrenti</h2>';
+    doc += '<p>Ecco cosa il sistema ha identificato come tratto forte in una parte significativa dei profili individuali. Non sono maggioranze assolute — sono <em>ricorrenze pedagogicamente rilevanti</em>:</p>';
+    doc += '<ul class="le-list le-forze">';
+    forzeOrd.slice(0, 8).forEach(f => {
+      doc += '<li><span class="le-pct">' + pp(f.p) + '</span> <span class="le-txt">' + esc(f.txt) + '</span></li>';
+    });
+    doc += '</ul>';
+  }
+  
+  // AREE DI CRESCITA
+  if (areeOrd.length > 0) {
+    doc += '<h2>Le aree di crescita più ricorrenti</h2>';
+    doc += '<p>Dove il sistema, incrociando le risposte, identifica uno spazio aperto — non un limite, ma un terreno su cui lavorare:</p>';
+    doc += '<ul class="le-list le-aree">';
+    areeOrd.slice(0, 8).forEach(f => {
+      doc += '<li><span class="le-pct">' + pp(f.p) + '</span> <span class="le-txt">' + esc(f.txt) + '</span></li>';
+    });
+    doc += '</ul>';
+  }
+  
+  // COSA CHIEDONO ALLA SCUOLA
+  if (richiesteOrd.length > 0) {
+    doc += '<h2>Cosa chiedono alla scuola</h2>';
+    doc += '<p>Le richieste più esplicite, in ordine di ricorrenza nei profili:</p>';
+    doc += '<ul class="le-list le-rich">';
+    richiesteOrd.forEach(f => {
+      doc += '<li><span class="le-pct">' + pp(f.p) + '</span> <span class="le-txt">' + esc(f.txt) + '</span></li>';
+    });
+    doc += '</ul>';
+  }
+  
+  doc += '<div class="callout info" style="margin-top:16pt"><div class="callout-title">COME LEGGERE QUESTA SEZIONE</div>';
+  doc += '<p>Le percentuali si riferiscono alla quota di studenti nel cui profilo individuale è emerso quel tratto saliente. Non sono somme (le frasi possono sovrapporsi — uno stesso studente può avere più forze e più aree di crescita). Sono indicatori di <strong>quanto quel pattern è diffuso</strong> nella popolazione scolastica.</p></div>';
+  
+  doc += '<div class="page-footer">TI ASCOLTO! &middot; Sezione 5 &middot; ' + esc(today) + '</div>';
   doc += '</div>';
   
   // ==========================================================
