@@ -565,7 +565,7 @@ function rTri(sec){
   let h='<div class="sh"><span class="sht" style="background:var(--'+S.c[0]+');color:var(--'+S.c[1]+')">'+sec+'</span><h2>'+S.t+'</h2><p>'+S.s+' · Domande '+base+' → '+(base+S.q.length-1)+'</p></div>';
   h+='<div class="cnt">'+done+'/'+S.q.length+'</div>';
   S.q.forEach((item,i)=>{const ok=ST.a[sec+'_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qc'+(ok?' ok':'')+'" data-qkey="'+sec+'_'+i+'">';
     h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
     h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\''+sec+'_'+i+"',"+(v+1)+')">'+opt+'</div>';});
@@ -592,7 +592,7 @@ function rMat(){
       dims.forEach((d,di)=>{
         const ok=ST.a['M_'+si+'_'+di];
         const subNum=getMatSubNum(si,di);
-        h+='<div class="mx-ext'+(ok?' ok':'')+'">';
+        h+='<div class="mx-ext'+(ok?' ok':'')+'" data-qkey="'+(d.code||'')+'">';
         h+='<div class="mx-qn">Domanda '+QNUMS.MATRIX+'.'+subNum+' · '+sn+'</div>';
         h+='<div class="mx-name">'+d.name+'</div>';
         if(d.intro)h+='<div class="mx-intro">'+d.intro+'</div>';
@@ -631,14 +631,14 @@ function rICC(){
   let h='<div class="sh"><span class="sht" style="background:var(--aml);color:var(--am)">ICC</span><h2>'+A.t+'</h2><p>'+A.s+' · Domande '+baseA+' → '+(baseB+B.q.length-1)+'</p></div>';
   h+='<div class="cnt">'+(dA+dB)+'/8</div>';
   A.q.forEach((item,i)=>{const ok=ST.a['IA_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qc'+(ok?' ok':'')+'" data-qkey="IA_'+i+'">';
     h+='<div class="qn"><span class="qn-num">Domanda '+(baseA+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
     h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IA_'+i+"',"+(v+1)+')">'+opt+'</div>';});
     h+='</div></div>';});
   h+='<div class="divider" style="background:var(--aml);color:var(--am)">'+B.s+'</div>';
   B.q.forEach((item,i)=>{const ok=ST.a['IB_'+i];
-    h+='<div class="qc'+(ok?' ok':'')+'">';
+    h+='<div class="qc'+(ok?' ok':'')+'" data-qkey="IB_'+i+'">';
     h+='<div class="qn"><span class="qn-num">Domanda '+(baseB+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
     h+='<div class="qt">'+item.q+'</div><div class="tri">';
     item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'IB_'+i+"',"+(v+1)+')">'+opt+'</div>';});
@@ -654,13 +654,13 @@ function rRules(){
   h+='<div class="cnt">'+done+'/'+S9Q.length+'</div>';
   S9Q.forEach((item,i)=>{const ok=ST.a['S9_'+i];
     if(item.tp==='emo'){
-      h+='<div class="qc'+(ok?' ok':'')+'">';
+      h+='<div class="qc'+(ok?' ok':'')+'" data-qkey="S9_'+i+'">';
       h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
       h+='<div class="qt">'+item.q+'</div><div class="emo">';
       item.opts.forEach((l,v)=>{h+='<div class="eb'+(ok===(v+1)?' on':'')+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+l+'</div>';});
       h+='</div></div>';
     }else{
-      h+='<div class="qc'+(ok?' ok':'')+'">';
+      h+='<div class="qc'+(ok?' ok':'')+'" data-qkey="S9_'+i+'">';
       h+='<div class="qn"><span class="qn-num">Domanda '+(base+i)+'</span><span class="qn-sub">di '+QNUMS.TOT+'</span></div>';
       h+='<div class="qt">'+item.q+'</div><div class="tri">';
       item.o.forEach((opt,v)=>{h+='<div class="tri-b'+(ok===(v+1)?' on':'')+'" data-v="'+(v+1)+'" onclick="sa(\'S9_'+i+"',"+(v+1)+')">'+opt+'</div>';});
@@ -948,38 +948,44 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['u','s','i',
 let _ac=0,_at=0;document.getElementById('adm-trigger').onclick=()=>{const n=Date.now();if(n-_at>800)_ac=0;_ac++;_at=n;if(_ac>=3){_ac=0;window.open('admin.html','_blank');}};
 
 // ════════════════════════════════════════════════════════
-// MODULO VOCE GUIDA — TTS browser-native (Web Speech API)
+// MODULO VOCE GUIDA — File audio AIFF pre-generati
 // ════════════════════════════════════════════════════════
+// Funzionamento: ogni domanda ha un file audio /audio/qNNN.aiff
+// generato con macOS `say -v Alice`. Il JS carica il file corretto
+// in base al data-qkey della card e lo riproduce.
+// Mappa chiave-domanda → nome file in VOICE_FILE_MAP sotto.
 const VOICE = {
   enabled: false,
-  voice: null,
-  activeCard: null,     // card attualmente in focus
-  pulseTimer: null,     // timer 12s per pulsazione
-  speaking: false,      // flag: voce sta parlando
-  WAIT_MS: 8000,        // ms prima di pulsare (ridotto: la voce legge solo la domanda, 8s bastano per leggere le 3 opzioni)
+  activeCard: null,
+  pulseTimer: null,
+  speaking: false,
+  audio: null,          // elemento Audio corrente
+  WAIT_MS: 8000,        // ms prima di pulsare
   PAUSE_MS: 1200,       // pausa dopo click prima del next
 };
 
+// Mappa: chiave card (es. "S1_0", "ANT", "IA_2") → nome file senza estensione
+const VOICE_FILE_MAP = {
+  "S1_0":"q001","S1_1":"q002","S1_2":"q003","S1_3":"q004","S1_4":"q005",
+  "S2_0":"q006","S2_1":"q007","S2_2":"q008","S2_3":"q009","S2_4":"q010",
+  "S3_0":"q011","S3_1":"q012","S3_2":"q013","S3_3":"q014","S3_4":"q015","S3_5":"q016","S3_6":"q017",
+  "S4_0":"q018","S4_1":"q019","S4_2":"q020","S4_3":"q021","S4_4":"q022","S4_5":"q023",
+  "S4_6":"q024","S4_7":"q025","S4_8":"q026","S4_9":"q027","S4_10":"q028","S4_11":"q029",
+  "S5_0":"q030","S5_1":"q031","S5_2":"q032","S5_3":"q033","S5_4":"q034",
+  "S6_0":"q035","S6_1":"q036","S6_2":"q037","S6_3":"q038","S6_4":"q039",
+  "S6_5":"q040","S6_6":"q041","S6_7":"q042",
+  "S10_0":"q043","S10_1":"q044","S10_2":"q045","S10_3":"q046","S10_4":"q047",
+  "S10_5":"q048","S10_6":"q049","S10_7":"q050","S10_8":"q051",
+  "S9_0":"q052","S9_1":"q053","S9_2":"q054","S9_3":"q055","S9_4":"q056",
+  "S9_5":"q057","S9_6":"q058","S9_7":"q059","S9_8":"q060","S9_9":"q061","S9_10":"q062","S9_11":"q063",
+  "IA_0":"q064","IA_1":"q065","IA_2":"q066","IA_3":"q067",
+  "IB_0":"q068","IB_1":"q069","IB_2":"q070","IB_3":"q071",
+  "ANT":"q072","EPL":"q073","GRA":"q074","SCR":"q075",
+  "ARI":"q076","GEO":"q077","REL":"q078","DAT":"q079",
+  "REG":"q080","LIN":"q081","SAN":"q082","RES":"q083","PAR":"q084","AUT":"q085","FRE":"q086"
+};
+
 function initVoice() {
-  if (!('speechSynthesis' in window)) { console.warn('Web Speech non disponibile'); return; }
-  const pick = () => {
-    const vs = speechSynthesis.getVoices();
-    VOICE.voice =
-      vs.find(v => v.lang === 'it-IT' && /Alice/i.test(v.name)) ||
-      vs.find(v => v.lang === 'it-IT' && /Luca/i.test(v.name)) ||
-      vs.find(v => v.lang === 'it-IT' && /Google/i.test(v.name)) ||
-      vs.find(v => v.lang === 'it-IT') ||
-      vs.find(v => v.lang && v.lang.startsWith('it')) || null;
-  };
-  pick();
-  // onvoiceschanged può scattare più volte — lo eseguo solo se non ho ancora una voce
-  speechSynthesis.onvoiceschanged = () => { if (!VOICE.voice) pick(); };
-  // Ping anti-idle per Chrome: previene il freeze su utterance consecutive
-  // (bug noto di Chrome: senza questo, dopo qualche lettura la voce si blocca)
-  setInterval(() => {
-    if (!VOICE.speaking) return;
-    try { speechSynthesis.pause(); speechSynthesis.resume(); } catch(e){}
-  }, 10000);
   // Preferenza salvata
   try { if (localStorage.getItem('ti_voice') === '1') { VOICE.enabled = true; updateVoiceToggleUI(); } } catch(e){}
 }
@@ -1001,28 +1007,37 @@ function updateVoiceToggleUI() {
 }
 
 function stopSpeak() {
-  try { speechSynthesis.cancel(); } catch(e){}
+  if (VOICE.audio) {
+    try { VOICE.audio.pause(); VOICE.audio.currentTime = 0; } catch(e){}
+    VOICE.audio = null;
+  }
   VOICE.speaking = false;
   if (VOICE.pulseTimer) { clearTimeout(VOICE.pulseTimer); VOICE.pulseTimer = null; }
 }
 
-function speakAndThen(text, onDone) {
-  if (!VOICE.enabled || !('speechSynthesis' in window)) { if(onDone) onDone(); return; }
-  // Cancel + attesa breve prima di speak (fix bug restart su Chrome/Safari)
-  // cancel() è asincrono: se chiamo subito speak() il motore va in stato incoerente e riparte
-  try { speechSynthesis.cancel(); } catch(e){}
-  setTimeout(() => {
-    if (!VOICE.enabled) { if(onDone) onDone(); return; }
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = 'it-IT';
-    utt.rate = 0.95;
-    utt.pitch = 1.0;
-    if (VOICE.voice) utt.voice = VOICE.voice;
-    VOICE.speaking = true;
-    utt.onend = () => { VOICE.speaking = false; if(onDone) onDone(); };
-    utt.onerror = () => { VOICE.speaking = false; if(onDone) onDone(); };
-    speechSynthesis.speak(utt);
-  }, 120); // 120ms di pausa sufficiente per far completare il cancel precedente
+// Riproduce il file audio per una chiave di domanda. onDone chiamato a fine riproduzione.
+function playAudioForKey(qkey, onDone) {
+  if (!VOICE.enabled) { if(onDone) onDone(); return; }
+  const filename = VOICE_FILE_MAP[qkey];
+  if (!filename) { 
+    console.warn('Nessun audio mappato per chiave:', qkey); 
+    if(onDone) onDone(); return; 
+  }
+  stopSpeak();
+  const audio = new Audio('audio/' + filename + '.aiff');
+  VOICE.audio = audio;
+  VOICE.speaking = true;
+  audio.onended = () => { VOICE.speaking = false; if(onDone) onDone(); };
+  audio.onerror = (e) => { 
+    console.warn('Errore caricamento audio:', filename, e); 
+    VOICE.speaking = false; 
+    if(onDone) onDone(); 
+  };
+  audio.play().catch(err => {
+    console.warn('Errore play audio:', err);
+    VOICE.speaking = false;
+    if(onDone) onDone();
+  });
 }
 
 // Ricostruisce il testo leggibile di una card dalla sua struttura HTML
@@ -1094,10 +1109,11 @@ function speakCard(card) {
   if (!VOICE.enabled || !card) return;
   if (VOICE.pulseTimer) { clearTimeout(VOICE.pulseTimer); VOICE.pulseTimer = null; }
   card.classList.remove('audio-pulse');
-  const text = extractCardText(card);
-  speakAndThen(text, () => {
-    // A fine lettura, parte il timer dei 12s
-    if (VOICE.activeCard !== card) return; // cambiato focus nel frattempo
+  const qkey = card.getAttribute('data-qkey');
+  if (!qkey) return;
+  playAudioForKey(qkey, () => {
+    // A fine riproduzione, parte il timer dei 8s prima della pulsazione
+    if (VOICE.activeCard !== card) return;
     VOICE.pulseTimer = setTimeout(() => {
       if (VOICE.activeCard === card) card.classList.add('audio-pulse');
     }, VOICE.WAIT_MS);
