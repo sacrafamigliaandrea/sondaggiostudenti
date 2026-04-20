@@ -978,9 +978,9 @@ function genDossier(){
   const pctCalcTrappole = pct(R,'M_MATE_ARI',1);
   const pctCalcRiesce = pct(R,'M_MATE_ARI',3);
   
-  // — Sezione 4 — Le loro parole (tematizzazione)
-  const materieOpen = getOpenTexts(R, 'OPEN_MAT');
-  const paroleOpen  = getOpenTexts(R, 'OPEN_FREE');
+  // — Sezione 4 — Le loro parole (testi originali, nessuna tematizzazione)
+  const materieOpen = getOpenTexts(R, 'MATERIA_NUOVA');
+  const paroleOpen  = getOpenTexts(R, 'TESTO');
   
   const themesMat = {
     'Futuro concreto (economia, tasse, lavoro)': ['economia','tasse','bollett','mutuo','soldi','lavoro','denaro','pagar'],
