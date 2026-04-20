@@ -1024,7 +1024,7 @@ function playAudioForKey(qkey, onDone) {
     if(onDone) onDone(); return; 
   }
   stopSpeak();
-  const audio = new Audio('audio/' + filename + '.aiff');
+  const audio = new Audio('audio/' + filename + '.m4a');
   VOICE.audio = audio;
   VOICE.speaking = true;
   audio.onended = () => { VOICE.speaking = false; if(onDone) onDone(); };
