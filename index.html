@@ -972,7 +972,14 @@ function initVoice() {
       vs.find(v => v.lang && v.lang.startsWith('it')) || null;
   };
   pick();
-  speechSynthesis.onvoiceschanged = pick;
+  // onvoiceschanged può scattare più volte — lo eseguo solo se non ho ancora una voce
+  speechSynthesis.onvoiceschanged = () => { if (!VOICE.voice) pick(); };
+  // Ping anti-idle per Chrome: previene il freeze su utterance consecutive
+  // (bug noto di Chrome: senza questo, dopo qualche lettura la voce si blocca)
+  setInterval(() => {
+    if (!VOICE.speaking) return;
+    try { speechSynthesis.pause(); speechSynthesis.resume(); } catch(e){}
+  }, 10000);
   // Preferenza salvata
   try { if (localStorage.getItem('ti_voice') === '1') { VOICE.enabled = true; updateVoiceToggleUI(); } } catch(e){}
 }
@@ -1001,16 +1008,21 @@ function stopSpeak() {
 
 function speakAndThen(text, onDone) {
   if (!VOICE.enabled || !('speechSynthesis' in window)) { if(onDone) onDone(); return; }
-  stopSpeak();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'it-IT';
-  utt.rate = 0.95;
-  utt.pitch = 1.0;
-  if (VOICE.voice) utt.voice = VOICE.voice;
-  VOICE.speaking = true;
-  utt.onend = () => { VOICE.speaking = false; if(onDone) onDone(); };
-  utt.onerror = () => { VOICE.speaking = false; if(onDone) onDone(); };
-  speechSynthesis.speak(utt);
+  // Cancel + attesa breve prima di speak (fix bug restart su Chrome/Safari)
+  // cancel() è asincrono: se chiamo subito speak() il motore va in stato incoerente e riparte
+  try { speechSynthesis.cancel(); } catch(e){}
+  setTimeout(() => {
+    if (!VOICE.enabled) { if(onDone) onDone(); return; }
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'it-IT';
+    utt.rate = 0.95;
+    utt.pitch = 1.0;
+    if (VOICE.voice) utt.voice = VOICE.voice;
+    VOICE.speaking = true;
+    utt.onend = () => { VOICE.speaking = false; if(onDone) onDone(); };
+    utt.onerror = () => { VOICE.speaking = false; if(onDone) onDone(); };
+    speechSynthesis.speak(utt);
+  }, 120); // 120ms di pausa sufficiente per far completare il cancel precedente
 }
 
 // Ricostruisce il testo leggibile di una card dalla sua struttura HTML
