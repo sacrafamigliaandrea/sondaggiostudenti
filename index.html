@@ -1145,15 +1145,24 @@ function voiceAfterAnswer(key) {
 }
 
 // ── Hook nelle funzioni esistenti ──
+// Flag per sapere se go() è stato chiamato da sa() (risposta) o da un vero cambio step
+let _voiceSkipNextRender = false;
+
 // go() viene chiamato a ogni cambio step: triggera voiceAfterRender dopo il render
 const _orig_go = go;
 go = function() {
   _orig_go.apply(this, arguments);
+  if (_voiceSkipNextRender) {
+    // go() chiamato internamente da sa() dopo una risposta — voiceAfterAnswer gestisce già il focus
+    _voiceSkipNextRender = false;
+    return;
+  }
   voiceAfterRender();
 };
-// sa() viene chiamato a ogni click risposta: attiva voiceAfterAnswer
+// sa() viene chiamato a ogni click risposta: salta il voiceAfterRender che go() farebbe partire
 const _orig_sa = sa;
 sa = function(k, v) {
+  _voiceSkipNextRender = true;  // dice a go() di non fare voiceAfterRender questa volta
   _orig_sa.apply(this, arguments);
   voiceAfterAnswer(k);
 };
