@@ -41,13 +41,15 @@ canvas{max-height:300px!important}
 .hm-legend-qual{font-size:9px;font-weight:500;opacity:.85;text-transform:uppercase;letter-spacing:.3px}
 
 /* DIVERGENT BARS */
-.div-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:10px}
-.div-label{width:100px;text-align:right;flex-shrink:0;font-weight:500}
-.div-bar{flex:1;height:22px;background:var(--bd);border-radius:4px;position:relative;overflow:hidden}
-.div-left{position:absolute;right:50%;height:100%;border-radius:4px 0 0 4px}
-.div-right{position:absolute;left:50%;height:100%;border-radius:0 4px 4px 0}
-.div-center{position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--mu);opacity:.3}
-.div-val{width:28px;font-size:9px;font-weight:600;text-align:center}
+.div-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:10px}
+.div-label{width:100px;text-align:right;flex-shrink:0;font-weight:600;font-size:11px}
+.div-bar{flex:1;height:26px;background:var(--bd);border-radius:4px;position:relative;overflow:hidden;display:flex}
+.div-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-width:0;transition:filter .15s;overflow:hidden;white-space:nowrap}
+.div-seg:hover{filter:brightness(1.12)}
+.div-seg-pass{background:var(--co)}
+.div-seg-mid{background:#B9BEC8;color:#3C3C36}
+.div-seg-act{background:var(--g)}
+.div-val{width:36px;font-size:10px;font-weight:700;text-align:center;cursor:help}
 
 /* GAUGES */
 .gauges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
@@ -454,7 +456,24 @@ function loadData(){
 
 function D(){const f=document.getElementById('filtro').value;if(f==='all')return ALL;if(f==='y1')return ALL.filter(r=>r.classe&&r.classe.startsWith('1'));if(f==='y2')return ALL.filter(r=>r.classe&&r.classe.startsWith('2'));if(f==='y3')return ALL.filter(r=>r.classe&&r.classe.startsWith('3'));return ALL.filter(r=>r.classe===f);}
 function avg(R,k){let s=0,c=0;R.forEach(r=>{const v=+r[k];if(v){s+=v;c++;}});return c?s/c:0;}
-function dist(R,k){let d=[0,0,0];R.forEach(r=>{const v=+r[k];if(v>=1&&v<=3)d[v-1]++;});const t=d[0]+d[1]+d[2];return t?d.map(x=>Math.round(x/t*100)):[0,0,0];}
+function dist(R,k){
+  let d=[0,0,0];
+  R.forEach(r=>{const v=+r[k];if(v>=1&&v<=3)d[v-1]++;});
+  const t=d[0]+d[1]+d[2];
+  if(!t) return [0,0,0];
+  // Largest Remainder Method: garantisce che i tre arrotondati sommino a 100.
+  // Senza questa correzione, arrotondamenti indipendenti possono dare 99 o 101.
+  const raw = d.map(x => x/t*100);
+  const floored = raw.map(v => Math.floor(v));
+  let used = floored[0]+floored[1]+floored[2];
+  let deficit = 100 - used;
+  // Distribuisco il deficit alle celle con resto frazionario più grande
+  const remainders = raw.map((v,i) => ({i, rem: v - Math.floor(v)}));
+  remainders.sort((a,b) => b.rem - a.rem);
+  const out = floored.slice();
+  for (let j=0; j<deficit; j++) out[remainders[j % 3].i]++;
+  return out;
+}
 function pct(R,k,v){let c=0,t=0;R.forEach(r=>{const x=+r[k];if(x){t++;if(x===v)c++;}});return t?Math.round(c/t*100):0;}
 // === SISTEMA CONFRONTO M/F ===
 // CMP_STATE memorizza per-sezione se il toggle è attivo.
@@ -760,9 +779,8 @@ function render(){
     h+='<div class="hm-row"><div class="hm-label">'+sn+'</div>';
     MDIM.forEach((dn,di)=>{
       const k='M_'+SUB_C[si]+'_'+['ARG','SPG','ATV'][di];
-      const p1 = pct(R,k,1);  // % estremo negativo
-      const p2 = pct(R,k,2);  // % centrale
-      const p3 = pct(R,k,3);  // % estremo positivo
+      const d = dist(R,k);  // usa Largest Remainder: i tre sommano a 100
+      const p1 = d[0], p2 = d[1], p3 = d[2];
       const c = hmColPct(p3);
       const textCol = p3 >= 40 ? '#fff' : '#333';
       const tip = dn+' in '+sn+'\n'+p1+'% negativo · '+p2+'% intermedio · '+p3+'% positivo';
@@ -789,15 +807,21 @@ function render(){
   h+=renderSpecialSubj(R,'COMP','Comportamento — le 7 componenti','Autovalutazione sugli atteggiamenti. Scala 1 (negativo) → 3 (positivo).','comp');
 
   // === 3. DIVERGENT: ATTIVI vs PASSIVI per materia (solo generiche: ITAL/MATE/COMP non hanno ATV) ===
-  h+='<div class="card"><h2>Attivi vs Passivi per materia</h2><div class="sub">Rosso = passivi (opz. 1) | Verde = attivi (opz. 3). Solo per le 12 materie generiche.</div>';
+  h+='<div class="card"><h2>Attivi vs Passivi per materia</h2><div class="sub">Percentuali su tutti e tre i livelli: passivi (rosso, opz. 1), Dipende (grigio, opz. 2), attivi (verde, opz. 3). La barra somma sempre 100%. Solo per le 12 materie generiche.</div>';
   SUBS.forEach((sn,si)=>{
     if(isSpecial(si))return;
-    const k='M_'+SUB_C[si]+'_ATV';const p1=pct(R,k,1),p3=pct(R,k,3);
-    h+='<div class="div-row"><div class="div-label">'+sn+'</div><div class="div-bar">';
-    h+='<div class="div-left" style="width:'+p1/2+'%;right:50%;background:var(--co)"></div>';
-    h+='<div class="div-right" style="width:'+p3/2+'%;background:var(--g)"></div>';
-    h+='<div class="div-center"></div></div>';
-    h+='<div class="div-val" style="color:var(--co)">'+p1+'</div><div class="div-val" style="color:var(--g)">'+p3+'</div></div>';
+    const k='M_'+SUB_C[si]+'_ATV';
+    const d = dist(R,k);   // [passivi%, dipende%, attivi%] — somma sempre 100
+    const p1 = d[0], p2 = d[1], p3 = d[2];
+    const tip = 'Passivi '+p1+'% · Dipende '+p2+'% · Attivi '+p3+'%';
+    h+='<div class="div-row"><div class="div-label">'+sn+'</div><div class="div-bar" title="'+tip+'">';
+    if(p1>0) h+='<div class="div-seg div-seg-pass" style="width:'+p1+'%">'+(p1>=8?p1+'%':'')+'</div>';
+    if(p2>0) h+='<div class="div-seg div-seg-mid" style="width:'+p2+'%">'+(p2>=8?p2+'%':'')+'</div>';
+    if(p3>0) h+='<div class="div-seg div-seg-act" style="width:'+p3+'%">'+(p3>=8?p3+'%':'')+'</div>';
+    h+='</div>';
+    h+='<div class="div-val" style="color:var(--co)" title="'+tip+'">'+p1+'%</div>';
+    h+='<div class="div-val" style="color:var(--g)" title="'+tip+'">'+p3+'%</div>';
+    h+='</div>';
   });
   let worstPassive=SUB_C.map((sc,i)=>({n:SUBS[i],p:pct(R,'M_'+sc+'_ATV',1),idx:i})).filter(x=>!isSpecial(x.idx)).sort((a,b)=>b.p-a.p)[0];
   if(worstPassive.p>30)h+='<div class="ev ev-alert"><strong>Evidenza:</strong> in '+worstPassive.n+' il '+worstPassive.p+'% degli studenti si sente passivo. Non \u00e8 il contenuto: \u00e8 il metodo.</div>';
