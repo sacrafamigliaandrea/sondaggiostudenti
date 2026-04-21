@@ -29,10 +29,16 @@
 canvas{max-height:300px!important}
 
 /* HEATMAP */
-.hm{display:grid;gap:2px;margin-top:8px}.hm-row{display:flex;gap:2px;align-items:center}
-.hm-label{width:80px;font-size:9px;font-weight:500;text-align:right;padding-right:6px;flex-shrink:0}
-.hm-cell{flex:1;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;min-width:0}
-.hm-header{display:flex;gap:2px;padding-left:82px;margin-bottom:2px}.hm-htxt{flex:1;font-size:8px;color:var(--mu);text-align:center}
+.hm{display:grid;gap:2px;margin-top:8px}.hm-row{display:flex;gap:3px;align-items:center;margin-bottom:3px}
+.hm-label{width:110px;font-size:12px;font-weight:600;text-align:right;padding-right:10px;flex-shrink:0;color:var(--tx)}
+.hm-cell{flex:1;height:42px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;min-width:0;cursor:help;transition:transform .1s}
+.hm-cell:hover{transform:scale(1.04)}
+.hm-header{display:flex;gap:3px;padding-left:115px;margin-bottom:4px}.hm-htxt{flex:1;font-size:11px;font-weight:600;color:var(--mu);text-align:center;letter-spacing:.3px;text-transform:uppercase}
+.hm-legend{margin-top:14px;padding-top:12px;border-top:1px dashed var(--bd)}
+.hm-legend-title{font-size:10px;color:var(--mu);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.hm-legend-row{display:flex;gap:3px;flex-wrap:wrap}
+.hm-legend-swatch{flex:1;min-width:90px;padding:6px 8px;border-radius:4px;font-size:11px;font-weight:700;text-align:center;display:flex;flex-direction:column;gap:2px}
+.hm-legend-qual{font-size:9px;font-weight:500;opacity:.85;text-transform:uppercase;letter-spacing:.3px}
 
 /* DIVERGENT BARS */
 .div-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;font-size:10px}
@@ -350,7 +356,14 @@ const QUESTION_DIRECTION = {
   'SAN': 'DEC',
   'SCR': 'INC',
 };
-function directionOf(key){ return QUESTION_DIRECTION[key] || "DEC"; }
+function directionOf(key){
+  if (QUESTION_DIRECTION[key]) return QUESTION_DIRECTION[key];
+  // Le componenti speciali sono chiamate con prefisso M_ITAL_/M_MATE_/M_COMP_
+  // La mia mappa usa solo il codice finale (ANT, EPL, ARI, ecc.)
+  const m = key.match(/^M_(?:ITAL|MATE|COMP)_(.+)$/);
+  if (m && QUESTION_DIRECTION[m[1]]) return QUESTION_DIRECTION[m[1]];
+  return 'DEC';
+}
 
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
@@ -738,20 +751,36 @@ function render(){
   h+='<div class="card"><h2>Profilo medio dello studente'+cmpTgl('radar')+'</h2><div class="sub">Le 6 macrodimensioni — media su scala 1-3. Zone colorate: <span style="color:#B8432E">rosa</span> = critica, <span style="color:#1B6D3F">verde</span> = consolidata.</div><div style="display:grid;grid-template-columns:minmax(380px,1fr) minmax(280px,400px);gap:20px;align-items:start;margin-top:10px"><div style="position:relative;min-height:420px;width:100%;max-width:520px;justify-self:center"><canvas id="chRadar" style="max-height:440px"></canvas></div><div id="radarEvidence" style="padding-top:8px"></div></div></div>';
 
   // === 2. HEATMAP: MATERIE × DIMENSIONI ===
-  const HM_WORDS=[['No','Un po\'','Molto'],['No','A volte','S\u00ec'],['Passivo','Dipende','Attivo']];
-  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Colore e parola: le 12 materie generiche su 3 dimensioni chiave (Interesse, Chiarezza, Attivazione). Italiano, Matematica e Comportamento in sezioni dedicate sotto.</div>';
+  // Mostra la % di studenti sull'opzione positiva (il 3) per ogni cella.
+  // Scala di colore basata sulla % stessa, numero dentro la cella.
+  h+='<div class="card"><h2>Mappa termica: materie × dimensioni</h2><div class="sub">Per ogni cella, la percentuale di studenti che ha scelto l\'opzione pienamente positiva. Verde scuro = risposta forte, rosso = segnale di allarme. Passa sulla cella per vedere la distribuzione completa.</div>';
   h+='<div class="hm-header">';MDIM.forEach(d=>{h+='<div class="hm-htxt">'+d+'</div>';});h+='</div>';
   SUBS.forEach((sn,si)=>{
-    if(isSpecial(si))return; // Salto ITAL/MATE/COMP
+    if(isSpecial(si))return; // Salto ITAL/MATE/COMP (hanno sezioni dedicate)
     h+='<div class="hm-row"><div class="hm-label">'+sn+'</div>';
     MDIM.forEach((dn,di)=>{
       const k='M_'+SUB_C[si]+'_'+['ARG','SPG','ATV'][di];
-      const a=avg(R,k);const c=hmCol(a);
-      const wi=a<1.5?0:a<2.5?1:2;const word=HM_WORDS[di][wi];
-      h+='<div class="hm-cell" style="background:'+c+'">'+word+'</div>';
+      const p1 = pct(R,k,1);  // % estremo negativo
+      const p2 = pct(R,k,2);  // % centrale
+      const p3 = pct(R,k,3);  // % estremo positivo
+      const c = hmColPct(p3);
+      const textCol = p3 >= 40 ? '#fff' : '#333';
+      const tip = dn+' in '+sn+'\n'+p1+'% negativo · '+p2+'% intermedio · '+p3+'% positivo';
+      h+='<div class="hm-cell" style="background:'+c+';color:'+textCol+'" title="'+tip+'">'+p3+'%</div>';
     });
     h+='</div>';
   });
+  // Legenda scala
+  h+='<div class="hm-legend">';
+  h+='<div class="hm-legend-title">Quanti scelgono l\'opzione positiva</div>';
+  h+='<div class="hm-legend-row">';
+  [[0,20,'<20%','allarme'],[20,35,'20-35%','debole'],[35,50,'35-50%','medio'],[50,65,'50-65%','buono'],[65,80,'65-80%','forte'],[80,101,'≥80%','ottimo']].forEach(([lo,hi,label,qual])=>{
+    const mid = (lo+hi-1)/2;
+    const col = hmColPct(mid);
+    const tx = mid >= 40 ? '#fff' : '#333';
+    h+='<div class="hm-legend-swatch" style="background:'+col+';color:'+tx+'">'+label+'<span class="hm-legend-qual">'+qual+'</span></div>';
+  });
+  h+='</div></div>';
   h+='</div>';
   
   // === 2bis. SEZIONI DEDICATE per le materie speciali (ITAL, MATE, COMP) ===
@@ -1165,6 +1194,15 @@ function render(){
 
 function hmCol(v){
   if(v>=2.5)return '#1B6D3F';if(v>=2)return '#5C9E4A';if(v>=1.5)return '#C28B0A';return '#B8432E';
+}
+// Scala di colore basata su % diretta (0-100): rosso → corallo → ambra → verde chiaro → verde scuro
+function hmColPct(p){
+  if (p >= 80) return '#0F5530';   // verde scuro intenso
+  if (p >= 65) return '#1B6D3F';   // verde scuro (Wimbledon)
+  if (p >= 50) return '#5C9E4A';   // verde medio
+  if (p >= 35) return '#C28B0A';   // ambra
+  if (p >= 20) return '#D9654A';   // corallo
+  return '#B8432E';                 // rosso allarme
 }
 function hmColRev(v){// For difficulty: high=hard=red
   if(v>=2.5)return '#B8432E';if(v>=2)return '#C28B0A';if(v>=1.5)return '#5C9E4A';return '#1B6D3F';
