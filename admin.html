@@ -819,8 +819,6 @@ function render(){
     if(p2>0) h+='<div class="div-seg div-seg-mid" style="width:'+p2+'%">'+(p2>=8?p2+'%':'')+'</div>';
     if(p3>0) h+='<div class="div-seg div-seg-act" style="width:'+p3+'%">'+(p3>=8?p3+'%':'')+'</div>';
     h+='</div>';
-    h+='<div class="div-val" style="color:var(--co)" title="'+tip+'">'+p1+'%</div>';
-    h+='<div class="div-val" style="color:var(--g)" title="'+tip+'">'+p3+'%</div>';
     h+='</div>';
   });
   let worstPassive=SUB_C.map((sc,i)=>({n:SUBS[i],p:pct(R,'M_'+sc+'_ATV',1),idx:i})).filter(x=>!isSpecial(x.idx)).sort((a,b)=>b.p-a.p)[0];
