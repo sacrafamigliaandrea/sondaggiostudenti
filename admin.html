@@ -65,6 +65,14 @@ canvas{max-height:300px!important}
 .qfam{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;vertical-align:middle;margin-left:4px;text-transform:uppercase}
 .qfam-a{background:var(--gl);color:var(--gd);border:1px solid var(--g50)}
 .qfam-b{background:#F0F1F4;color:#5E6573;border:1px solid #C9CDD4}
+.ld-donut{padding:10px 0}
+.donut-row{display:flex;gap:18px;align-items:center;margin-top:6px}
+.donut-svg{flex:0 0 140px;width:140px;height:140px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px;font-family:var(--fb)}
+.donut-legend-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.donut-dot{flex:0 0 12px;width:12px;height:12px;border-radius:50%}
+.donut-lbl{flex:1;color:var(--tx);line-height:1.35}
+.donut-pct{font-weight:700;color:#5E6573;min-width:40px;text-align:right}
 .ld-row{display:grid;grid-template-columns:220px 1fr 54px;align-items:center;gap:12px;margin-bottom:7px}
 .ld-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative}
 .ld-fill{height:100%;border-radius:6px;transition:width .4s ease-out;min-width:2px}
@@ -245,11 +253,104 @@ const FAMILY_B_KEYS = new Set([
 ]);
 const FAMILY_B_COLORS = ['#5E6573','#8E94A0','#B9BEC8']; // grigi graduati (scuro→medio→chiaro)
 function isFamilyB(key){ return FAMILY_B_KEYS.has(key); }
-function colorsFor(key){ return isFamilyB(key) ? FAMILY_B_COLORS : ['var(--g)','var(--am)','var(--co)']; }
+function colorsFor(key){
+  if (isFamilyB(key)) return FAMILY_B_COLORS;
+  const dir = directionOf(key);
+  if (dir === 'INC') return ['var(--co)','var(--am)','var(--g)'];  // invertito: 3 è virtù
+  return ['var(--g)','var(--am)','var(--co)'];  // default DEC: 1 è virtù
+}
 function familyBadge(key){
   if (isFamilyB(key)) return '<span class="qfam qfam-b">STRATEGIE</span>';
   return '<span class="qfam qfam-a">SCALA</span>';
 }
+
+// Classificazione direzione di ogni domanda a 3 opzioni:
+// DEC (default): 1=virtuoso, 3=problema → verde/ambra/corallo
+// INC (invertita): 3=virtuoso, 1=problema → corallo/ambra/verde
+// NONE: famiglia B, nessuna direzione (ciambella grigia)
+const QUESTION_DIRECTION = {
+  'ANT': 'INC',
+  'ARI': 'INC',
+  'AUT': 'INC',
+  'DAT': 'INC',
+  'EPL': 'INC',
+  'FRE': 'DEC',
+  'GEO': 'INC',
+  'GRA': 'INC',
+  'IA_0': 'DEC',
+  'IA_1': 'DEC',
+  'IA_2': 'DEC',
+  'IA_3': 'DEC',
+  'IB_0': 'DEC',
+  'IB_1': 'DEC',
+  'IB_2': 'DEC',
+  'IB_3': 'DEC',
+  'LIN': 'INC',
+  'PRT': 'INC',
+  'REG': 'INC',
+  'REL': 'INC',
+  'RES': 'INC',
+  'S10_0': 'INC',
+  'S10_1': 'INC',
+  'S10_2': 'INC',
+  'S10_3': 'INC',
+  'S10_4': 'INC',
+  'S10_5': 'INC',
+  'S10_6': 'INC',
+  'S10_7': 'INC',
+  'S10_8': 'INC',
+  'S1_0': 'DEC',
+  'S1_1': 'DEC',
+  'S1_2': 'DEC',
+  'S1_3': 'DEC',
+  'S1_4': 'DEC',
+  'S2_0': 'DEC',
+  'S2_1': 'DEC',
+  'S2_2': 'DEC',
+  'S2_3': 'DEC',
+  'S2_4': 'NONE',
+  'S3_0': 'DEC',
+  'S3_1': 'DEC',
+  'S3_2': 'DEC',
+  'S3_3': 'DEC',
+  'S3_4': 'DEC',
+  'S3_5': 'DEC',
+  'S3_6': 'DEC',
+  'S4_0': 'NONE',
+  'S4_1': 'NONE',
+  'S4_11': 'DEC',
+  'S4_2': 'DEC',
+  'S4_3': 'NONE',
+  'S4_4': 'DEC',
+  'S4_5': 'DEC',
+  'S4_7': 'DEC',
+  'S4_8': 'DEC',
+  'S4_9': 'DEC',
+  'S5_0': 'NONE',
+  'S5_1': 'INC',
+  'S5_2': 'DEC',
+  'S5_3': 'DEC',
+  'S5_4': 'INC',
+  'S6_0': 'DEC',
+  'S6_1': 'DEC',
+  'S6_3': 'DEC',
+  'S6_4': 'INC',
+  'S6_5': 'DEC',
+  'S6_6': 'INC',
+  'S9_0': 'INC',
+  'S9_1': 'INC',
+  'S9_2': 'INC',
+  'S9_3': 'INC',
+  'S9_4': 'INC',
+  'S9_5': 'INC',
+  'S9_6': 'INC',
+  'S9_7': 'INC',
+  'S9_8': 'INC',
+  'S9_9': 'DEC',
+  'SAN': 'DEC',
+  'SCR': 'INC',
+};
+function directionOf(key){ return QUESTION_DIRECTION[key] || "DEC"; }
 
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
@@ -402,6 +503,10 @@ function ldistCompare(R,key,question,opts,colors,badge){
 }
 
 function ldist(R,key,question,opts,colors){
+  // Per Famiglia B (strategie neutre) uso ciambella invece di barre
+  if (isFamilyB(key) && !(CURRENT_CMP && CMP_STATE[CURRENT_CMP])) {
+    return ldistDonut(R, key, question, opts);
+  }
   // Se non passano colori espliciti, scelgo in base alla famiglia della key
   colors = colors || colorsFor(key);
   const badge = familyBadge(key);
@@ -419,6 +524,51 @@ function ldist(R,key,question,opts,colors){
       +'</div>';
   });
   h+='</div>';return h;
+}
+
+// Ciambella per domande di Famiglia B: tre spicchi grigi graduati, nessuna
+// suggestione di ordine valoriale. Legenda a lato.
+function ldistDonut(R, key, question, opts){
+  const d = dist(R, key);
+  const badge = familyBadge(key);
+  const colors = FAMILY_B_COLORS;
+  // SVG donut chart
+  const cx = 70, cy = 70, r = 55, ir = 34;
+  const total = d[0] + d[1] + d[2];
+  let startAngle = -Math.PI / 2;  // parte da ore 12
+  let arcs = '';
+  if (total > 0) {
+    for (let i = 0; i < 3; i++) {
+      const frac = d[i] / total;
+      if (frac <= 0) continue;
+      const endAngle = startAngle + frac * Math.PI * 2;
+      const x1 = cx + r * Math.cos(startAngle);
+      const y1 = cy + r * Math.sin(startAngle);
+      const x2 = cx + r * Math.cos(endAngle);
+      const y2 = cy + r * Math.sin(endAngle);
+      const x3 = cx + ir * Math.cos(endAngle);
+      const y3 = cy + ir * Math.sin(endAngle);
+      const x4 = cx + ir * Math.cos(startAngle);
+      const y4 = cy + ir * Math.sin(startAngle);
+      const large = frac > 0.5 ? 1 : 0;
+      const path = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${ir} ${ir} 0 ${large} 0 ${x4} ${y4} Z`;
+      arcs += `<path d="${path}" fill="${colors[i]}"><title>${opts[i]}: ${d[i]}%</title></path>`;
+      startAngle = endAngle;
+    }
+  }
+  let h = '<div class="ld ld-donut"><div class="ld-q">' + question + ' ' + badge + '</div>';
+  h += '<div class="donut-row">';
+  h += '<svg class="donut-svg" viewBox="0 0 140 140" aria-hidden="true">' + arcs + '</svg>';
+  h += '<div class="donut-legend">';
+  opts.forEach((o, i) => {
+    h += '<div class="donut-legend-row">';
+    h += '<span class="donut-dot" style="background:' + colors[i] + '"></span>';
+    h += '<span class="donut-lbl">' + o + '</span>';
+    h += '<span class="donut-pct">' + d[i] + '%</span>';
+    h += '</div>';
+  });
+  h += '</div></div></div>';
+  return h;
 }
 
 
