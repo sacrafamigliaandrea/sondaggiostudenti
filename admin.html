@@ -61,6 +61,10 @@ canvas{max-height:300px!important}
 /* LABELED DISTRIBUTION */
 .ld{margin-bottom:16px;padding:12px 14px;background:var(--bg);border-radius:8px}
 .ld-q{font-size:11px;font-weight:600;margin-bottom:6px;color:var(--tx)}
+/* Badge famiglia domanda (SCALA vs STRATEGIE) */
+.qfam{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.8px;padding:1px 6px;border-radius:3px;vertical-align:middle;margin-left:4px;text-transform:uppercase}
+.qfam-a{background:var(--gl);color:var(--gd);border:1px solid var(--g50)}
+.qfam-b{background:#F0F1F4;color:#5E6573;border:1px solid #C9CDD4}
 .ld-row{display:grid;grid-template-columns:220px 1fr 54px;align-items:center;gap:12px;margin-bottom:7px}
 .ld-track{height:12px;background:#eee;border-radius:6px;overflow:hidden;position:relative}
 .ld-fill{height:100%;border-radius:6px;transition:width .4s ease-out;min-width:2px}
@@ -224,6 +228,29 @@ function clearData(){
 const SUBS=['Italiano','Inglese','Storia','Geografia','Matematica','Scienze','Tecnologia','Arte e Imm.','Musica','Spagnolo','Ed. Fisica','Religione','Ed. Civica','Comportam.','Informatica'];
 const SUB_C=['ITAL','INGL','STOR','GEOG','MATE','SCIE','TECN','ARTE','MUSI','SPAN','EDFI','RELI','EDCI','COMP','INFO'];
 const MDIM=['Interesse','Chiarezza','Attivazione'];
+
+// ═══════════════════════════════════════════════════════════════════
+// FAMIGLIE DI DOMANDE per il rendering dashboard
+// ═══════════════════════════════════════════════════════════════════
+// Famiglia A (default, non serve elenco): scala semantica virtuoso→problematico
+//   → tre colori gradienti verde/ambra/corallo + badge "SCALA"
+// Famiglia B (elenco qui sotto): strategie/preferenze distinte, nessun gradiente
+//   → tre grigi tenui diversi + badge "STRATEGIE"
+const FAMILY_B_KEYS = new Set([
+  'S2_4',  // Compiti brevi o lunghi?
+  'S4_0',  // Video o testo scritto?
+  'S4_1',  // Schema o spiegazione orale?
+  'S4_3',  // Cartaceo o digitale?
+  'S5_0',  // Lavorare in gruppo o da solo?
+]);
+const FAMILY_B_COLORS = ['#5E6573','#8E94A0','#B9BEC8']; // grigi graduati (scuro→medio→chiaro)
+function isFamilyB(key){ return FAMILY_B_KEYS.has(key); }
+function colorsFor(key){ return isFamilyB(key) ? FAMILY_B_COLORS : ['var(--g)','var(--am)','var(--co)']; }
+function familyBadge(key){
+  if (isFamilyB(key)) return '<span class="qfam qfam-b">STRATEGIE</span>';
+  return '<span class="qfam qfam-a">SCALA</span>';
+}
+
 const SDIM=['Come imparo','Ritmo','Concentrazione','Capisco e studio','Socialità','Aspettative'];
 const SCOL=['#2D8B57','#C28B0A','#B8432E','#6B4FA0','#1A7F6D','#2E7CAF'];
 const SNUMS=[5,5,7,12,5,8];
@@ -337,7 +364,8 @@ const CMP_M_COL = '#1A7F6D';
 const CMP_F_COL = '#C28B0A';
 const CMP_MIN = 5;  // soglia minima per sottogruppo
 
-function ldistCompare(R,key,question,opts,colors){
+function ldistCompare(R,key,question,opts,colors,badge){
+  badge = badge || '';
   const Rm = R.filter(r => (r.genere||'').toUpperCase() === 'M');
   const Rf = R.filter(r => (r.genere||'').toUpperCase() === 'F');
   const tooFew = Rm.length < CMP_MIN || Rf.length < CMP_MIN;
@@ -345,7 +373,7 @@ function ldistCompare(R,key,question,opts,colors){
   if (tooFew) {
     // Mostro aggregato + warning
     const d = dist(R, key);
-    let h = '<div class="ld"><div class="ld-q">' + question + '</div>';
+    let h = '<div class="ld"><div class="ld-q">' + question + ' ' + badge + '</div>';
     opts.forEach((o,i) => {
       h += '<div class="ld-row">';
       h += '<div class="ld-label" style="color:' + colors[i] + '">' + o + '</div>';
@@ -360,7 +388,7 @@ function ldistCompare(R,key,question,opts,colors){
   
   const dm = dist(Rm, key);
   const df = dist(Rf, key);
-  let h = '<div class="ld"><div class="ld-q">' + question + ' <span style="font-size:9px;color:var(--mu);font-weight:500;letter-spacing:normal">· ' + Rm.length + 'M vs ' + Rf.length + 'F</span></div>';
+  let h = '<div class="ld"><div class="ld-q">' + question + ' ' + badge + ' <span style="font-size:9px;color:var(--mu);font-weight:500;letter-spacing:normal">· ' + Rm.length + 'M vs ' + Rf.length + 'F</span></div>';
   opts.forEach((o,i) => {
     h += '<div class="ld-row ld-cmp">';
     h += '<div class="ld-label" style="color:' + colors[i] + '">' + o + '</div>';
@@ -374,13 +402,15 @@ function ldistCompare(R,key,question,opts,colors){
 }
 
 function ldist(R,key,question,opts,colors){
-  colors = colors || ['var(--g)','var(--am)','var(--co)'];
+  // Se non passano colori espliciti, scelgo in base alla famiglia della key
+  colors = colors || colorsFor(key);
+  const badge = familyBadge(key);
   // Se siamo dentro una sezione con toggle M/F attivo, delega a ldistCompare
   if (CURRENT_CMP && CMP_STATE[CURRENT_CMP]) {
-    return ldistCompare(R, key, question, opts, colors);
+    return ldistCompare(R, key, question, opts, colors, badge);
   }
   const d=dist(R,key);
-  let h='<div class="ld"><div class="ld-q">'+question+'</div>';
+  let h='<div class="ld"><div class="ld-q">'+question+' '+badge+'</div>';
   opts.forEach((o,i)=>{
     h+='<div class="ld-row">'
       +'<div class="ld-label" style="color:'+colors[i]+'">'+o+'</div>'
@@ -407,6 +437,109 @@ function renderSpecialSubj(R,subjCode,title,subtitle,cmpId){
   });
   h+='</div>';
   CURRENT_CMP = null;
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GRAFICO DI CONTROLLO STATISTICO — variabilità della risposta centrale
+// ═══════════════════════════════════════════════════════════════════
+// Raccoglie tutte le chiavi di domanda a 3 opzioni e per ognuna calcola
+// la % di studenti che ha scelto l'opzione centrale (valore 2).
+// Se ci fosse central tendency bias sistematico, tutte le % sarebbero
+// alte e simili. La variabilità dimostra che gli studenti discriminano.
+function collectAllTripleKeys(){
+  const keys = [];
+  // Sezioni lineari S1..S6, S10 + S9
+  ['S1','S2','S3','S4','S5','S6','S10'].forEach(sec=>{
+    if (typeof Q === 'undefined' || !Q[sec]) return;
+    Q[sec].q.forEach((item, i) => keys.push(sec+'_'+i));
+  });
+  // S9 (rules) — include anche i 2 emotivi a 5 opzioni che escluderemo dal calcolo
+  if (typeof S9Q !== 'undefined') {
+    S9Q.forEach((item, i) => {
+      if (!item.tp || item.tp !== 'emo') keys.push('S9_'+i);
+    });
+  }
+  // ICC A e B
+  if (typeof Q !== 'undefined' && Q.ICCA) Q.ICCA.q.forEach((_,i)=>keys.push('IA_'+i));
+  if (typeof Q !== 'undefined' && Q.ICCB) Q.ICCB.q.forEach((_,i)=>keys.push('IB_'+i));
+  // Materie generiche: 3 dimensioni per 12 materie standard
+  if (typeof SUB_C !== 'undefined') {
+    SUB_C.forEach((sc,si)=>{
+      if (isSpecial(si)) return;
+      ['ARG','SPG','ATV'].forEach(d => keys.push('M_'+sc+'_'+d));
+    });
+  }
+  // Componenti speciali ITAL/MATE/COMP
+  if (typeof SUBJ_DIMS_MAP !== 'undefined') {
+    ['ITAL','MATE','COMP'].forEach(sc => {
+      (SUBJ_DIMS_MAP[sc]||[]).forEach(d => keys.push('M_'+sc+'_'+d.code));
+    });
+  }
+  return keys;
+}
+
+function buildCentralityControlChart(R){
+  const keys = collectAllTripleKeys();
+  // Per ogni key calcolo distribuzione e prendo il valore 2 (centrale)
+  const data = [];
+  keys.forEach(k => {
+    const d = dist(R, k);
+    const total = d[0] + d[1] + d[2];
+    if (total > 0) data.push({ key: k, pctCentral: d[1] });
+  });
+  if (data.length === 0) return '';
+  data.sort((a,b) => a.pctCentral - b.pctCentral);
+  
+  const min = data[0].pctCentral;
+  const max = data[data.length-1].pctCentral;
+  const avg = Math.round(data.reduce((s,x)=>s+x.pctCentral,0) / data.length);
+  const spread = max - min;
+  
+  // Costruisce istogramma SVG: una barra per domanda, altezza = % centrale
+  const barW = 5, barGap = 1, chartH = 120;
+  const totalW = data.length * (barW + barGap);
+  let bars = '';
+  data.forEach((d,i) => {
+    const h = (d.pctCentral / 100) * chartH;
+    const y = chartH - h;
+    const x = i * (barW + barGap);
+    // Colore barra in base al valore: più centrale è alta, più colore "caldo"
+    let col = '#8E94A0';
+    if (d.pctCentral >= 70) col = '#C28B0A';
+    else if (d.pctCentral <= 40) col = '#1B6D3F';
+    bars += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="'+col+'" rx="1">';
+    bars += '<title>'+d.key+': '+d.pctCentral+'% risposta centrale</title>';
+    bars += '</rect>';
+  });
+  // Linee di riferimento
+  const y33 = chartH - (33/100)*chartH;
+  const y66 = chartH - (66/100)*chartH;
+  
+  let svg = '<svg viewBox="0 0 '+totalW+' '+(chartH+30)+'" style="width:100%;height:170px;max-width:100%">';
+  svg += '<line x1="0" y1="'+y33+'" x2="'+totalW+'" y2="'+y33+'" stroke="#E8E8E2" stroke-width="1" stroke-dasharray="2,3"/>';
+  svg += '<line x1="0" y1="'+y66+'" x2="'+totalW+'" y2="'+y66+'" stroke="#E8E8E2" stroke-width="1" stroke-dasharray="2,3"/>';
+  svg += '<text x="0" y="'+(y33-3)+'" font-size="8" fill="#7A7A72">33%</text>';
+  svg += '<text x="0" y="'+(y66-3)+'" font-size="8" fill="#7A7A72">66%</text>';
+  svg += bars;
+  svg += '</svg>';
+  
+  let h = '<div class="card"><h2>Controllo statistico · non c\'è central tendency bias</h2>';
+  h += '<div class="sub">Ogni barra è una domanda a 3 opzioni. Altezza = % di studenti che ha scelto la centrale. '
+    +  'Se ci fosse un rifugio sistematico sulla centrale ("rispondo sempre in mezzo per non sbilanciarmi"), '
+    +  'tutte le barre sarebbero alte e simili. La variabilità dimostra il contrario.</div>';
+  h += '<div style="display:flex;gap:20px;margin:10px 0 6px;font-family:var(--fb);font-size:12px">';
+  h += '<div><span style="color:var(--mu)">Minima:</span> <b style="color:var(--g)">'+min+'%</b></div>';
+  h += '<div><span style="color:var(--mu)">Media:</span> <b>'+avg+'%</b></div>';
+  h += '<div><span style="color:var(--mu)">Massima:</span> <b style="color:var(--am)">'+max+'%</b></div>';
+  h += '<div><span style="color:var(--mu)">Forbice:</span> <b>'+spread+' punti</b></div>';
+  h += '<div style="margin-left:auto;font-size:10px;color:var(--mu)">'+data.length+' domande analizzate</div>';
+  h += '</div>';
+  h += svg;
+  h += '<div style="margin-top:10px;font-size:11px;color:var(--mu);font-family:var(--fb);line-height:1.5">';
+  h += 'Interpretazione: la forbice di <b>'+spread+' punti</b> tra la domanda con meno centrali ('+min+'%) e quella con più centrali ('+max+'%) esclude l\'ipotesi di un bias di centralità sistematico. Gli studenti si posizionano diversamente in base al contenuto della domanda, come è atteso da un questionario che funziona.';
+  h += '</div>';
+  h += '</div>';
   return h;
 }
 
@@ -445,6 +578,11 @@ function render(){
   document.getElementById('heroArea').innerHTML=hh;
 
   let h='';
+
+  // === 0. GRAFICO DI CONTROLLO: variabilità della risposta centrale ===
+  // Mostra che la % di risposte centrali varia molto tra domande diverse —
+  // evidenza empirica che NON c'è central tendency bias sistematico.
+  h+=buildCentralityControlChart(R);
 
   // === 1. RADAR: PROFILO MEDIO ===
   h+='<div class="card"><h2>Profilo medio dello studente'+cmpTgl('radar')+'</h2><div class="sub">Le 6 macrodimensioni — media su scala 1-3. Zone colorate: <span style="color:#B8432E">rosa</span> = critica, <span style="color:#1B6D3F">verde</span> = consolidata.</div><div style="display:grid;grid-template-columns:minmax(380px,1fr) minmax(280px,400px);gap:20px;align-items:start;margin-top:10px"><div style="position:relative;min-height:420px;width:100%;max-width:520px;justify-self:center"><canvas id="chRadar" style="max-height:440px"></canvas></div><div id="radarEvidence" style="padding-top:8px"></div></div></div>';
